@@ -19,10 +19,11 @@ VOICE: confident, energetic, a little funny, genuinely useful — like a friend 
 RULES
 - Only recommend stores from the provided list of vetted candidates (by id) — never invent a store name or id.
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
-- Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and a short buying note (how to buy — walk in vs. appointment, what to bring, alteration expectations).
+- Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and buyingNotes.
+- buyingNotes is the whole point of this plan being usable in a store, not just readable on a phone: write it like he could hand his phone to the salesperson and point at it. Always include, in this order: (a) an actual opening line to say when he walks in ("I'm looking for a navy tropical-wool suit, slim through the body, budget around $X" — not "ask about suits"), (b) the one or two specs/details that matter most for HIS fit and coloring (reference his fitPreferences, colorPreferences/colorsToAvoid, and — if provided — the photo assessment's fitGuidance, bestColors, and colorsToAvoidFromPhotos by name, not generically), (c) one specific thing to decline or steer away from if the salesperson offers it (a cut, fabric, color, or upsell that works against his stated style or the photo assessment) — this is what actually keeps him from getting sold the wrong thing, and (d) practical logistics (walk-in vs. appointment, what to bring, alteration turnaround).
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
 - Respect his stated budget total and cadence — the sum of essential+recommended items across the plan should be a realistic fit for his budget, not wildly over it. If his budget can't realistically cover everything on his wish list, prioritize essentials and be upfront about what's a stretch goal.
-- If a photo assessment is provided, actively use its fit/color/silhouette guidance to shape specific item choices (fits, colors to seek or avoid).
+- If a photo assessment is provided, actively use its fit/color/silhouette guidance to shape specific item choices (fits, colors to seek or avoid) AND to personalize buyingNotes as described above.
 - Write a short, punchy intro narrative and a short, hyped final pep talk in your voice.
 - Call submit_wardrobe_plan exactly once with the complete plan.`;
 
@@ -36,7 +37,11 @@ const WARDROBE_ITEM_SCHEMA = {
     estimatedBudgetHighUsd: { type: "number" },
     priority: { type: "string", enum: ["essential", "recommended", "nice-to-have"] },
     recommendedStoreIds: { type: "array", items: { type: "string" } },
-    buyingNotes: { type: "string" },
+    buyingNotes: {
+      type: "string",
+      description:
+        "The in-store script for this item: an opening line to say, the fit/color specs that matter most for this specific man, one thing to decline if offered, and practical buying logistics.",
+    },
   },
   required: [
     "category",
@@ -131,7 +136,11 @@ Build the complete wardrobe plan now.`;
 
   const params: Anthropic.MessageCreateParamsNonStreaming = {
     model: AGENT_MODEL,
-    max_tokens: 8192,
+    // Bumped from 8192 after enriching buyingNotes (opening line + specs +
+    // decline + logistics) pushed a live plan to stop_reason "max_tokens"
+    // mid-JSON, truncating the tool call before phases/budgetSummary/tips
+    // were ever written. Kept high with the enriched field in place.
+    max_tokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userMessage }],
     tools: [SUBMIT_PLAN_TOOL],
@@ -144,6 +153,16 @@ Build the complete wardrobe plan now.`;
     // agent doesn't need to also be fast.
   };
   const response = await anthropic.messages.create(params);
+
+  // A "max_tokens" stop reason means the tool call's JSON was cut off
+  // mid-generation — the API still hands back a best-effort parse of
+  // whatever was written so far, so toolUse can exist here with phases,
+  // budgetSummary, etc. silently missing. Fail loudly instead of serving a
+  // plan with an empty budget and no phases (this is exactly how a real
+  // truncation bug looked live before max_tokens was raised).
+  if (response.stop_reason === "max_tokens") {
+    throw new Error("Wardrobe planner response was cut off before completing the plan (hit max_tokens)");
+  }
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_wardrobe_plan",

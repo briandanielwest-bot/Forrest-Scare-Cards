@@ -122,7 +122,12 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
       {(item.recommendedStoreIds ?? []).length > 0 && (
         <Text style={styles.itemStores}>Where: {(item.recommendedStoreIds ?? []).map(storeName).join(", ")}</Text>
       )}
-      <Text style={styles.itemNotes}>{cleanText(item.buyingNotes)}</Text>
+      {item.buyingNotes ? (
+        <View style={styles.scriptBox}>
+          <Text style={styles.scriptLabel}>WHAT TO SAY IN-STORE</Text>
+          <Text style={styles.scriptText}>{cleanText(item.buyingNotes)}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -152,7 +157,17 @@ const styles = StyleSheet.create({
   itemDescription: { ...typography.body },
   itemBudget: { ...typography.small, color: colors.bayou, fontWeight: "700" },
   itemStores: { ...typography.small },
-  itemNotes: { ...typography.small, fontStyle: "italic" },
+  scriptBox: {
+    backgroundColor: colors.cream,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    padding: spacing.sm,
+    marginTop: 4,
+    gap: 2,
+  },
+  scriptLabel: { ...typography.small, color: colors.bayou, fontWeight: "800", letterSpacing: 0.5 },
+  scriptText: { ...typography.small },
   tipsCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border, gap: spacing.xs },
   tipText: { ...typography.body },
   pepCard: { backgroundColor: colors.gold, borderRadius: radii.md, padding: spacing.md },

@@ -66,7 +66,9 @@ export type StoreCategory =
   | "western-boots-leather"
   | "contemporary-boutique"
   | "footwear"
-  | "lifestyle-accessories";
+  | "lifestyle-accessories"
+  | "formal-wear"
+  | "big-tall";
 
 export interface HoustonStore {
   id: string;

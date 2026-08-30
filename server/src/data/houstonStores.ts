@@ -21,7 +21,9 @@ export type StoreCategory =
   | "western-boots-leather"
   | "contemporary-boutique"
   | "footwear"
-  | "lifestyle-accessories";
+  | "lifestyle-accessories"
+  | "formal-wear"
+  | "big-tall";
 
 export type PriceTier = "$$" | "$$$" | "$$$$";
 
@@ -139,6 +141,34 @@ export const HOUSTON_STORES: HoustonStore[] = [
     verified: false,
   },
   {
+    id: "blu-fine-menswear",
+    name: "BLU Fine Menswear",
+    category: "bespoke-tailoring",
+    neighborhood: "Houston (by appointment)",
+    priceTier: "$$$",
+    styleTags: ["custom", "made-to-measure", "business", "black-tie", "wedding"],
+    bestFor: "Custom suits and wedding-party tuxedos from a family shop three generations deep in tailoring, with a huge fabric library to pick from.",
+    howToBuy: "Book a fitting; ask about wedding-party group programs if you're outfitting a whole party at once.",
+    description:
+      "Family-owned Houston custom clothier — three generations of tailoring experience — building custom suits, tuxedos, and wedding suits from a library of 4,000+ fabrics.",
+    website: "https://www.houstonsuitguy.com/",
+    verified: false,
+  },
+  {
+    id: "bzach-clothier",
+    name: "Bzach Clothier",
+    category: "bespoke-tailoring",
+    neighborhood: "Houston (by appointment)",
+    priceTier: "$$$",
+    styleTags: ["custom", "bespoke", "business", "black-tie"],
+    bestFor: "Old-school bespoke construction for a guy who wants the full hand-tailored process, not just made-to-measure.",
+    howToBuy: "Book a consultation; expect multiple fittings as a true bespoke garment is built by hand.",
+    description:
+      "Houston bespoke tailoring house blending old-school hand craftsmanship with modern precision for custom suits, tuxedos, and shirts.",
+    website: "https://bzachclothier.com/",
+    verified: false,
+  },
+  {
     id: "festari-for-men",
     name: "Festari For Men",
     category: "bespoke-tailoring",
@@ -239,6 +269,81 @@ export const HOUSTON_STORES: HoustonStore[] = [
     verified: false,
   },
 
+  {
+    id: "brunello-cucinelli-river-oaks",
+    name: "Brunello Cucinelli",
+    category: "luxury-department",
+    neighborhood: "River Oaks District",
+    priceTier: "$$$$",
+    styleTags: ["designer", "italian-tailoring", "classic", "luxury-casual"],
+    bestFor: "The top of Italian quiet-luxury casualwear and tailoring — cashmere, suede, and knitwear built to be worn, not just looked at.",
+    howToBuy: "Walk in to the River Oaks District boutique; staff will build a full head-to-toe look around a piece you're drawn to.",
+    description:
+      "Italian luxury house boutique in the River Oaks District specializing in refined, understated tailoring and cashmere for the modern gentleman.",
+    website: "https://www.riveroaksdistrict.com/brunello-cucinelli",
+    verified: false,
+  },
+  {
+    id: "louis-vuitton-mens-galleria",
+    name: "Louis Vuitton Men's",
+    category: "luxury-department",
+    neighborhood: "The Galleria",
+    priceTier: "$$$$",
+    styleTags: ["designer", "leather-goods", "luxury-casual", "accessories"],
+    bestFor: "Top-shelf leather goods, shoes, and ready-to-wear from one of fashion's biggest houses, including on-site personalization.",
+    howToBuy: "Walk in to the dedicated men's store (separate from the main Galleria LV store); ask about the on-site hot-stamping personalization on leather goods.",
+    description:
+      "Dedicated Louis Vuitton men's boutique inside the Galleria carrying ready-to-wear, leather goods, shoes, watches, and accessories, with in-store personalization.",
+    website: "https://us.louisvuitton.com/eng-us/point-of-sale/usa/louis-vuitton-houston-mens",
+    verified: false,
+  },
+
+  // ---- Formal wear (tuxedo rental & purchase) ----
+  {
+    id: "the-black-tux-galleria",
+    name: "The Black Tux",
+    category: "formal-wear",
+    neighborhood: "The Galleria",
+    priceTier: "$$$",
+    styleTags: ["formal", "black-tie", "modern", "rent-or-buy", "wedding"],
+    bestFor: "A modern, well-fitted tuxedo or suit for a wedding or gala — rent or buy, with an actual showroom to try it on first.",
+    howToBuy: "Book a free showroom appointment online first, try on your exact size in person, then order online for the event.",
+    description:
+      "Modern formalwear company with a Galleria-area showroom — rent or buy tuxedos and suits online after trying on your exact size in person.",
+    website: "https://theblacktux.com/pages/showroom/houston-galleria",
+    verified: false,
+  },
+  {
+    id: "als-formal-wear",
+    name: "Al's Formal Wear",
+    category: "formal-wear",
+    neighborhood: "Multiple Houston-area locations",
+    priceTier: "$$",
+    styleTags: ["formal", "black-tie", "rent-or-buy", "wedding"],
+    bestFor: "The budget-friendly, walk-in option for a tux rental — especially useful for outfitting an entire wedding party fast.",
+    howToBuy: "Walk in for measurements well ahead of the event date; reported service quality varies by location, so confirm your order details in writing.",
+    description:
+      "Houston-headquartered formalwear chain renting and selling tuxedos across multiple Texas locations — a long-running local name for prom, wedding, and black-tie rentals.",
+    website: "https://www.alsformalwears.com/",
+    verified: false,
+  },
+
+  // ---- Big & tall ----
+  {
+    id: "dxl-big-tall",
+    name: "DXL Big + Tall",
+    category: "big-tall",
+    neighborhood: "Uptown / Westheimer Rd",
+    priceTier: "$$",
+    styleTags: ["big-and-tall", "business", "business-casual", "casual"],
+    bestFor: "A guy who needs real big & tall sizing — up to 8X and a 72-inch waist — without settling for whatever fits off a standard rack.",
+    howToBuy: "Walk in; larger fitting rooms and staff who specialize in big & tall fit make this an easier in-person fitting than a standard department store.",
+    description:
+      "Dedicated big & tall menswear retailer with a Houston storefront carrying sizes up to 8X and waist 72, spanning everyday, business, and dress categories.",
+    website: "https://stores.dxl.com/us/tx/houston/5393-westheimer-road",
+    verified: false,
+  },
+
   // ---- Contemporary & smart-casual boutiques ----
   {
     id: "suitsupply-river-oaks-district",
@@ -266,6 +371,20 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Contemporary menswear boutique carrying designer casualwear and denim (brands like Diesel and John Varvatos), sister shop to Q Clothier.",
     website: "https://rye51.com/pages/houston",
+    verified: false,
+  },
+  {
+    id: "premium-goods",
+    name: "Premium Goods",
+    category: "contemporary-boutique",
+    neighborhood: "Montrose area",
+    priceTier: "$$$",
+    styleTags: ["streetwear", "sneakers", "contemporary", "smart-casual"],
+    bestFor: "The guy whose smart-casual and weekend rotation runs through sneakers — a real sneaker and streetwear boutique, not a mall chain.",
+    howToBuy: "Walk in for in-stock pairs; limited/hyped releases may require following their release calendar or app instead of assuming walk-in stock.",
+    description:
+      "Houston sneaker and streetwear boutique running since 2004, carrying everything from classic silhouettes to limited-edition releases alongside curated streetwear.",
+    website: "https://premiumgoods.com/",
     verified: false,
   },
   {
@@ -389,4 +508,6 @@ export const STORE_CATEGORY_LABELS: Record<StoreCategory, string> = {
   "contemporary-boutique": "Contemporary & Smart-Casual Boutiques",
   footwear: "Footwear",
   "lifestyle-accessories": "Lifestyle & Accessories",
+  "formal-wear": "Tuxedos & Formal Wear",
+  "big-tall": "Big & Tall",
 };
