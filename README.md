@@ -66,6 +66,30 @@ This app was built with Expo, so the path to a real App Store submission is [EAS
 
 Because the app calls your own backend, **the backend needs to be deployed somewhere reachable from the internet** (Render, Fly.io, Railway, a small VPS, etc.) before a build you hand to someone else — or submit to the App Store — will work; `localhost`/your LAN IP only works for local dev. Point `EXPO_PUBLIC_API_BASE_URL` at that deployed URL before building.
 
+## 4. Sharing a web version instead (fastest, free, works on any phone)
+
+You don't need the App Store, Expo Go, or to buy a domain to let a few friends try this — Expo can export this same app as a static website, since this codebase (React Native + Expo) runs on the web too via `react-native-web`. Verified working: `npx expo export --platform web` from `app/` builds a static site into `app/dist/` (already confirmed rendering correctly, including live agent replies, in a real browser at a phone-sized viewport).
+
+Both pieces below have free tiers, so this costs nothing beyond your Claude API usage — no website purchase required. A custom domain (~$10-15/year from any registrar, pointed at your host) is a nice-to-have you can add later, not a requirement.
+
+1. **Deploy the backend first** (see below) — Render's free tier works fine for sharing with a few friends. Note the URL it gives you (e.g. `https://bayou-blazer-server.onrender.com`).
+2. **Deploy the web app** — `app/vercel.json` is a ready-made [Vercel](https://vercel.com) config. Push this repo to GitHub, go to vercel.com → **Add New** → **Project**, import the repo, and set the **Root Directory** to `app`. Vercel reads `vercel.json` and handles the build automatically.
+3. Before deploying, set an environment variable in Vercel's project settings: `EXPO_PUBLIC_API_BASE_URL` = the backend URL from step 1. (This gets baked into the build, so set it *before* the first deploy, or trigger a redeploy after adding it.)
+4. Vercel gives you a free URL like `https://bayou-blazer.vercel.app` — text that to your friends. It opens in any phone's browser, looks and works like the app (same screens, same agents), and needs nothing installed.
+5. Once you know the real Vercel URL, tighten `CORS_ORIGIN` on the backend (in Render's dashboard, or `server/.env` if self-hosting) from `*` to that exact URL, so only your site can call your backend.
+
+Netlify or Cloudflare Pages work the same way if you'd rather use those (same build command `npx expo export --platform web`, output directory `dist`) — Vercel's just the path with a config file already in the repo.
+
+## Deploying the backend
+
+Two ready-made paths, both verified against this repo's actual `npm run build` / `npm start`:
+
+**Render (no Docker needed)** — `render.yaml` at the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec). On [render.com](https://render.com), pick **New +** → **Blueprint**, point it at this repo, and Render reads that file: it builds and starts `server/` for you and prompts for `ANTHROPIC_API_KEY` in its dashboard (kept out of the repo since it's a secret). Free tier works for trying this out.
+
+**Anywhere else that runs a container** (Fly.io, Railway, Google Cloud Run, a VPS) — `server/Dockerfile` is a standard multi-stage Node build. e.g. for Fly.io: `fly launch` from inside `server/` (it'll detect the Dockerfile), then `fly secrets set ANTHROPIC_API_KEY=sk-ant-...`. For a plain VPS: `docker build -t bayou-blazer-server . && docker run -p 4000:4000 -e ANTHROPIC_API_KEY=sk-ant-... bayou-blazer-server`.
+
+Either way, once it's live, set `CORS_ORIGIN` to your actual app's origin instead of the `*` default if you want to lock that down, and point `EXPO_PUBLIC_API_BASE_URL` in `app/.env` at the deployed URL before building the app.
+
 ## About the store data
 
 `server/src/data/houstonStores.ts` is a **curated seed list built from general knowledge**, not a live, verified business directory. Every entry is flagged `verified: false` on purpose. Addresses are given at neighborhood/shopping-center granularity rather than exact street addresses, and hours, current operating status, and inventory should be confirmed independently before anyone relies on this to plan a visit — the app's UI includes that disclaimer too.

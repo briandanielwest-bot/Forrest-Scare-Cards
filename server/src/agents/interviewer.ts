@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { anthropic } from "../anthropicClient";
+import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 import type { SessionState, StyleProfile } from "../types";
 
@@ -92,14 +92,18 @@ export interface InterviewTurnResult {
 }
 
 async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
-  const response = await anthropic.messages.create({
+  const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: AGENT_MODEL,
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: session.interviewHistory,
     tools: [SUBMIT_PROFILE_TOOL],
     tool_choice: { type: "auto" },
-  });
+    // This is a live chat turn — a man is waiting on the other end for
+    // Tex's reply, so it needs to come back quickly, not exhaustively.
+    output_config: { effort: "medium" },
+  };
+  const response = await anthropic.messages.create(params);
 
   session.interviewHistory.push({ role: "assistant", content: response.content });
 

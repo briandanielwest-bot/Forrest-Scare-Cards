@@ -20,10 +20,15 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export function RootNavigator() {
+export function RootNavigator({
+  initialRouteName = "Welcome",
+}: {
+  initialRouteName?: keyof RootStackParamList;
+}) {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        initialRouteName={initialRouteName}
         screenOptions={{
           headerStyle: { backgroundColor: colors.bayou },
           headerTintColor: colors.cream,

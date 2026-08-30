@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { anthropic } from "../anthropicClient";
+import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 import type { PhotoAssessment, StyleProfile, UploadedImage } from "../types";
 
@@ -82,14 +82,16 @@ export async function analyzePhotos(
     },
   ];
 
-  const response = await anthropic.messages.create({
+  const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: AGENT_MODEL,
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content }],
     tools: [SUBMIT_ASSESSMENT_TOOL],
     tool_choice: { type: "tool", name: "submit_assessment" },
-  });
+    output_config: { effort: "medium" },
+  };
+  const response = await anthropic.messages.create(params);
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_assessment",

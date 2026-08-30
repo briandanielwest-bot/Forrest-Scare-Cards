@@ -1,4 +1,5 @@
-import { anthropic } from "../anthropicClient";
+import type Anthropic from "@anthropic-ai/sdk";
+import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 
 /**
@@ -40,12 +41,14 @@ const ALMANAC_SYSTEM_PROMPT = `You are "The Almanac," the Houston climate and me
 ${getHoustonClimateStyleBrief()}`;
 
 export async function askAlmanac(question: string): Promise<string> {
-  const response = await anthropic.messages.create({
+  const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: AGENT_MODEL,
     max_tokens: 1024,
     system: ALMANAC_SYSTEM_PROMPT,
     messages: [{ role: "user", content: question }],
-  });
+    output_config: { effort: "low" },
+  };
+  const response = await anthropic.messages.create(params);
 
   return response.content
     .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
