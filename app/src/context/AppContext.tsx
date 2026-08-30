@@ -17,6 +17,7 @@ interface AppContextValue {
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   interviewDone: boolean;
   setInterviewDone: (done: boolean) => void;
+  resetSession: () => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -29,6 +30,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [categoryLabels, setCategoryLabels] = useState<Record<StoreCategory, string> | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [interviewDone, setInterviewDone] = useState(false);
+
+  function resetSession() {
+    // Deliberately keeps `stores`/`categoryLabels` cached — the Houston
+    // directory doesn't change between one man's session and the next.
+    setSessionId(null);
+    setStyleProfile(null);
+    setWardrobePlan(null);
+    setChatMessages([]);
+    setInterviewDone(false);
+  }
 
   const value = useMemo<AppContextValue>(
     () => ({
@@ -47,6 +58,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setChatMessages,
       interviewDone,
       setInterviewDone,
+      resetSession,
     }),
     [sessionId, styleProfile, wardrobePlan, stores, categoryLabels, chatMessages, interviewDone],
   );

@@ -10,11 +10,12 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
 export function WelcomeScreen({ navigation }: Props) {
-  const { setSessionId, setStores, setCategoryLabels, setChatMessages } = useAppContext();
+  const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (stores.length > 0) return;
     fetchStores()
       .then(({ stores, categoryLabels }) => {
         setStores(stores);
@@ -23,7 +24,7 @@ export function WelcomeScreen({ navigation }: Props) {
       .catch(() => {
         // Store directory can load later from its own screen; don't block welcome.
       });
-  }, []);
+  }, [stores.length]);
 
   async function handleStart() {
     setError(null);

@@ -20,7 +20,12 @@ function money(n: number) {
 }
 
 export function PlanScreen({ navigation }: Props) {
-  const { wardrobePlan, storeById } = useAppContext();
+  const { wardrobePlan, storeById, resetSession } = useAppContext();
+
+  function handleStartOver() {
+    resetSession();
+    navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
+  }
 
   if (!wardrobePlan) {
     return (
@@ -80,6 +85,10 @@ export function PlanScreen({ navigation }: Props) {
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
           <Text style={styles.directoryButtonText}>Browse the full Houston store directory</Text>
+        </Pressable>
+
+        <Pressable style={styles.startOverButton} onPress={handleStartOver}>
+          <Text style={styles.startOverText}>Start a new plan</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -142,4 +151,6 @@ const styles = StyleSheet.create({
   pepText: { ...typography.body, color: colors.bayouDark, fontWeight: "600" },
   directoryButton: { alignItems: "center", paddingVertical: spacing.md },
   directoryButtonText: { color: colors.bayou, fontWeight: "700", textDecorationLine: "underline" },
+  startOverButton: { alignItems: "center", paddingVertical: spacing.sm, marginBottom: spacing.lg },
+  startOverText: { color: colors.muted, textDecorationLine: "underline" },
 });
