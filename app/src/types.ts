@@ -78,6 +78,7 @@ export interface HoustonStore {
   bestFor: string;
   howToBuy: string;
   description: string;
+  website: string;
 }
 
 export interface ChatMessage {

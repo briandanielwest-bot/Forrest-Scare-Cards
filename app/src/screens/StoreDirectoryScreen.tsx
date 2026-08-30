@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, SectionList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, SectionList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppContext } from "../context/AppContext";
 import { fetchStores } from "../api/client";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, StoreCategory } from "../types";
+
+function formatWebsite(url: string): string {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
 
 export function StoreDirectoryScreen() {
   const { stores, setStores, categoryLabels, setCategoryLabels } = useAppContext();
@@ -68,12 +72,17 @@ export function StoreDirectoryScreen() {
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
             <Text style={styles.howToBuy}>How to buy: {item.howToBuy}</Text>
+            {item.website ? (
+              <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8}>
+                <Text style={styles.website}>{formatWebsite(item.website)} →</Text>
+              </Pressable>
+            ) : null}
           </View>
         )}
         ListFooterComponent={
           <Text style={styles.disclaimer}>
-            Seed directory built from general knowledge — always confirm current hours, address, and inventory before
-            visiting.
+            Seed directory researched via live web search, not a real-time feed — always confirm current hours,
+            address, and inventory on the store's own site before visiting.
           </Text>
         }
       />
@@ -109,5 +118,6 @@ const styles = StyleSheet.create({
   description: { ...typography.body },
   bestFor: { ...typography.small, fontWeight: "700" },
   howToBuy: { ...typography.small },
+  website: { ...typography.small, color: colors.bayou, fontWeight: "700", marginTop: 2 },
   disclaimer: { ...typography.small, textAlign: "center", marginTop: spacing.lg, marginBottom: spacing.xl },
 });
