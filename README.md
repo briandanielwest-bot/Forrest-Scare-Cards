@@ -8,11 +8,13 @@ A React Native (Expo) app in `app/`, talking to a small Node/Express backend in 
 
 | Agent | Persona | Job |
 |---|---|---|
-| Interviewer | **Tex** | Fun, hip, funny conversation that gets a real style + budget profile — not a form. |
-| Photo Analyst | **The Eye** | Reviews as many photos as you upload; calls your current style, fit, coloring, and gaps. |
-| Store Scouts | **The Cutter** / **The Floor** / **The Ranch Hand** / **The Finisher** | Four specialist agents, each reviewing one slice of Houston's custom/high-end menswear scene (bespoke tailoring; luxury department & contemporary; Western wear & footwear; lifestyle & accessories) and ranking the best fits for your profile. |
-| Style & Weather | **The Almanac** | Houston's climate calendar and dress culture — feeds every other agent so recommendations actually make sense for this city. |
-| Wardrobe Planner | **The Closet Architect** | Synthesizes everything into one phased, budgeted, store-by-store wardrobe plan. |
+| Interviewer | **Kyla** | Confident, sharp professional stylist who runs a real, in-depth conversation to get a genuine style + budget profile — not a form. |
+| Photo Analyst | **Fondren** | Reviews as many photos as you upload; calls your current style, fit, coloring, and gaps. |
+| Store Scouts | **Cullen** / **Jones** / **Hobby** / **Wortham** | Four specialist agents, each reviewing one slice of Houston's custom/high-end menswear scene (bespoke tailoring; luxury department & contemporary; footwear & western wear; lifestyle & accessories) and ranking the best fits for your profile. |
+| Style & Weather | **Allen** | Houston's climate calendar and dress culture — feeds every other agent so recommendations actually make sense for this city. |
+| Wardrobe Planner | **Brown** | Synthesizes everything into one phased, budgeted, store-by-store wardrobe plan. |
+
+Agent names other than Kyla are drawn from Houston's historical civic namesakes (Rice University, Hobby Airport, Fondren Library, the Allen brothers who founded the city, Cullen and Wortham's civic philanthropy, Brown & Root) as an homage — not AI personas claiming to be those real people.
 
 See `server/src/agents/` for each one's system prompt and logic, and `server/src/data/houstonStores.ts` for the curated store dataset (see **About the store data** below).
 

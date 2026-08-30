@@ -51,12 +51,21 @@ export async function analyzePhotos(sessionId: string, photos: PickedPhoto[]) {
   });
 }
 
-export function generatePlan(sessionId: string) {
-  return request<{ plan: WardrobePlan }>("/api/plan/generate", {
+export type PlanStatus = "idle" | "generating" | "done" | "error";
+
+// Plan generation runs five real Claude API calls end to end and can take
+// over a minute — kicking it off returns immediately (202) so the request
+// never has to stay open that long; poll getPlanStatus for the result.
+export function startPlanGeneration(sessionId: string) {
+  return request<{ status: PlanStatus }>("/api/plan/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sessionId }),
   });
+}
+
+export function getPlanStatus(sessionId: string) {
+  return request<{ status: PlanStatus; plan?: WardrobePlan; error?: string }>(`/api/plan/${sessionId}`);
 }
 
 export function fetchStores() {

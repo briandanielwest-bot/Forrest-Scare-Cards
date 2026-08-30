@@ -14,6 +14,7 @@ export function createSession(): SessionState {
     createdAt: Date.now(),
     interviewHistory: [],
     interviewComplete: false,
+    planStatus: "idle",
   };
   sessions.set(session.id, session);
   return session;

@@ -3,14 +3,16 @@ import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 
 /**
- * "The Almanac" — Houston Style & Weather Agent.
+ * "Allen" — Houston Style & Weather Agent, named for the city's founders.
  *
  * Houston's climate and dress culture are specific enough that generic
  * wardrobe advice fails here: nine-plus-degree AC/outdoor swings, a
- * subtropical summer that runs half the calendar, and a business culture
- * where Western wear is formalwear a few weeks a year. This module is the
- * shared knowledge base every other agent (mainly the Wardrobe Planner)
- * builds on, plus a small conversational surface for one-off questions.
+ * subtropical summer that runs half the calendar, and a genuinely
+ * cosmopolitan, international business culture (energy, the Texas Medical
+ * Center, NASA/aerospace) where western wear is one legitimate optional
+ * category, not the app's default aesthetic. This module is the shared
+ * knowledge base every other agent (mainly the Wardrobe Planner) builds
+ * on, plus a small conversational surface for one-off questions.
  */
 
 export function getHoustonClimateStyleBrief(): string {
@@ -23,20 +25,20 @@ CLIMATE
 - Rain is frequent and sometimes sudden/heavy. A packable rain layer and water-resistant footwear are more useful here than in most climates.
 - Bottom line for fabric weight across a Houston wardrobe: mostly lightweight-to-midweight, breathable, with a small "AC and winter" capsule layered on top.
 
-STYLE CULTURE
-- Business casual is the dominant office dress code across Houston's energy, medical (Texas Medical Center), legal, and corporate corridors — full formal suits are common for client-facing and leadership roles, less so for everyday desk work.
-- Western wear is not costume here — boots, and for the right occasion a good Stetson, read as legitimate formalwear, especially February-March during the Houston Livestock Show & Rodeo, at ranch/vineyard events, and at plenty of black-tie-adjacent galas with a Texas twist.
+STYLE CULTURE — Houston is a huge, cosmopolitan, international city; western wear is one legitimate category here, not the whole identity
+- Houston is the energy capital of the US, home to the Texas Medical Center (the largest medical complex in the world), the NASA/Johnson Space Center aerospace corridor, one of the busiest ports in the country, and one of the most ethnically and internationally diverse populations of any US city — that mix shows up in the food, the art, and the professional dress culture far more than any single regional trope does.
+- Business casual is the dominant office dress code across Houston's energy, medical, legal, and corporate corridors — full formal suits are common for client-facing and leadership roles, less so for everyday desk work. This is the baseline most Houston men are actually dressing for, day to day.
+- Fall/winter carries most of Houston's black-tie gala and formalwear season (charity galas, holiday parties, symphony/ballet/museum events) — a serious, cosmopolitan formal scene, not a Western one. A proper dark wool suit or tux earns its keep here.
 - Guayaberas and short-sleeve linen shirts are acceptable smart-casual summer wear at a level many other US cities wouldn't recognize as "dressed up" — lean into it rather than fighting the climate with a heavy shirt.
-- Fall/winter carries most of Houston's black-tie gala and formalwear season (charity galas, holiday parties, symphony/ballet events) — this is where a proper dark wool suit or tux gets its use.
-- Denim and boots are everyday-acceptable in most non-corporate settings, including a lot of "smart casual" dinners.
+- Western wear (boots, and for the right occasion a good hat) is a real and legitimate category some Houston men want in their closet — it has genuine formalwear standing at the Houston Livestock Show & Rodeo (February-March) and at ranch-style or Texas-themed galas specifically. Treat it as one optional capsule to offer if a man's answers call for it, not as a default aesthetic to push on everyone.
 
 SEASONAL PLANNING CUES
 - Buy the hot-weather foundation first — it's worn 7+ months a year and does the most day-to-day work.
-- Buy Western/rodeo-season pieces ahead of February if that's a relevant occasion, not during it — good boots and hats can have lead time.
-- Buy the winter/gala capsule in fall, timed before the holiday party and gala season hits.`;
+- Buy the winter/gala capsule in fall, timed before the holiday party and gala season hits.
+- If Western/rodeo-season pieces are actually relevant to this man, buy them ahead of February, not during it — good boots and hats can have lead time.`;
 }
 
-const ALMANAC_SYSTEM_PROMPT = `You are "The Almanac," the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
+const ALMANAC_SYSTEM_PROMPT = `You are Allen, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
 
 ${getHoustonClimateStyleBrief()}`;
 

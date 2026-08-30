@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { generatePlan } from "../api/client";
+import { getPlanStatus, startPlanGeneration } from "../api/client";
 import { colors, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 
 const STATUS_LINES = [
-  "Tex is handing your profile to the store scouts…",
-  "The Ranch Hand is checking boots and Western wear…",
-  "The Floor is scanning the Galleria's designer racks…",
-  "The Cutter is lining up bespoke tailors…",
-  "The Almanac is factoring in Houston's humidity…",
-  "The Closet Architect is building your phased plan…",
+  "Kyla is handing your profile to the store scouts…",
+  "Hobby is checking footwear (and boots, if that's your thing)…",
+  "Jones is scanning the Galleria's designer racks…",
+  "Cullen is lining up bespoke tailors…",
+  "Allen is factoring in Houston's humidity…",
+  "Brown is building your phased plan…",
 ];
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_MS = 4 * 60 * 1000; // give up after 4 minutes
 
 export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();
   const [error, setError] = useState<string | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
+  const startedAtRef = useRef(Date.now());
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,19 +37,44 @@ export function GeneratingPlanScreen({ navigation }: Props) {
   useEffect(() => {
     if (!sessionId) return;
     let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout>;
 
-    generatePlan(sessionId)
-      .then(({ plan }) => {
+    async function poll() {
+      try {
+        const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
-        setWardrobePlan(plan);
-        navigation.replace("Plan");
+
+        if (result.status === "done" && result.plan) {
+          setWardrobePlan(result.plan);
+          navigation.replace("Plan");
+          return;
+        }
+        if (result.status === "error") {
+          setError(result.error ?? "The agents hit a snag building your plan.");
+          return;
+        }
+        if (Date.now() - startedAtRef.current > MAX_POLL_MS) {
+          setError("This is taking much longer than expected — the server may be overloaded. Try again in a bit.");
+          return;
+        }
+        pollTimer = setTimeout(poll, POLL_INTERVAL_MS);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Lost connection while building your plan.");
+      }
+    }
+
+    startedAtRef.current = Date.now();
+    startPlanGeneration(sessionId)
+      .then(() => {
+        if (!cancelled) poll();
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "The agents hit a snag building your plan.");
+        if (!cancelled) setError(e instanceof Error ? e.message : "Couldn't start building your plan.");
       });
 
     return () => {
       cancelled = true;
+      clearTimeout(pollTimer);
     };
   }, [sessionId]);
 
