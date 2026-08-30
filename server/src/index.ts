@@ -19,6 +19,11 @@ if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
 
 const app = express();
 
+// Render (like most PaaS platforms) puts the app behind a reverse proxy,
+// which sets X-Forwarded-For. Without this, express-rate-limit can't
+// safely determine the real client IP and throws on every request.
+app.set("trust proxy", 1);
+
 app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json({ limit: "1mb" }));
