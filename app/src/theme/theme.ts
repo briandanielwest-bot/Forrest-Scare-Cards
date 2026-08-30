@@ -1,13 +1,15 @@
 export const colors = {
-  bayou: "#0F3D3E",
-  bayouDark: "#0A2B2C",
-  blazerNavy: "#1B2A4A",
-  gold: "#C9A24B",
-  cream: "#FAF6EE",
+  // Hunter green + gold — every screen reads these tokens rather than raw
+  // hex, so retuning the palette here is a one-file change.
+  bayou: "#355E3B",
+  bayouDark: "#1F3823",
+  blazerNavy: "#2A4B32",
+  gold: "#C5A028",
+  cream: "#FAF6EC",
   paper: "#FFFFFF",
   ink: "#1A1A1A",
   muted: "#6B7280",
-  border: "#E7E1D3",
+  border: "#E4DCC6",
   danger: "#B3432B",
   success: "#3F7A5C",
 };
