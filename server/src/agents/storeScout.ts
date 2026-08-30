@@ -30,25 +30,28 @@ interface ScoutDefinition {
   focus: string;
 }
 
+// Scout names are a fan homage to Houston sports legends, matched to each
+// role — the craftsman, the smoothest style in the building, the footwork,
+// the closer. Not affiliated with or endorsed by the people they honor.
 const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   {
-    scoutName: "Cullen (Bespoke & Made-to-Measure Scout)",
+    scoutName: "Biggio (Bespoke & Made-to-Measure Scout)",
     categories: ["bespoke-tailoring"],
     focus: "custom and made-to-measure tailoring — suits and shirts built or fitted specifically to this man",
   },
   {
-    scoutName: "Jones (Luxury Department & Contemporary Scout)",
+    scoutName: "Drexler (Luxury Department & Contemporary Scout)",
     categories: ["luxury-department", "contemporary-boutique", "formal-wear", "big-tall"],
     focus:
       "designer ready-to-wear, department-store and big & tall menswear, contemporary boutique pieces, and tuxedo/formal-wear for black-tie events",
   },
   {
-    scoutName: "Hobby (Footwear & Western Scout)",
+    scoutName: "Olajuwon (Footwear & Western Scout)",
     categories: ["western-boots-leather", "footwear"],
     focus: "dress and casual footwear, plus boots and western wear for the man who genuinely wants that category — not a default push toward it",
   },
   {
-    scoutName: "Wortham (Lifestyle & Accessories Scout)",
+    scoutName: "Wagner (Lifestyle & Accessories Scout)",
     categories: ["lifestyle-accessories"],
     focus: "grooming, small leather goods, and finishing accessories",
   },

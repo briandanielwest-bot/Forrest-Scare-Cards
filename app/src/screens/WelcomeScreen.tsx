@@ -9,15 +9,18 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
+// Agent names (other than Kyla) are a fan homage to Houston sports
+// legends, matched to each role — not affiliated with or endorsed by the
+// people they honor. The disclaimer renders under the team grid.
 const TEAM = [
   { name: "Kyla", role: "Interviewer" },
-  { name: "Fondren", role: "Photo Analyst" },
-  { name: "Cullen", role: "Bespoke Scout" },
-  { name: "Jones", role: "Designer Scout" },
-  { name: "Hobby", role: "Footwear Scout" },
-  { name: "Wortham", role: "Accessories Scout" },
-  { name: "Allen", role: "Climate & Culture" },
-  { name: "Brown", role: "Final Plan" },
+  { name: "Watt", role: "Photo Analyst" },
+  { name: "Biggio", role: "Bespoke Scout" },
+  { name: "Drexler", role: "Designer Scout" },
+  { name: "Olajuwon", role: "Footwear Scout" },
+  { name: "Wagner", role: "Accessories Scout" },
+  { name: "Campbell", role: "Climate & Culture" },
+  { name: "Moon", role: "Final Plan" },
 ];
 
 export function WelcomeScreen({ navigation }: Props) {
@@ -87,11 +90,11 @@ export function WelcomeScreen({ navigation }: Props) {
           />
           <Step
             number="2"
-            text="Optional: show Fondren your photos so it can read your fit, coloring, and current look."
+            text="Optional: show Watt your photos — he reads your face shape, body type, fit, and coloring like game film, and it sharpens every recommendation."
           />
           <Step
             number="3"
-            text="Four Houston store scouts and Brown turn all of that into your full, phased rebuild plan."
+            text="Four Houston store scouts and Moon, the quarterback, turn all of that into your full, phased rebuild plan."
           />
         </View>
 
@@ -105,6 +108,10 @@ export function WelcomeScreen({ navigation }: Props) {
               </View>
             ))}
           </View>
+          <Text style={styles.teamDisclaimer}>
+            Agent names are a fan homage to Houston sports legends — this app is not affiliated with or endorsed by
+            the people they honor.
+          </Text>
         </View>
       </ScrollView>
 
@@ -192,6 +199,7 @@ const styles = StyleSheet.create({
   },
   teamPillName: { color: colors.gold, fontWeight: "700", fontSize: 13 },
   teamPillRole: { color: colors.cream, opacity: 0.75, fontSize: 11, marginTop: 2 },
+  teamDisclaimer: { color: colors.cream, opacity: 0.55, fontSize: 10, lineHeight: 14, marginTop: spacing.xs },
   footer: {
     padding: spacing.lg,
     paddingTop: spacing.sm,

@@ -3,7 +3,8 @@ import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 
 /**
- * "Allen" — Houston Style & Weather Agent, named for the city's founders.
+ * "Campbell" — Houston Style & Weather Agent, named in homage to the
+ * running back who powered through everything Houston threw at him.
  *
  * Houston's climate and dress culture are specific enough that generic
  * wardrobe advice fails here: nine-plus-degree AC/outdoor swings, a
@@ -38,7 +39,7 @@ SEASONAL PLANNING CUES
 - If Western/rodeo-season pieces are actually relevant to this man, buy them ahead of February, not during it — good boots and hats can have lead time.`;
 }
 
-const ALMANAC_SYSTEM_PROMPT = `You are Allen, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
+const ALMANAC_SYSTEM_PROMPT = `You are Campbell, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
 
 ${getHoustonClimateStyleBrief()}`;
 

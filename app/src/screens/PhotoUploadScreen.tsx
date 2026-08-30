@@ -22,7 +22,7 @@ export function PhotoUploadScreen({ navigation }: Props) {
     setError(null);
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      setError("Photo library access is needed for Fondren to see your look.");
+      setError("Photo library access is needed for Watt to see your look.");
       return;
     }
 
@@ -51,7 +51,7 @@ export function PhotoUploadScreen({ navigation }: Props) {
       await analyzePhotos(sessionId, photos);
       navigation.navigate("GeneratingPlan");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Fondren couldn't process those — try again?");
+      setError(e instanceof Error ? e.message : "Watt couldn't process those — try again?");
     } finally {
       setBusy(false);
     }
@@ -60,10 +60,11 @@ export function PhotoUploadScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Show Fondren what you've got</Text>
+        <Text style={styles.title}>Show Watt what you've got</Text>
         <Text style={styles.subtitle}>
-          Upload as many photos as you want — current outfits, full-body shots, whatever you have. More photos means
-          a sharper read on your fit, coloring, and current style.
+          Upload as many photos as you want — a clear face shot, full-body shots, current outfits, whatever you have.
+          Watt reads your face shape, body type, fit, and coloring, and every one of those sharpens what the plan
+          tells you to buy — down to collar styles and lapel widths that suit your face.
         </Text>
 
         <Pressable style={styles.pickButton} onPress={handlePick}>
