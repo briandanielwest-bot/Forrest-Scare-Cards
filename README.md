@@ -66,6 +66,16 @@ This app was built with Expo, so the path to a real App Store submission is [EAS
 
 Because the app calls your own backend, **the backend needs to be deployed somewhere reachable from the internet** (Render, Fly.io, Railway, a small VPS, etc.) before a build you hand to someone else — or submit to the App Store — will work; `localhost`/your LAN IP only works for local dev. Point `EXPO_PUBLIC_API_BASE_URL` at that deployed URL before building.
 
+## Deploying the backend
+
+Two ready-made paths, both verified against this repo's actual `npm run build` / `npm start`:
+
+**Render (no Docker needed)** — `render.yaml` at the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec). On [render.com](https://render.com), pick **New +** → **Blueprint**, point it at this repo, and Render reads that file: it builds and starts `server/` for you and prompts for `ANTHROPIC_API_KEY` in its dashboard (kept out of the repo since it's a secret). Free tier works for trying this out.
+
+**Anywhere else that runs a container** (Fly.io, Railway, Google Cloud Run, a VPS) — `server/Dockerfile` is a standard multi-stage Node build. e.g. for Fly.io: `fly launch` from inside `server/` (it'll detect the Dockerfile), then `fly secrets set ANTHROPIC_API_KEY=sk-ant-...`. For a plain VPS: `docker build -t bayou-blazer-server . && docker run -p 4000:4000 -e ANTHROPIC_API_KEY=sk-ant-... bayou-blazer-server`.
+
+Either way, once it's live, set `CORS_ORIGIN` to your actual app's origin instead of the `*` default if you want to lock that down, and point `EXPO_PUBLIC_API_BASE_URL` in `app/.env` at the deployed URL before building the app.
+
 ## About the store data
 
 `server/src/data/houstonStores.ts` is a **curated seed list built from general knowledge**, not a live, verified business directory. Every entry is flagged `verified: false` on purpose. Addresses are given at neighborhood/shopping-center granularity rather than exact street addresses, and hours, current operating status, and inventory should be confirmed independently before anyone relies on this to plan a visit — the app's UI includes that disclaimer too.
