@@ -151,13 +151,14 @@ ${JSON.stringify(vettedStores, null, 2)}
 
 Build the complete wardrobe plan now.`;
 
-  const params: Anthropic.MessageCreateParamsNonStreaming = {
+  // Streamed rather than messages.create: the plan is the longest output in
+  // the app (observed 10-13K tokens and growing with every feature), and a
+  // live truncation at the old 16000 non-streaming cap shipped a plan with
+  // no phases. Streaming lets max_tokens sit far above any real plan size
+  // without risking SDK HTTP timeouts.
+  const stream = anthropic.messages.stream({
     model: AGENT_MODEL,
-    // Bumped from 8192 after enriching buyingNotes (opening line + specs +
-    // decline + logistics) pushed a live plan to stop_reason "max_tokens"
-    // mid-JSON, truncating the tool call before phases/budgetSummary/tips
-    // were ever written. Kept high with the enriched field in place.
-    max_tokens: 16000,
+    max_tokens: 64000,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userMessage }],
     tools: [SUBMIT_PLAN_TOOL],
@@ -168,8 +169,8 @@ Build the complete wardrobe plan now.`;
     // consistently gotten this arithmetic right. The fire-and-forget +
     // polling change is what actually fixes host request timeouts; this
     // agent doesn't need to also be fast.
-  };
-  const response = await anthropic.messages.create(params);
+  });
+  const response = await stream.finalMessage();
 
   // A "max_tokens" stop reason means the tool call's JSON was cut off
   // mid-generation — the API still hands back a best-effort parse of
