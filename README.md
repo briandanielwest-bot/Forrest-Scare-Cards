@@ -36,6 +36,8 @@ You need an [Anthropic API key](https://console.anthropic.com/) in `server/.env`
 
 Session state (the interview transcript, profile, photo assessment, plan) is kept **in memory** on the server — fine for trying this out or sharing with a friend, but it resets on server restart and only works with a single server process. Swap `server/src/sessionStore.ts` for a real database before this needs to survive restarts or scale past one instance.
 
+Every route that calls an agent (`/api/interview`, `/api/photo`, `/api/plan`) is rate-limited to 60 requests per 15 minutes per IP, so a leaked link or a stuck client-side retry loop can't run up an unbounded Claude API bill. Adjust `agentRouteLimiter` in `server/src/index.ts` if that's too tight or too loose for how you're using it.
+
 ## 2. Run the app
 
 ```bash
