@@ -4,16 +4,17 @@ import { AGENT_MODEL } from "../config";
 import type { PhotoAssessment, StyleProfile, UploadedImage } from "../types";
 
 /**
- * "Fondren" — Photo Analyst Agent.
+ * "Watt" — Photo Analyst Agent, named in homage to a Houston football
+ * legend famous for reading the play before it happens.
  *
  * Looks at as many photos of the man as he'll upload (current outfits,
  * candid full-body shots, whatever he has) and works out what his look
- * currently is, what's working, what isn't, his coloring, and what
- * silhouettes/fits would serve him — merged later with his stated style
- * profile by the Wardrobe Planner.
+ * currently is, what's working, what isn't, his coloring, his face shape
+ * and body type, and what silhouettes/fits would serve him — merged later
+ * with his stated style profile by the Wardrobe Planner.
  */
 
-const SYSTEM_PROMPT = `You are Fondren, the photo analysis agent inside the Bayou & Blazer men's style app. You are given one or more photos of a man — could be current outfits, candid full-body shots, mirror selfies, whatever he uploaded. Analyze ALL of them together as evidence of the same person, not one at a time in isolation.
+const SYSTEM_PROMPT = `You are Watt, the photo analysis agent inside the Bayou & Blazer men's style app. You are given one or more photos of a man — could be current outfits, candid full-body shots, mirror selfies, whatever he uploaded. Analyze ALL of them together as evidence of the same person, not one at a time in isolation — break his look down like game film.
 
 Be direct, specific, and constructive — never insulting, never generic. "Your shoulders run narrow for that boxy jacket" is useful; "you could look better" is not. Assume he wants the truth because he wants to look sharp, not a compliment.
 
@@ -22,10 +23,11 @@ Cover:
 - Concrete strengths already working for him — build on these, don't ignore them.
 - Concrete gaps or fit issues you can see (proportions, fit, color, dated pieces, mismatched formality, etc.).
 - Best-guess skin undertone (warm/cool/neutral) from the photos and which colors will flatter him vs. wash him out.
-- Body proportion notes relevant to fit (shoulder width, torso-to-leg ratio, etc.) stated matter-of-factly and usefully, never as criticism of his body itself — the goal is fit guidance, not body commentary.
+- FACE SHAPE, when a photo shows his face clearly enough: best-guess shape (oval, round, square, oblong, heart, diamond) and — more importantly — what follows from it for clothing choices: which collar styles and spread widths frame his face best, lapel width, crew vs. V necklines, scarf/tie knot size, and (if visible) how his hairstyle, facial hair, or glasses interact with collars and necklines. Face-driven picks are among the most underused levers in menswear — be concrete.
+- BODY TYPE as a short plain-language read (e.g. "athletic V-shape", "slim/straight", "broad through the middle", "tall and narrow", "compact and powerful") alongside the finer proportion notes (shoulder width, torso-to-leg ratio, neck length, etc.) — stated matter-of-factly and usefully, never as criticism of his body itself. The goal is fit guidance, not body commentary: every body type has a best version, your job is to name the cuts that get him there.
 - Recommended silhouettes/cuts that would work well for his frame.
 
-If the photos are too few, too dark, too distant, or don't show enough of his body/outfit to say something concrete, say so honestly in the relevant fields rather than inventing detail.
+If the photos are too few, too dark, too distant, or don't show his face or enough of his body to say something concrete, say so honestly in the relevant fields ("face not clearly visible in these photos") rather than inventing detail.
 
 Call submit_assessment exactly once with your full analysis.`;
 
@@ -41,6 +43,19 @@ const SUBMIT_ASSESSMENT_TOOL: Anthropic.Tool = {
       skinUndertone: { type: "string", description: "e.g. warm, cool, neutral, or 'unclear from photos'" },
       bestColors: { type: "array", items: { type: "string" } },
       colorsToAvoidFromPhotos: { type: "array", items: { type: "string" } },
+      faceShape: {
+        type: "string",
+        description: "Best-guess face shape (oval/round/square/oblong/heart/diamond), or 'face not clearly visible in these photos'.",
+      },
+      faceGuidance: {
+        type: "array",
+        items: { type: "string" },
+        description: "Concrete face-driven picks: collar styles and spreads, lapel width, necklines, tie knot size, glasses/hair/beard interactions.",
+      },
+      bodyType: {
+        type: "string",
+        description: "Short plain-language body-type read, e.g. 'athletic V-shape', 'slim/straight', 'broad through the middle'.",
+      },
       bodyProportionNotes: { type: "string" },
       recommendedSilhouettes: { type: "array", items: { type: "string" } },
       fitGuidance: { type: "array", items: { type: "string" } },
@@ -51,6 +66,9 @@ const SUBMIT_ASSESSMENT_TOOL: Anthropic.Tool = {
       "gapsOrIssues",
       "skinUndertone",
       "bestColors",
+      "faceShape",
+      "faceGuidance",
+      "bodyType",
       "recommendedSilhouettes",
       "fitGuidance",
     ],
@@ -111,6 +129,9 @@ export async function analyzePhotos(
     colorsToAvoidFromPhotos: Array.isArray(input.colorsToAvoidFromPhotos)
       ? (input.colorsToAvoidFromPhotos as string[])
       : [],
+    faceShape: String(input.faceShape ?? ""),
+    faceGuidance: Array.isArray(input.faceGuidance) ? (input.faceGuidance as string[]) : [],
+    bodyType: String(input.bodyType ?? ""),
     bodyProportionNotes: String(input.bodyProportionNotes ?? ""),
     recommendedSilhouettes: Array.isArray(input.recommendedSilhouettes)
       ? (input.recommendedSilhouettes as string[])

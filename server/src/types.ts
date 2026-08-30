@@ -31,6 +31,9 @@ export interface PhotoAssessment {
   skinUndertone: string;
   bestColors: string[];
   colorsToAvoidFromPhotos: string[];
+  faceShape: string;
+  faceGuidance: string[];
+  bodyType: string;
   bodyProportionNotes: string;
   recommendedSilhouettes: string[];
   fitGuidance: string[];

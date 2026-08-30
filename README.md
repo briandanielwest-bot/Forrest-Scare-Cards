@@ -9,12 +9,12 @@ A React Native (Expo) app in `app/`, talking to a small Node/Express backend in 
 | Agent | Persona | Job |
 |---|---|---|
 | Interviewer | **Kyla** | Confident, sharp professional stylist who runs a real, in-depth conversation to get a genuine style + budget profile — not a form. |
-| Photo Analyst | **Fondren** | Reviews as many photos as you upload; calls your current style, fit, coloring, and gaps. |
-| Store Scouts | **Cullen** / **Jones** / **Hobby** / **Wortham** | Four specialist agents, each reviewing one slice of Houston's custom/high-end menswear scene (bespoke tailoring; luxury department & contemporary; footwear & western wear; lifestyle & accessories) and ranking the best fits for your profile. |
-| Style & Weather | **Allen** | Houston's climate calendar and dress culture — feeds every other agent so recommendations actually make sense for this city. |
-| Wardrobe Planner | **Brown** | Synthesizes everything into one phased, budgeted, store-by-store wardrobe plan. |
+| Photo Analyst | **Watt** | Breaks your photos down like game film — face shape, body type, fit, coloring, and gaps — and turns them into concrete recommendations (collar spreads, lapel widths, cuts). |
+| Store Scouts | **Biggio** / **Drexler** / **Olajuwon** / **Wagner** | Four specialist agents, each reviewing one slice of Houston's custom/high-end menswear scene (bespoke tailoring; luxury department & contemporary; footwear & western wear; lifestyle & accessories) and ranking the best fits for your profile. |
+| Style & Weather | **Campbell** | Houston's climate calendar and dress culture — feeds every other agent so recommendations actually make sense for this city. |
+| Wardrobe Planner | **Moon** | The quarterback — synthesizes everything into one phased, budgeted, store-by-store wardrobe game plan. |
 
-Agent names other than Kyla are drawn from Houston's historical civic namesakes (Rice University, Hobby Airport, Fondren Library, the Allen brothers who founded the city, Cullen and Wortham's civic philanthropy, Brown & Root) as an homage — not AI personas claiming to be those real people.
+Agent names other than Kyla are a fan homage to Houston sports legends, each matched to their role — the film-room read, the craftsman who played every position, The Glide's effortless style, the greatest footwork in the game, the closer, the power through Houston heat, and the Hall of Fame quarterback calling the plan. This app is not affiliated with or endorsed by the people these names honor.
 
 See `server/src/agents/` for each one's system prompt and logic, and `server/src/data/houstonStores.ts` for the curated store dataset (see **About the store data** below).
 

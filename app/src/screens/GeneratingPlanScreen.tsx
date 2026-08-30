@@ -9,13 +9,17 @@ import { colors, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 
+// Each line pairs the agent's namesake Houston sports legend with the
+// actual job that agent is doing right now (fan homage — see WelcomeScreen).
 const STATUS_LINES = [
-  "Kyla is handing your profile to the store scouts…",
-  "Hobby is checking footwear (and boots, if that's your thing)…",
-  "Jones is scanning the Galleria's designer racks…",
-  "Cullen is lining up bespoke tailors…",
-  "Allen is factoring in Houston's humidity…",
-  "Brown is building your phased plan…",
+  "Kyla is walking your profile into the war room…",
+  "Watt is breaking down your photos like Thursday-night film…",
+  "Olajuwon is giving your shoe game the Dream Shake…",
+  "Drexler is gliding through the Galleria's designer floors…",
+  "Biggio is grinding through Houston's custom tailors, ready for anything…",
+  "Wagner is coming out of the bullpen to close out your accessories…",
+  "Campbell is powering your plan straight through Houston's humidity…",
+  "Moon is reading the field and calling your full wardrobe game plan…",
 ];
 
 const POLL_INTERVAL_MS = 3000;
