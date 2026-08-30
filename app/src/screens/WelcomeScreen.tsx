@@ -10,7 +10,8 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
 export function WelcomeScreen({ navigation }: Props) {
-  const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages } = useAppContext();
+  const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages, setStyleProfile, setInterviewDone } =
+    useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +32,11 @@ export function WelcomeScreen({ navigation }: Props) {
     setLoading(true);
     try {
       const { sessionId, reply } = await startInterview();
+      // Clears any profile/interviewDone left over from a restored session
+      // (e.g. the app was killed after the interview but before a plan was
+      // generated) so this fresh interview isn't mistaken for a finished one.
+      setStyleProfile(null);
+      setInterviewDone(false);
       setSessionId(sessionId);
       setChatMessages([{ id: "opening", role: "assistant", text: reply }]);
       navigation.navigate("Interview");
