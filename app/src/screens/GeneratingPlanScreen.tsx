@@ -23,7 +23,9 @@ const STATUS_LINES = [
 ];
 
 const POLL_INTERVAL_MS = 3000;
-const MAX_POLL_MS = 4 * 60 * 1000; // give up after 4 minutes
+// Six agents with full store knowledge take a while on a rich profile —
+// observed real generations run past 4 minutes, so the cutoff sits at 6.
+const MAX_POLL_MS = 6 * 60 * 1000;
 
 export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();

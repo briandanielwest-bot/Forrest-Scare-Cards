@@ -3,6 +3,7 @@ export interface StyleProfile {
   budgetTotalUsd: number;
   budgetCadence: "one-time" | "monthly" | "quarterly";
   lifestyle: string;
+  homeBase?: string;
   dressCodes: string[];
   styleArchetypes: string[];
   fitPreferences: string;
@@ -71,7 +72,9 @@ export type StoreCategory =
   | "footwear"
   | "lifestyle-accessories"
   | "formal-wear"
-  | "big-tall";
+  | "big-tall"
+  | "alterations"
+  | "eyewear";
 
 export interface HoustonStore {
   id: string;
@@ -91,4 +94,6 @@ export interface ChatMessage {
   id: string;
   role: "assistant" | "user";
   text: string;
+  /** Tappable answer options Kyla offered with this message. */
+  quickReplies?: string[];
 }

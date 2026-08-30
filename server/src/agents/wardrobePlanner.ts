@@ -23,9 +23,10 @@ RULES
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
 - Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and buyingNotes.
 - buyingNotes is the whole point of this plan being usable in a store, not just readable on a phone: write it like he could hand his phone to the salesperson and point at it. Always include, in this order: (a) an actual opening line to say when he walks in ("I'm looking for a navy tropical-wool suit, slim through the body, budget around $X" — not "ask about suits"), (b) the one or two specs/details that matter most for HIS fit, face, and coloring (reference his fitPreferences, colorPreferences/colorsToAvoid, and — if provided — the photo assessment's fitGuidance, bestColors, colorsToAvoidFromPhotos, bodyType, faceShape, and faceGuidance by name, not generically; for shirts, knitwear, jackets, and neckwear especially, let faceGuidance drive collar spread, neckline, and lapel choices), (c) one specific thing to decline or steer away from if the salesperson offers it (a cut, fabric, color, or upsell that works against his stated style or the photo assessment) — this is what actually keeps him from getting sold the wrong thing, and (d) practical logistics drawn from the store's OWN profile: whether it's walk-in or appointment (per its howToBuy), its phone/contact when one is listed, its neighborhood, what to bring, and alteration turnaround.
+- ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it but say in buyingNotes why it earns the drive. Where several items land in the same part of town, note it so he can knock them out in one trip — a plan that respects Houston traffic is a plan that actually gets executed.
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
 - Respect his stated budget total and cadence — the sum of essential+recommended items across the plan should be a realistic fit for his budget, not wildly over it. If his budget can't realistically cover everything on his wish list, prioritize essentials and be upfront about what's a stretch goal.
-- If a photo assessment is provided, actively use its fit/color/silhouette guidance AND its faceShape/faceGuidance/bodyType reads to shape specific item choices (fits, collar styles, necklines, lapels, colors to seek or avoid) AND to personalize buyingNotes as described above.
+- If a photo assessment is provided, actively use its fit/color/silhouette guidance AND its faceShape/faceGuidance/bodyType reads to shape specific item choices (fits, collar styles, necklines, lapels, colors to seek or avoid) AND to personalize buyingNotes as described above. If his faceShape is known, he visibly wears glasses in the photos or an eyewear store was vetted, and the budget has room, a frames item (usually nice-to-have) with shape-specific guidance is a high-impact, low-cost addition most men never think of.
 - Write a short, punchy intro narrative and a short, hyped final pep talk in your voice — the pep talk is the locker-room send-off before he runs the plan.
 - Call submit_wardrobe_plan exactly once with the complete plan.`;
 
@@ -187,5 +188,53 @@ Build the complete wardrobe plan now.`;
     throw new Error("Wardrobe planner did not return a plan");
   }
 
-  return toolUse.input as WardrobePlan;
+  return normalizeWardrobePlan(toolUse.input);
+}
+
+// The model occasionally emits a nested array/object field as a JSON
+// *string* inside the tool input (seen live: phases arrived stringified,
+// crashing the client's phases.map). Parse those back, then validate hard —
+// a malformed plan must become a retryable error, never a stored plan.
+function normalizeWardrobePlan(raw: unknown): WardrobePlan {
+  const plan = { ...(raw as Record<string, unknown>) };
+
+  const parseIfString = (v: unknown): unknown => {
+    if (typeof v !== "string") return v;
+    try {
+      return JSON.parse(v);
+    } catch {
+      return v;
+    }
+  };
+
+  plan.phases = parseIfString(plan.phases);
+  plan.generalBuyingTips = parseIfString(plan.generalBuyingTips);
+  plan.budgetSummary = parseIfString(plan.budgetSummary);
+  if (plan.budgetSummary && typeof plan.budgetSummary === "object") {
+    const bs = plan.budgetSummary as Record<string, unknown>;
+    bs.perPhaseUsd = parseIfString(bs.perPhaseUsd);
+  }
+  if (Array.isArray(plan.phases)) {
+    for (const phase of plan.phases as Record<string, unknown>[]) {
+      if (phase && typeof phase === "object") {
+        phase.items = parseIfString(phase.items);
+        if (Array.isArray(phase.items)) {
+          for (const item of phase.items as Record<string, unknown>[]) {
+            if (item && typeof item === "object") {
+              item.recommendedStoreIds = parseIfString(item.recommendedStoreIds);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (!Array.isArray(plan.phases) || plan.phases.length === 0) {
+    throw new Error("Wardrobe planner returned malformed phases — retry plan generation");
+  }
+  if ((plan.phases as unknown[]).some((p) => !p || typeof p !== "object" || !Array.isArray((p as any).items))) {
+    throw new Error("Wardrobe planner returned a phase without a valid items array — retry plan generation");
+  }
+
+  return plan as unknown as WardrobePlan;
 }

@@ -28,6 +28,14 @@ function cleanText(text: string | undefined | null): string {
   return (text ?? "").replace(/\\n/g, "\n");
 }
 
+// `?? []` doesn't guard against a field that EXISTS but isn't an array
+// (seen live: the model returned phases as a JSON string, crashing .map).
+// The server now normalizes that, but the client must never crash on a
+// stored plan's shape either way.
+function asArray<T>(v: unknown): T[] {
+  return Array.isArray(v) ? (v as T[]) : [];
+}
+
 interface StoreRun {
   storeId: string;
   store?: HoustonStore;
@@ -39,9 +47,9 @@ interface StoreRun {
 // things, here's who to contact.
 function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonStore | undefined): StoreRun[] {
   const runs = new Map<string, StoreRun>();
-  for (const phase of plan.phases ?? []) {
-    for (const item of phase.items ?? []) {
-      const primary = (item.recommendedStoreIds ?? [])[0];
+  for (const phase of asArray<WardrobePlan["phases"][number]>(plan.phases)) {
+    for (const item of asArray<WardrobeItem>(phase.items)) {
+      const primary = asArray<string>(item.recommendedStoreIds)[0];
       if (!primary) continue;
       let run = runs.get(primary);
       if (!run) {
@@ -106,7 +114,7 @@ export function PlanScreen({ navigation }: Props) {
 
         <View style={styles.budgetCard}>
           <Text style={styles.budgetTotal}>{money(plan.budgetSummary?.totalBudgetUsd)} total budget</Text>
-          {(plan.budgetSummary?.perPhaseUsd ?? []).map((p, i) => (
+          {asArray<{ phaseName: string; amountUsd: number }>(plan.budgetSummary?.perPhaseUsd).map((p, i) => (
             <View key={p.phaseName ?? i} style={styles.budgetRow}>
               <Text style={styles.budgetPhase}>{p.phaseName ?? "Phase"}</Text>
               <Text style={styles.budgetAmount}>{money(p.amountUsd)}</Text>
@@ -114,13 +122,13 @@ export function PlanScreen({ navigation }: Props) {
           ))}
         </View>
 
-        {(plan.phases ?? []).map((phase, i) => (
+        {asArray<WardrobePlan["phases"][number]>(plan.phases).map((phase, i) => (
           <View key={phase.name ?? i} style={styles.phaseCard}>
             <Text style={styles.phaseTiming}>{(phase.timingLabel ?? "").toUpperCase()}</Text>
             <Text style={styles.phaseName}>{phase.name ?? "Phase"}</Text>
             <Text style={styles.phaseGoal}>{cleanText(phase.goal)}</Text>
 
-            {(phase.items ?? []).map((item, idx) => (
+            {asArray<WardrobeItem>(phase.items).map((item, idx) => (
               <ItemRow key={idx} item={item} storeName={(id) => storeById(id)?.name ?? id} />
             ))}
           </View>
@@ -130,7 +138,7 @@ export function PlanScreen({ navigation }: Props) {
 
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
-          {(plan.generalBuyingTips ?? []).map((tip, i) => (
+          {asArray<string>(plan.generalBuyingTips).map((tip, i) => (
             <Text key={i} style={styles.tipText}>
               •  {cleanText(tip)}
             </Text>
@@ -212,8 +220,8 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
       <Text style={styles.itemBudget}>
         {money(item.estimatedBudgetLowUsd)} – {money(item.estimatedBudgetHighUsd)}
       </Text>
-      {(item.recommendedStoreIds ?? []).length > 0 && (
-        <Text style={styles.itemStores}>Where: {(item.recommendedStoreIds ?? []).map(storeName).join(", ")}</Text>
+      {asArray<string>(item.recommendedStoreIds).length > 0 && (
+        <Text style={styles.itemStores}>Where: {asArray<string>(item.recommendedStoreIds).map(storeName).join(", ")}</Text>
       )}
       {item.buyingNotes ? (
         <View style={styles.scriptBox}>

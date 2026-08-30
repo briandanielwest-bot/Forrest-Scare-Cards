@@ -8,7 +8,7 @@ interviewRouter.post("/start", async (_req, res, next) => {
   try {
     const session = createSession();
     const result = await startInterview(session);
-    res.json({ sessionId: session.id, reply: result.reply, done: result.done });
+    res.json({ sessionId: session.id, reply: result.reply, done: result.done, quickReplies: result.quickReplies });
   } catch (err) {
     next(err);
   }
@@ -32,7 +32,12 @@ interviewRouter.post("/message", async (req, res, next) => {
       session.interviewComplete = true;
     }
 
-    res.json({ reply: result.reply, done: result.done, profile: session.styleProfile });
+    res.json({
+      reply: result.reply,
+      done: result.done,
+      profile: session.styleProfile,
+      quickReplies: result.quickReplies,
+    });
   } catch (err) {
     next(err);
   }

@@ -23,7 +23,9 @@ export type StoreCategory =
   | "footwear"
   | "lifestyle-accessories"
   | "formal-wear"
-  | "big-tall";
+  | "big-tall"
+  | "alterations"
+  | "eyewear";
 
 export type PriceTier = "$$" | "$$$" | "$$$$";
 
@@ -542,6 +544,21 @@ export const HOUSTON_STORES: HoustonStore[] = [
     verified: false,
   },
   {
+    id: "the-hat-store",
+    name: "The Hat Store",
+    category: "western-boots-leather",
+    neighborhood: "Richmond Ave / Galleria area",
+    priceTier: "$$$",
+    styleTags: ["hats", "custom", "western", "classic"],
+    bestFor: "A truly custom hat — western or otherwise — shaped and fitted to your head by the only shop of its kind left in Houston.",
+    howToBuy: "Walk in; they measure your head, shape the hat to your face and preference on the spot, and can build fully custom hats, belts, and buckles.",
+    description:
+      "Houston institution dating to 1915 and the city's last true custom hat shop — western hats, fedoras, and dress hats shaped and fitted in-house, plus custom belts and buckles.",
+    website: "https://www.thehatstore.com/",
+    contact: "(713) 780-2480",
+    verified: false,
+  },
+  {
     id: "pinto-ranch",
     name: "Pinto Ranch",
     category: "western-boots-leather",
@@ -585,6 +602,55 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "165-year-old American shoemaker's Galleria store carrying dress shoes, casual leather sneakers, and business-casual hybrids plus belts and small leather goods.",
     website: "https://www.johnstonmurphy.com/",
     contact: "(713) 961-0025",
+    verified: false,
+  },
+
+  // ---- Alterations & tailoring ----
+  {
+    id: "qc-tailors",
+    name: "QC Tailors",
+    category: "alterations",
+    neighborhood: "Upper Kirby",
+    priceTier: "$$",
+    styleTags: ["alterations", "tailoring", "suit-work"],
+    bestFor: "The independent alterations shop for everything you already own or buy off the rack elsewhere — shirt darts, trouser tapers, jacket work.",
+    howToBuy: "Walk in with your pieces (bring the shoes you'll wear with trousers so hems get set right); typical turnaround runs days, ask for a written ticket with pickup date.",
+    description:
+      "Upper Kirby's tailor since 1998 — a dedicated alterations and dress-work shop, the place plans in this app send you to make off-the-rack pieces fit like they were made for you.",
+    website: "https://qctailors.com/",
+    contact: "(713) 520-6090",
+    verified: false,
+  },
+
+  // ---- Eyewear & opticians ----
+  {
+    id: "warby-parker-rice-village",
+    name: "Warby Parker",
+    category: "eyewear",
+    neighborhood: "Rice Village",
+    priceTier: "$$",
+    styleTags: ["eyewear", "glasses", "sunglasses", "modern"],
+    bestFor: "Well-designed frames matched to your face shape without a luxury price — glasses from around $95, with styling help in-store.",
+    howToBuy: "Walk in at Rice Village; try frames freely and ask an advisor to pull shapes for your face — eye exams available on-site.",
+    description:
+      "Warby Parker's Rice Village store — in-house-designed prescription glasses and sunglasses at accessible prices, with expert frame-styling help and on-site eye exams.",
+    website: "https://stores.warbyparker.com/tx/houston/2518-university-blvd",
+    contact: "(832) 301-9886",
+    verified: false,
+  },
+  {
+    id: "eye-elegance",
+    name: "Eye Elegance",
+    category: "eyewear",
+    neighborhood: "Post Oak Blvd / Galleria area (also Montrose)",
+    priceTier: "$$$$",
+    styleTags: ["eyewear", "designer", "luxury", "rare-frames"],
+    bestFor: "The luxury end of eyewear — rare and special-edition designer frames hand-picked from around the world, fitted by real opticians.",
+    howToBuy: "Walk in to the Post Oak Plaza or Montrose boutique; bring your prescription, and let them match frame geometry to your face shape.",
+    description:
+      "Houston luxury optical boutique (Post Oak and Montrose locations) carrying hand-picked international designer frames — Cartier, Matsuda, and hard-to-find special editions — with premium lenses and fitting.",
+    website: "https://eyeelegance.com/",
+    contact: "(713) 322-5541",
     verified: false,
   },
 
@@ -636,4 +702,6 @@ export const STORE_CATEGORY_LABELS: Record<StoreCategory, string> = {
   "lifestyle-accessories": "Lifestyle & Accessories",
   "formal-wear": "Tuxedos & Formal Wear",
   "big-tall": "Big & Tall",
+  alterations: "Alterations & Tailoring",
+  eyewear: "Eyewear & Opticians",
 };

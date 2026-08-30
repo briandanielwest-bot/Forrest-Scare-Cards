@@ -45,14 +45,14 @@ export function WelcomeScreen({ navigation }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const { sessionId, reply } = await startInterview();
+      const { sessionId, reply, quickReplies } = await startInterview();
       // Clears any profile/interviewDone left over from a restored session
       // (e.g. the app was killed after the interview but before a plan was
       // generated) so this fresh interview isn't mistaken for a finished one.
       setStyleProfile(null);
       setInterviewDone(false);
       setSessionId(sessionId);
-      setChatMessages([{ id: "opening", role: "assistant", text: reply }]);
+      setChatMessages([{ id: "opening", role: "assistant", text: reply, quickReplies }]);
       navigation.navigate("Interview");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't reach the server — is it running?");

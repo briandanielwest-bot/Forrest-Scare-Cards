@@ -28,8 +28,7 @@ export function InterviewScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
-  async function handleSend() {
-    const message = draft.trim();
+  async function sendText(message: string) {
     if (!message || !sessionId || sending) return;
 
     setError(null);
@@ -39,7 +38,10 @@ export function InterviewScreen({ navigation }: Props) {
 
     try {
       const result = await sendInterviewMessage(sessionId, message);
-      setChatMessages((prev) => [...prev, { id: `a-${Date.now()}`, role: "assistant", text: result.reply }]);
+      setChatMessages((prev) => [
+        ...prev,
+        { id: `a-${Date.now()}`, role: "assistant", text: result.reply, quickReplies: result.quickReplies },
+      ]);
       if (result.done && result.profile) {
         setStyleProfile(result.profile);
         setInterviewDone(true);
@@ -51,6 +53,16 @@ export function InterviewScreen({ navigation }: Props) {
       requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
     }
   }
+
+  function handleSend() {
+    void sendText(draft.trim());
+  }
+
+  // Chips belong to Kyla's latest message only — once he answers (typed or
+  // tapped), the conversation has moved past them.
+  const lastMessage = chatMessages[chatMessages.length - 1];
+  const activeQuickReplies =
+    !interviewDone && !sending && lastMessage?.role === "assistant" ? lastMessage.quickReplies ?? [] : [];
 
   return (
     <KeyboardAvoidingView
@@ -73,6 +85,16 @@ export function InterviewScreen({ navigation }: Props) {
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        {activeQuickReplies.length > 0 ? (
+          <View style={styles.chipRow}>
+            {activeQuickReplies.map((reply) => (
+              <Pressable key={reply} style={styles.chip} onPress={() => void sendText(reply)}>
+                <Text style={styles.chipText}>{reply}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
 
         {interviewDone ? (
           <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("PhotoUpload")}>
@@ -108,6 +130,22 @@ const styles = StyleSheet.create({
   userBubble: { backgroundColor: colors.bayou, alignSelf: "flex-end" },
   assistantText: { ...typography.body },
   userText: { ...typography.body, color: colors.cream },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  chip: {
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderColor: colors.bayou,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  chipText: { color: colors.bayou, fontWeight: "700", fontSize: 13 },
   inputRow: {
     flexDirection: "row",
     alignItems: "flex-end",

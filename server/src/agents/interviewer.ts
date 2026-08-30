@@ -28,10 +28,14 @@ PERSONALITY
 - Keep messages SHORT — 2-4 sentences, one or two questions max per turn. This is a text conversation, not an essay.
 - React to what the guy actually says before moving on. Callbacks are funnier than a script. Push back on vague answers — "normal clothes" or "whatever looks good" doesn't fly, and you say so with a laugh, not a shrug. You're the expert in the room; ask like it, and don't ask permission to be right.
 
+QUICK REPLIES — make answering effortless
+Whenever your question has natural multiple-choice answers, ALSO call the offer_quick_replies tool with 3-5 short tappable options alongside your message — budget ranges ("Under $1,000", "$1,000-2,500", "$2,500-5,000", "$5,000+"), dress codes, fit preference, part of town (The Heights, Montrose, Galleria/Uptown, Katy/West, The Woodlands/North, Sugar Land/Southwest, Inside the Loop elsewhere), timeline, yes/no-ish questions. Options are shortcuts, not limits — he can always type his own answer, so keep them punchy (2-4 words each). Do NOT offer quick replies for genuinely open questions (what's not working about his wardrobe, who he wants to look like) — those deserve his own words.
+
 GOAL — go deep, not just wide
 Through natural conversation, extract enough to build a genuinely specific StyleProfile. Don't settle for the first thing he says on any of these — ask a real follow-up on at least the style/archetype and current-pain-points questions before moving on:
 - Total budget and whether that's a one-time wardrobe rebuild, a monthly amount, or a quarterly amount.
 - Lifestyle / what he actually does day to day (office? field/site visits? client-facing? remote? which industry — that changes everything in this city).
+- WHERE in the Houston area he lives and works (neighborhood or suburb — the Heights, Montrose, River Oaks, Galleria, Katy, Sugar Land, The Woodlands, EaDo, Pearland…). Houston is a 600-square-mile city; the plan routes him to stores he'll actually drive to, so this one question makes the whole thing feel custom-built. Ask it early, right after lifestyle.
 - Dress codes he needs to cover (business formal, business casual, smart casual, black tie events, weekend, gym-adjacent, date night, etc.) and how often each comes up.
 - Style archetypes he's drawn to (classic/traditional, modern minimal, streetwear-influenced, prep, rugged/workwear, western-influenced, etc.) — it's fine if he doesn't know the vocabulary, translate his answers into these for him, but push for specifics: ask what's NOT working about his current wardrobe, and if he has a reference point (someone whose style he admires, a look he's tried to copy and missed).
 - Fit preference (slim, tailored/classic, relaxed) — ask this plainly if unclear.
@@ -44,10 +48,30 @@ Through natural conversation, extract enough to build a genuinely specific Style
 RULES
 - Ask ONE topic at a time. Don't interrogate — but don't rush either. A real profile takes more than two exchanges; expect something like 6-10 turns for a guy giving normal-length answers, more if he's terse and you have to draw him out.
 - If he gives a vague or one-word answer, use humor to draw out a real one instead of accepting "idk, normal clothes."
-- Once you have real, specific coverage of budget, lifestyle, at least 2 dress codes, at least one well-defined style archetype (with a follow-up behind it, not just his first guess), fit preference, colors, and timeline — STOP INTERVIEWING and call the submit_style_profile tool. Missing brands/sizes is fine, leave those fields as empty arrays/strings/undefined — but don't skip the follow-up depth on style itself just to wrap up faster.
+- Once you have real, specific coverage of budget, lifestyle, at least 2 dress codes, at least one well-defined style archetype (with a follow-up behind it, not just his first guess), fit preference, colors, and timeline — STOP INTERVIEWING and call the submit_style_profile tool.
+- THE INTERVIEW ONLY ENDS WHEN YOU ACTUALLY CALL submit_style_profile — in that same response. Never tell him the profile is submitted, locked in, queued, or "in motion" unless the tool call is in this very message: words alone do nothing, and the app will leave him stranded at a chat box. If you've decided you have enough, the correct move is always: short closing text + submit_style_profile call, together, now. (offer_quick_replies is never a substitute for this.) Missing brands/sizes is fine, leave those fields as empty arrays/strings/undefined — but don't skip the follow-up depth on style itself just to wrap up faster.
 - When you call submit_style_profile, also send a short, hyped closing text line that names the real scale of what's coming — dollar amounts, a timeline, real Houston stores — not just "let's build your plan."
 - Never call submit_style_profile before you have at minimum: budgetTotalUsd, budgetCadence, lifestyle, at least two dressCodes, at least one styleArchetype, fitPreferences, colorPreferences, and timeline.
 - All monetary amounts are USD.`;
+
+const OFFER_QUICK_REPLIES_TOOL: Anthropic.Tool = {
+  name: "offer_quick_replies",
+  description:
+    "Offer 3-5 short tappable answer options alongside your question. Use for multiple-choice-shaped questions (budget ranges, dress codes, fit, part of town, timeline) — never for open questions that deserve his own words.",
+  input_schema: {
+    type: "object",
+    properties: {
+      replies: {
+        type: "array",
+        items: { type: "string" },
+        minItems: 2,
+        maxItems: 5,
+        description: "Short options, 2-4 words each.",
+      },
+    },
+    required: ["replies"],
+  },
+};
 
 const SUBMIT_PROFILE_TOOL: Anthropic.Tool = {
   name: "submit_style_profile",
@@ -60,6 +84,10 @@ const SUBMIT_PROFILE_TOOL: Anthropic.Tool = {
       budgetTotalUsd: { type: "number", description: "Numeric budget amount in US dollars." },
       budgetCadence: { type: "string", enum: ["one-time", "monthly", "quarterly"] },
       lifestyle: { type: "string", description: "1-2 sentence summary of his day-to-day and work context." },
+      homeBase: {
+        type: "string",
+        description: "Where in the Houston area he lives/works, e.g. 'lives in the Heights, works downtown'. Used to route him to nearby stores.",
+      },
       dressCodes: { type: "array", items: { type: "string" } },
       styleArchetypes: { type: "array", items: { type: "string" } },
       fitPreferences: { type: "string" },
@@ -97,6 +125,7 @@ export interface InterviewTurnResult {
   reply: string;
   done: boolean;
   profile?: StyleProfile;
+  quickReplies?: string[];
 }
 
 async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
@@ -105,7 +134,7 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: session.interviewHistory,
-    tools: [SUBMIT_PROFILE_TOOL],
+    tools: [SUBMIT_PROFILE_TOOL, OFFER_QUICK_REPLIES_TOOL],
     tool_choice: { type: "auto" },
     // This is a live chat turn — a man is waiting on the other end for
     // Kyla's reply, so it needs to come back quickly, not exhaustively.
@@ -117,10 +146,18 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
 
   let reply = "";
   let profile: StyleProfile | undefined;
+  let quickReplies: string[] | undefined;
+  const toolResults: Anthropic.ToolResultBlockParam[] = [];
 
   for (const block of response.content) {
     if (block.type === "text") {
       reply += (reply ? "\n" : "") + block.text;
+    } else if (block.type === "tool_use" && block.name === "offer_quick_replies") {
+      const input = block.input as { replies?: unknown };
+      quickReplies = Array.isArray(input.replies)
+        ? (input.replies as unknown[]).filter((r): r is string => typeof r === "string").slice(0, 5)
+        : undefined;
+      toolResults.push({ type: "tool_result", tool_use_id: block.id, content: "Options shown as tappable chips." });
     } else if (block.type === "tool_use" && block.name === "submit_style_profile") {
       const input = block.input as Record<string, unknown>;
       profile = {
@@ -128,6 +165,7 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
         budgetTotalUsd: Number(input.budgetTotalUsd) || 0,
         budgetCadence: (input.budgetCadence as StyleProfile["budgetCadence"]) ?? "one-time",
         lifestyle: String(input.lifestyle ?? ""),
+        homeBase: typeof input.homeBase === "string" ? input.homeBase : undefined,
         dressCodes: Array.isArray(input.dressCodes) ? (input.dressCodes as string[]) : [],
         styleArchetypes: Array.isArray(input.styleArchetypes) ? (input.styleArchetypes as string[]) : [],
         fitPreferences: String(input.fitPreferences ?? ""),
@@ -139,20 +177,14 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
         sizes: (input.sizes as StyleProfile["sizes"]) ?? undefined,
         notes: String(input.notes ?? ""),
       };
-
-      // The tool call needs a tool_result to keep the transcript valid, even
-      // though we won't send another request in this turn.
-      session.interviewHistory.push({
-        role: "user",
-        content: [
-          {
-            type: "tool_result",
-            tool_use_id: block.id,
-            content: "Profile received. Interview complete.",
-          },
-        ],
-      });
+      toolResults.push({ type: "tool_result", tool_use_id: block.id, content: "Profile received. Interview complete." });
     }
+  }
+
+  // All tool_results for one assistant turn must land in a single user
+  // message, or the transcript is invalid on the next request.
+  if (toolResults.length > 0) {
+    session.interviewHistory.push({ role: "user", content: toolResults });
   }
 
   if (!reply) {
@@ -161,7 +193,8 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
       : "Tell me more?";
   }
 
-  return { reply, done: Boolean(profile), profile };
+  // No chips once the interview is done — the input row is gone anyway.
+  return { reply, done: Boolean(profile), profile, quickReplies: profile ? undefined : quickReplies };
 }
 
 export async function startInterview(session: SessionState): Promise<InterviewTurnResult> {
