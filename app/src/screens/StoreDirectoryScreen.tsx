@@ -72,6 +72,7 @@ export function StoreDirectoryScreen() {
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
             <Text style={styles.howToBuy}>How to buy: {item.howToBuy}</Text>
+            {item.contact ? <Text style={styles.contact}>Contact: {item.contact}</Text> : null}
             {item.website ? (
               <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8}>
                 <Text style={styles.website}>{formatWebsite(item.website)} →</Text>
@@ -118,6 +119,7 @@ const styles = StyleSheet.create({
   description: { ...typography.body },
   bestFor: { ...typography.small, fontWeight: "700" },
   howToBuy: { ...typography.small },
+  contact: { ...typography.small, fontWeight: "700", color: colors.ink },
   website: { ...typography.small, color: colors.bayou, fontWeight: "700", marginTop: 2 },
   disclaimer: { ...typography.small, textAlign: "center", marginTop: spacing.lg, marginBottom: spacing.xl },
 });

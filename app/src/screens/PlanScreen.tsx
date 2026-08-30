@@ -1,11 +1,12 @@
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
+import { fetchStores } from "../api/client";
 import { colors, radii, spacing, typography } from "../theme/theme";
-import type { WardrobeItem, StorePriority } from "../types";
+import type { HoustonStore, WardrobeItem, WardrobePlan, StorePriority } from "../types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Plan">;
 
@@ -27,8 +28,55 @@ function cleanText(text: string | undefined | null): string {
   return (text ?? "").replace(/\\n/g, "\n");
 }
 
+interface StoreRun {
+  storeId: string;
+  store?: HoustonStore;
+  items: { label: string; phaseName: string; low: number; high: number }[];
+}
+
+// Regroups the plan's items by their primary recommended store, so the
+// plan ends with a literal errand list: walk into this store, buy these
+// things, here's who to contact.
+function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonStore | undefined): StoreRun[] {
+  const runs = new Map<string, StoreRun>();
+  for (const phase of plan.phases ?? []) {
+    for (const item of phase.items ?? []) {
+      const primary = (item.recommendedStoreIds ?? [])[0];
+      if (!primary) continue;
+      let run = runs.get(primary);
+      if (!run) {
+        run = { storeId: primary, store: storeById(primary), items: [] };
+        runs.set(primary, run);
+      }
+      run.items.push({
+        label: `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.category}`,
+        phaseName: phase.timingLabel || phase.name || "",
+        low: Number(item.estimatedBudgetLowUsd) || 0,
+        high: Number(item.estimatedBudgetHighUsd) || 0,
+      });
+    }
+  }
+  // Biggest runs first — the store he'll spend the most time in leads.
+  return Array.from(runs.values()).sort((a, b) => b.items.length - a.items.length);
+}
+
 export function PlanScreen({ navigation }: Props) {
-  const { wardrobePlan, storeById, resetSession } = useAppContext();
+  const { wardrobePlan, stores, setStores, setCategoryLabels, storeById, resetSession } = useAppContext();
+
+  // On a cold app restore, the persisted plan can land here before the
+  // store directory has ever been fetched (that normally happens on the
+  // Welcome screen) — without it, store names render as raw ids.
+  React.useEffect(() => {
+    if (stores.length > 0) return;
+    fetchStores()
+      .then(({ stores, categoryLabels }) => {
+        setStores(stores);
+        setCategoryLabels(categoryLabels);
+      })
+      .catch(() => {
+        // Names fall back to ids; nothing else breaks.
+      });
+  }, [stores.length]);
 
   function handleStartOver() {
     resetSession();
@@ -78,6 +126,8 @@ export function PlanScreen({ navigation }: Props) {
           </View>
         ))}
 
+        <StoreRunList runs={buildStoreRuns(plan, storeById)} />
+
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
           {(plan.generalBuyingTips ?? []).map((tip, i) => (
@@ -100,6 +150,49 @@ export function PlanScreen({ navigation }: Props) {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function StoreRunList({ runs }: { runs: StoreRun[] }) {
+  if (runs.length === 0) return null;
+  return (
+    <View style={styles.runCard}>
+      <Text style={styles.runHeader}>Your store run list</Text>
+      <Text style={styles.runSubheader}>
+        Every item above, regrouped by store — this is your errand list. Show it at the counter.
+      </Text>
+      {runs.map((run) => {
+        const low = run.items.reduce((sum, it) => sum + it.low, 0);
+        const high = run.items.reduce((sum, it) => sum + it.high, 0);
+        const name = run.store?.name ?? run.storeId;
+        return (
+          <View key={run.storeId} style={styles.runStore}>
+            <View style={styles.runStoreHeader}>
+              <Text style={styles.runStoreName}>{name}</Text>
+              <Text style={styles.runStoreBudget}>
+                {money(low)} – {money(high)}
+              </Text>
+            </View>
+            {run.store?.neighborhood ? <Text style={styles.runStoreMeta}>{run.store.neighborhood}</Text> : null}
+            {run.store?.contact ? <Text style={styles.runStoreContact}>{run.store.contact}</Text> : null}
+            {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
+            {run.items.map((it, i) => (
+              <Text key={i} style={styles.runItem}>
+                •  {it.label}
+                {it.phaseName ? `  (${it.phaseName})` : ""}
+              </Text>
+            ))}
+            {run.store?.website ? (
+              <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8}>
+                <Text style={styles.runStoreLink}>
+                  {run.store.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} →
+                </Text>
+              </Pressable>
+            ) : null}
+          </View>
+        );
+      })}
+    </View>
   );
 }
 
@@ -168,6 +261,17 @@ const styles = StyleSheet.create({
   },
   scriptLabel: { ...typography.small, color: colors.bayou, fontWeight: "800", letterSpacing: 0.5 },
   scriptText: { ...typography.small },
+  runCard: { backgroundColor: colors.blazerNavy, borderRadius: radii.lg, padding: spacing.md, gap: spacing.sm },
+  runHeader: { color: colors.cream, fontSize: 20, fontWeight: "800" },
+  runSubheader: { color: colors.cream, opacity: 0.8, fontSize: 13, lineHeight: 18, marginBottom: spacing.xs },
+  runStore: { backgroundColor: "rgba(255,255,255,0.08)", borderRadius: radii.md, padding: spacing.sm, gap: 3 },
+  runStoreHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  runStoreName: { color: colors.cream, fontSize: 16, fontWeight: "700", flexShrink: 1 },
+  runStoreBudget: { color: colors.gold, fontWeight: "700", fontSize: 13 },
+  runStoreMeta: { color: colors.cream, opacity: 0.75, fontSize: 12, lineHeight: 17 },
+  runStoreContact: { color: colors.gold, fontSize: 13, fontWeight: "700" },
+  runItem: { color: colors.cream, fontSize: 13, lineHeight: 19 },
+  runStoreLink: { color: colors.gold, fontSize: 12, fontWeight: "700", textDecorationLine: "underline", marginTop: 2 },
   tipsCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border, gap: spacing.xs },
   tipText: { ...typography.body },
   pepCard: { backgroundColor: colors.gold, borderRadius: radii.md, padding: spacing.md },
