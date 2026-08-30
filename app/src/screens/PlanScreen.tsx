@@ -15,8 +15,8 @@ const PRIORITY_COLOR: Record<StorePriority, string> = {
   "nice-to-have": colors.muted,
 };
 
-function money(n: number) {
-  return `$${n.toLocaleString()}`;
+function money(n: number | undefined | null) {
+  return `$${(Number(n) || 0).toLocaleString()}`;
 }
 
 export function PlanScreen({ navigation }: Props) {
@@ -49,22 +49,22 @@ export function PlanScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.budgetCard}>
-          <Text style={styles.budgetTotal}>{money(plan.budgetSummary.totalBudgetUsd)} total budget</Text>
-          {plan.budgetSummary.perPhaseUsd.map((p) => (
-            <View key={p.phaseName} style={styles.budgetRow}>
-              <Text style={styles.budgetPhase}>{p.phaseName}</Text>
+          <Text style={styles.budgetTotal}>{money(plan.budgetSummary?.totalBudgetUsd)} total budget</Text>
+          {(plan.budgetSummary?.perPhaseUsd ?? []).map((p, i) => (
+            <View key={p.phaseName ?? i} style={styles.budgetRow}>
+              <Text style={styles.budgetPhase}>{p.phaseName ?? "Phase"}</Text>
               <Text style={styles.budgetAmount}>{money(p.amountUsd)}</Text>
             </View>
           ))}
         </View>
 
-        {plan.phases.map((phase) => (
-          <View key={phase.name} style={styles.phaseCard}>
-            <Text style={styles.phaseTiming}>{phase.timingLabel.toUpperCase()}</Text>
-            <Text style={styles.phaseName}>{phase.name}</Text>
+        {(plan.phases ?? []).map((phase, i) => (
+          <View key={phase.name ?? i} style={styles.phaseCard}>
+            <Text style={styles.phaseTiming}>{(phase.timingLabel ?? "").toUpperCase()}</Text>
+            <Text style={styles.phaseName}>{phase.name ?? "Phase"}</Text>
             <Text style={styles.phaseGoal}>{phase.goal}</Text>
 
-            {phase.items.map((item, idx) => (
+            {(phase.items ?? []).map((item, idx) => (
               <ItemRow key={idx} item={item} storeName={(id) => storeById(id)?.name ?? id} />
             ))}
           </View>
@@ -72,7 +72,7 @@ export function PlanScreen({ navigation }: Props) {
 
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
-          {plan.generalBuyingTips.map((tip, i) => (
+          {(plan.generalBuyingTips ?? []).map((tip, i) => (
             <Text key={i} style={styles.tipText}>
               •  {tip}
             </Text>
@@ -103,16 +103,16 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
           {item.quantity > 1 ? `${item.quantity}× ` : ""}
           {item.category}
         </Text>
-        <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] }]}>
-          <Text style={styles.priorityText}>{item.priority}</Text>
+        <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] ?? colors.muted }]}>
+          <Text style={styles.priorityText}>{item.priority ?? "recommended"}</Text>
         </View>
       </View>
       <Text style={styles.itemDescription}>{item.description}</Text>
       <Text style={styles.itemBudget}>
         {money(item.estimatedBudgetLowUsd)} – {money(item.estimatedBudgetHighUsd)}
       </Text>
-      {item.recommendedStoreIds.length > 0 && (
-        <Text style={styles.itemStores}>Where: {item.recommendedStoreIds.map(storeName).join(", ")}</Text>
+      {(item.recommendedStoreIds ?? []).length > 0 && (
+        <Text style={styles.itemStores}>Where: {(item.recommendedStoreIds ?? []).map(storeName).join(", ")}</Text>
       )}
       <Text style={styles.itemNotes}>{item.buyingNotes}</Text>
     </View>
