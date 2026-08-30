@@ -38,8 +38,9 @@ const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   },
   {
     scoutName: "Jones (Luxury Department & Contemporary Scout)",
-    categories: ["luxury-department", "contemporary-boutique"],
-    focus: "designer ready-to-wear, department-store menswear, and contemporary boutique pieces",
+    categories: ["luxury-department", "contemporary-boutique", "formal-wear", "big-tall"],
+    focus:
+      "designer ready-to-wear, department-store and big & tall menswear, contemporary boutique pieces, and tuxedo/formal-wear for black-tie events",
   },
   {
     scoutName: "Hobby (Footwear & Western Scout)",

@@ -1,10 +1,14 @@
 import { Router } from "express";
 import { requireSession } from "../sessionStore";
 import { generateWardrobePlan } from "../agents/orchestrator";
+import { agentRouteLimiter } from "../rateLimiter";
 
 export const planRouter = Router();
 
-planRouter.post("/generate", (req, res, next) => {
+// Only this route actually calls Claude — the GET status poll below is a
+// cheap in-memory read a client hits every few seconds for minutes while a
+// plan builds, so it deliberately stays outside this limiter.
+planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
   try {
     const { sessionId } = req.body as { sessionId?: string };
     if (!sessionId) {

@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import type { HoustonStore, PhotoAssessment, StoreCategory, StyleProfile, WardrobePlan } from "../types";
 
 // Set EXPO_PUBLIC_API_BASE_URL in app/.env to point at your running server
@@ -36,14 +37,26 @@ export interface PickedPhoto {
 export async function analyzePhotos(sessionId: string, photos: PickedPhoto[]) {
   const form = new FormData();
   form.append("sessionId", sessionId);
-  photos.forEach((photo, i) => {
-    // React Native's FormData accepts this { uri, name, type } shape directly.
-    form.append("photos", {
-      uri: photo.uri,
-      name: photo.fileName ?? `photo-${i}.jpg`,
-      type: photo.mimeType ?? "image/jpeg",
-    } as unknown as Blob);
-  });
+
+  if (Platform.OS === "web") {
+    // A browser's real FormData needs an actual Blob/File — the
+    // { uri, name, type } object below is a React Native-only convention
+    // and silently produces no file part in a web build (confirmed: the
+    // server received zero files even though a photo was selected).
+    for (const [i, photo] of photos.entries()) {
+      const blob = await fetch(photo.uri).then((r) => r.blob());
+      form.append("photos", blob, photo.fileName ?? `photo-${i}.jpg`);
+    }
+  } else {
+    photos.forEach((photo, i) => {
+      // React Native's FormData accepts this { uri, name, type } shape directly.
+      form.append("photos", {
+        uri: photo.uri,
+        name: photo.fileName ?? `photo-${i}.jpg`,
+        type: photo.mimeType ?? "image/jpeg",
+      } as unknown as Blob);
+    });
+  }
 
   return request<{ assessment: PhotoAssessment }>("/api/photo/analyze", {
     method: "POST",

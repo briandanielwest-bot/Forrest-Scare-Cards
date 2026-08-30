@@ -15,8 +15,16 @@ const PRIORITY_COLOR: Record<StorePriority, string> = {
   "nice-to-have": colors.muted,
 };
 
-function money(n: number) {
-  return `$${n.toLocaleString()}`;
+function money(n: number | undefined | null) {
+  return `$${(Number(n) || 0).toLocaleString()}`;
+}
+
+// The model occasionally writes the literal two-character sequence \n
+// inside a free-text field instead of an actual newline (seen live in
+// introNarrative) — this turns those back into real line breaks so text
+// doesn't render with visible backslash-n in it.
+function cleanText(text: string | undefined | null): string {
+  return (text ?? "").replace(/\\n/g, "\n");
 }
 
 export function PlanScreen({ navigation }: Props) {
@@ -41,30 +49,30 @@ export function PlanScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.guideTitle}>{plan.guideTitle}</Text>
-        <Text style={styles.narrative}>{plan.introNarrative}</Text>
+        <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
         <View style={styles.calloutCard}>
           <Text style={styles.calloutLabel}>Houston climate notes</Text>
-          <Text style={styles.calloutText}>{plan.climateNotes}</Text>
+          <Text style={styles.calloutText}>{cleanText(plan.climateNotes)}</Text>
         </View>
 
         <View style={styles.budgetCard}>
-          <Text style={styles.budgetTotal}>{money(plan.budgetSummary.totalBudgetUsd)} total budget</Text>
-          {plan.budgetSummary.perPhaseUsd.map((p) => (
-            <View key={p.phaseName} style={styles.budgetRow}>
-              <Text style={styles.budgetPhase}>{p.phaseName}</Text>
+          <Text style={styles.budgetTotal}>{money(plan.budgetSummary?.totalBudgetUsd)} total budget</Text>
+          {(plan.budgetSummary?.perPhaseUsd ?? []).map((p, i) => (
+            <View key={p.phaseName ?? i} style={styles.budgetRow}>
+              <Text style={styles.budgetPhase}>{p.phaseName ?? "Phase"}</Text>
               <Text style={styles.budgetAmount}>{money(p.amountUsd)}</Text>
             </View>
           ))}
         </View>
 
-        {plan.phases.map((phase) => (
-          <View key={phase.name} style={styles.phaseCard}>
-            <Text style={styles.phaseTiming}>{phase.timingLabel.toUpperCase()}</Text>
-            <Text style={styles.phaseName}>{phase.name}</Text>
-            <Text style={styles.phaseGoal}>{phase.goal}</Text>
+        {(plan.phases ?? []).map((phase, i) => (
+          <View key={phase.name ?? i} style={styles.phaseCard}>
+            <Text style={styles.phaseTiming}>{(phase.timingLabel ?? "").toUpperCase()}</Text>
+            <Text style={styles.phaseName}>{phase.name ?? "Phase"}</Text>
+            <Text style={styles.phaseGoal}>{cleanText(phase.goal)}</Text>
 
-            {phase.items.map((item, idx) => (
+            {(phase.items ?? []).map((item, idx) => (
               <ItemRow key={idx} item={item} storeName={(id) => storeById(id)?.name ?? id} />
             ))}
           </View>
@@ -72,15 +80,15 @@ export function PlanScreen({ navigation }: Props) {
 
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
-          {plan.generalBuyingTips.map((tip, i) => (
+          {(plan.generalBuyingTips ?? []).map((tip, i) => (
             <Text key={i} style={styles.tipText}>
-              •  {tip}
+              •  {cleanText(tip)}
             </Text>
           ))}
         </View>
 
         <View style={styles.pepCard}>
-          <Text style={styles.pepText}>{plan.finalPepTalk}</Text>
+          <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
@@ -103,18 +111,23 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
           {item.quantity > 1 ? `${item.quantity}× ` : ""}
           {item.category}
         </Text>
-        <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] }]}>
-          <Text style={styles.priorityText}>{item.priority}</Text>
+        <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] ?? colors.muted }]}>
+          <Text style={styles.priorityText}>{item.priority ?? "recommended"}</Text>
         </View>
       </View>
-      <Text style={styles.itemDescription}>{item.description}</Text>
+      <Text style={styles.itemDescription}>{cleanText(item.description)}</Text>
       <Text style={styles.itemBudget}>
         {money(item.estimatedBudgetLowUsd)} – {money(item.estimatedBudgetHighUsd)}
       </Text>
-      {item.recommendedStoreIds.length > 0 && (
-        <Text style={styles.itemStores}>Where: {item.recommendedStoreIds.map(storeName).join(", ")}</Text>
+      {(item.recommendedStoreIds ?? []).length > 0 && (
+        <Text style={styles.itemStores}>Where: {(item.recommendedStoreIds ?? []).map(storeName).join(", ")}</Text>
       )}
-      <Text style={styles.itemNotes}>{item.buyingNotes}</Text>
+      {item.buyingNotes ? (
+        <View style={styles.scriptBox}>
+          <Text style={styles.scriptLabel}>WHAT TO SAY IN-STORE</Text>
+          <Text style={styles.scriptText}>{cleanText(item.buyingNotes)}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -144,7 +157,17 @@ const styles = StyleSheet.create({
   itemDescription: { ...typography.body },
   itemBudget: { ...typography.small, color: colors.bayou, fontWeight: "700" },
   itemStores: { ...typography.small },
-  itemNotes: { ...typography.small, fontStyle: "italic" },
+  scriptBox: {
+    backgroundColor: colors.cream,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    padding: spacing.sm,
+    marginTop: 4,
+    gap: 2,
+  },
+  scriptLabel: { ...typography.small, color: colors.bayou, fontWeight: "800", letterSpacing: 0.5 },
+  scriptText: { ...typography.small },
   tipsCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border, gap: spacing.xs },
   tipText: { ...typography.body },
   pepCard: { backgroundColor: colors.gold, borderRadius: radii.md, padding: spacing.md },

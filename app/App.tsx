@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppProvider, useAppContext } from "./src/context/AppContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
+import { ErrorBoundary } from "./src/components/ErrorBoundary";
 import { colors } from "./src/theme/theme";
 
 function AppGate() {
@@ -22,11 +23,24 @@ function AppGate() {
   return <RootNavigator initialRouteName={wardrobePlan ? "Plan" : "Welcome"} />;
 }
 
+function GuardedAppGate() {
+  // resetSession (not just clearing the boundary's own error state) is
+  // required on reset — if a crash was caused by malformed plan data,
+  // AppGate would immediately re-derive the same "Plan" route from that
+  // same bad data and crash again.
+  const { resetSession } = useAppContext();
+  return (
+    <ErrorBoundary onReset={resetSession}>
+      <AppGate />
+    </ErrorBoundary>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <AppGate />
+        <GuardedAppGate />
         <StatusBar style="light" />
       </AppProvider>
     </SafeAreaProvider>
