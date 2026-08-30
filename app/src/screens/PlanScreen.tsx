@@ -19,6 +19,14 @@ function money(n: number | undefined | null) {
   return `$${(Number(n) || 0).toLocaleString()}`;
 }
 
+// The model occasionally writes the literal two-character sequence \n
+// inside a free-text field instead of an actual newline (seen live in
+// introNarrative) — this turns those back into real line breaks so text
+// doesn't render with visible backslash-n in it.
+function cleanText(text: string | undefined | null): string {
+  return (text ?? "").replace(/\\n/g, "\n");
+}
+
 export function PlanScreen({ navigation }: Props) {
   const { wardrobePlan, storeById, resetSession } = useAppContext();
 
@@ -41,11 +49,11 @@ export function PlanScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.guideTitle}>{plan.guideTitle}</Text>
-        <Text style={styles.narrative}>{plan.introNarrative}</Text>
+        <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
         <View style={styles.calloutCard}>
           <Text style={styles.calloutLabel}>Houston climate notes</Text>
-          <Text style={styles.calloutText}>{plan.climateNotes}</Text>
+          <Text style={styles.calloutText}>{cleanText(plan.climateNotes)}</Text>
         </View>
 
         <View style={styles.budgetCard}>
@@ -62,7 +70,7 @@ export function PlanScreen({ navigation }: Props) {
           <View key={phase.name ?? i} style={styles.phaseCard}>
             <Text style={styles.phaseTiming}>{(phase.timingLabel ?? "").toUpperCase()}</Text>
             <Text style={styles.phaseName}>{phase.name ?? "Phase"}</Text>
-            <Text style={styles.phaseGoal}>{phase.goal}</Text>
+            <Text style={styles.phaseGoal}>{cleanText(phase.goal)}</Text>
 
             {(phase.items ?? []).map((item, idx) => (
               <ItemRow key={idx} item={item} storeName={(id) => storeById(id)?.name ?? id} />
@@ -74,13 +82,13 @@ export function PlanScreen({ navigation }: Props) {
           <Text style={styles.calloutLabel}>Buying tips</Text>
           {(plan.generalBuyingTips ?? []).map((tip, i) => (
             <Text key={i} style={styles.tipText}>
-              •  {tip}
+              •  {cleanText(tip)}
             </Text>
           ))}
         </View>
 
         <View style={styles.pepCard}>
-          <Text style={styles.pepText}>{plan.finalPepTalk}</Text>
+          <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
@@ -107,14 +115,14 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
           <Text style={styles.priorityText}>{item.priority ?? "recommended"}</Text>
         </View>
       </View>
-      <Text style={styles.itemDescription}>{item.description}</Text>
+      <Text style={styles.itemDescription}>{cleanText(item.description)}</Text>
       <Text style={styles.itemBudget}>
         {money(item.estimatedBudgetLowUsd)} – {money(item.estimatedBudgetHighUsd)}
       </Text>
       {(item.recommendedStoreIds ?? []).length > 0 && (
         <Text style={styles.itemStores}>Where: {(item.recommendedStoreIds ?? []).map(storeName).join(", ")}</Text>
       )}
-      <Text style={styles.itemNotes}>{item.buyingNotes}</Text>
+      <Text style={styles.itemNotes}>{cleanText(item.buyingNotes)}</Text>
     </View>
   );
 }
