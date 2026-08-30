@@ -36,8 +36,9 @@ interface ScoutDefinition {
 const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   {
     scoutName: "Biggio (Bespoke & Made-to-Measure Scout)",
-    categories: ["bespoke-tailoring"],
-    focus: "custom and made-to-measure tailoring — suits and shirts built or fitted specifically to this man",
+    categories: ["bespoke-tailoring", "alterations"],
+    focus:
+      "custom and made-to-measure tailoring — suits and shirts built or fitted specifically to this man — plus dedicated alterations shops for making off-the-rack pieces fit",
   },
   {
     scoutName: "Drexler (Luxury Department & Contemporary Scout)",
@@ -52,8 +53,9 @@ const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   },
   {
     scoutName: "Wagner (Lifestyle & Accessories Scout)",
-    categories: ["lifestyle-accessories"],
-    focus: "grooming, small leather goods, and finishing accessories",
+    categories: ["lifestyle-accessories", "eyewear"],
+    focus:
+      "grooming, small leather goods, finishing accessories, and eyewear (the planner downstream matches frames to his face shape, so include an eyewear option at his price tier when glasses could plausibly matter)",
   },
 ];
 
@@ -81,7 +83,7 @@ const RECOMMEND_TOOL: Anthropic.Tool = {
 
 function buildSystemPrompt(def: ScoutDefinition): string {
   const plainName = def.scoutName.split(" (")[0];
-  return `You are ${plainName}, a Houston menswear store scout inside the Bayou & Blazer app. You specialize in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty — each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier — and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. In each reason, be concrete about what he'd buy THERE specifically. It's fine to recommend fewer stores than are in the list, or all of them, if all genuinely fit. Call submit_recommendations exactly once.`;
+  return `You are ${plainName}, a Houston menswear store scout inside the Bayou & Blazer app. You specialize in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty — each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier — and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. If his profile includes a homeBase (where in the Houston area he lives/works), weigh each store's neighborhood against it — Houston distances are real, and a store he'll actually get to beats a marginally better one 45 minutes away; a genuinely superior fit can still earn the drive, just say so in the reason. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. In each reason, be concrete about what he'd buy THERE specifically. It's fine to recommend fewer stores than are in the list, or all of them, if all genuinely fit. Call submit_recommendations exactly once.`;
 }
 
 async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrief: string): Promise<ScoutReport> {

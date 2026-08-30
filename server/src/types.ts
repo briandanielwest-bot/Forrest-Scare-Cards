@@ -5,6 +5,8 @@ export interface StyleProfile {
   budgetTotalUsd: number;
   budgetCadence: "one-time" | "monthly" | "quarterly";
   lifestyle: string;
+  /** Where in the Houston area he lives/works — routes the plan to nearby stores. */
+  homeBase?: string;
   dressCodes: string[];
   styleArchetypes: string[];
   fitPreferences: string;

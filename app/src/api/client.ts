@@ -15,13 +15,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function startInterview() {
-  return request<{ sessionId: string; reply: string; done: boolean }>("/api/interview/start", {
+  return request<{ sessionId: string; reply: string; done: boolean; quickReplies?: string[] }>("/api/interview/start", {
     method: "POST",
   });
 }
 
 export function sendInterviewMessage(sessionId: string, message: string) {
-  return request<{ reply: string; done: boolean; profile?: StyleProfile }>("/api/interview/message", {
+  return request<{ reply: string; done: boolean; profile?: StyleProfile; quickReplies?: string[] }>("/api/interview/message", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sessionId, message }),
