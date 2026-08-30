@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { anthropic } from "../anthropicClient";
+import { anthropic, type WithEffort } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 import { getStoresByCategory, STORE_CATEGORY_LABELS, type HoustonStore, type StoreCategory } from "../data/houstonStores";
 import type { StyleProfile } from "../types";
@@ -95,14 +95,19 @@ ${climateBrief}
 CANDIDATE STORES (${def.categories.map((c) => STORE_CATEGORY_LABELS[c]).join(", ")}):
 ${JSON.stringify(candidates.map((c) => ({ id: c.id, name: c.name, priceTier: c.priceTier, styleTags: c.styleTags, bestFor: c.bestFor })), null, 2)}`;
 
-  const response = await anthropic.messages.create({
+  const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: AGENT_MODEL,
     max_tokens: 2048,
     system: buildSystemPrompt(def),
     messages: [{ role: "user", content: userMessage }],
     tools: [RECOMMEND_TOOL],
     tool_choice: { type: "tool", name: "submit_recommendations" },
-  });
+    // Ranking a short candidate list against a profile doesn't need deep
+    // reasoning, and four of these run in parallel ahead of the planner —
+    // low effort here is the single biggest lever on total wait time.
+    output_config: { effort: "low" },
+  };
+  const response = await anthropic.messages.create(params);
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_recommendations",
