@@ -78,7 +78,7 @@ const RECOMMEND_TOOL: Anthropic.Tool = {
 
 function buildSystemPrompt(def: ScoutDefinition): string {
   const plainName = def.scoutName.split(" (")[0];
-  return `You are ${plainName}, a Houston menswear store scout inside the Bayou & Blazer app. You specialize in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty and a man's style profile. Pick and rank the stores from the candidate list that best fit HIS budget, style, and lifestyle — do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. It's fine to recommend fewer stores than are in the list, or all of them, if all genuinely fit. Call submit_recommendations exactly once.`;
+  return `You are ${plainName}, a Houston menswear store scout inside the Bayou & Blazer app. You specialize in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty — each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier — and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. In each reason, be concrete about what he'd buy THERE specifically. It's fine to recommend fewer stores than are in the list, or all of them, if all genuinely fit. Call submit_recommendations exactly once.`;
 }
 
 async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrief: string): Promise<ScoutReport> {
@@ -95,7 +95,20 @@ HOUSTON CLIMATE CONTEXT:
 ${climateBrief}
 
 CANDIDATE STORES (${def.categories.map((c) => STORE_CATEGORY_LABELS[c]).join(", ")}):
-${JSON.stringify(candidates.map((c) => ({ id: c.id, name: c.name, priceTier: c.priceTier, styleTags: c.styleTags, bestFor: c.bestFor })), null, 2)}`;
+${JSON.stringify(
+    candidates.map((c) => ({
+      id: c.id,
+      name: c.name,
+      neighborhood: c.neighborhood,
+      priceTier: c.priceTier,
+      styleTags: c.styleTags,
+      whatItIs: c.description,
+      bestFor: c.bestFor,
+      howToBuy: c.howToBuy,
+    })),
+    null,
+    2,
+  )}`;
 
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: AGENT_MODEL,

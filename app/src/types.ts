@@ -81,6 +81,7 @@ export interface HoustonStore {
   howToBuy: string;
   description: string;
   website: string;
+  contact?: string;
 }
 
 export interface ChatMessage {
