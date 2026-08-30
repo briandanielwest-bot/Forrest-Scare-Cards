@@ -45,7 +45,7 @@ export function InterviewScreen({ navigation }: Props) {
         setInterviewDone(true);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Tex didn't get that — try again?");
+      setError(e instanceof Error ? e.message : "Kyla didn't get that — try again?");
     } finally {
       setSending(false);
       requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
@@ -76,7 +76,7 @@ export function InterviewScreen({ navigation }: Props) {
 
         {interviewDone ? (
           <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("PhotoUpload")}>
-            <Text style={styles.primaryButtonText}>Next: show The Eye your photos →</Text>
+            <Text style={styles.primaryButtonText}>Next: show Fondren your photos →</Text>
           </Pressable>
         ) : (
           <View style={styles.inputRow}>

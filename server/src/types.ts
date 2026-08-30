@@ -69,6 +69,8 @@ export interface WardrobePlan {
   finalPepTalk: string;
 }
 
+export type PlanStatus = "idle" | "generating" | "done" | "error";
+
 export interface SessionState {
   id: string;
   createdAt: number;
@@ -77,6 +79,8 @@ export interface SessionState {
   styleProfile?: StyleProfile;
   photoAssessment?: PhotoAssessment;
   wardrobePlan?: WardrobePlan;
+  planStatus: PlanStatus;
+  planError?: string;
 }
 
 export interface UploadedImage {

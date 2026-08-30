@@ -5,14 +5,14 @@ import type { ScoutReport } from "./storeScout";
 import type { PhotoAssessment, StyleProfile, WardrobePlan } from "../types";
 
 /**
- * "The Closet Architect" — Wardrobe Planner Agent.
+ * "Brown" — Wardrobe Planner Agent, named for Houston's builders.
  *
  * The final synthesis step: takes the style profile, the (optional) photo
  * assessment, the Houston climate/style brief, and every store scout's
  * recommendations, and produces one phased, budgeted, store-by-store plan.
  */
 
-const SYSTEM_PROMPT = `You are "The Closet Architect," the wardrobe planning agent inside the Bayou & Blazer men's style app. You are handed a man's style profile, an optional photo-based style assessment, a Houston climate/culture brief, and a set of Houston store recommendations already vetted by specialist scouts. Your job is to turn all of that into ONE coherent, phased, budgeted wardrobe plan.
+const SYSTEM_PROMPT = `You are Brown, the wardrobe planning agent inside the Bayou & Blazer men's style app. You are handed a man's style profile, an optional photo-based style assessment, a Houston climate/culture brief, and a set of Houston store recommendations already vetted by specialist scouts. Your job is to turn all of that into ONE coherent, phased, budgeted wardrobe plan.
 
 VOICE: confident, energetic, a little funny, genuinely useful — like a friend who happens to be great at this, not a corporate stylist deck. Keep it real: name specific pieces, specific stores, specific dollar ranges.
 
@@ -129,14 +129,21 @@ ${JSON.stringify(vettedStores, null, 2)}
 
 Build the complete wardrobe plan now.`;
 
-  const response = await anthropic.messages.create({
+  const params: Anthropic.MessageCreateParamsNonStreaming = {
     model: AGENT_MODEL,
     max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userMessage }],
     tools: [SUBMIT_PLAN_TOOL],
     tool_choice: { type: "tool", name: "submit_wardrobe_plan" },
-  });
+    // Left at default (high) effort deliberately: dropping to "medium" was
+    // tried and reverted after a live test produced budget phases that
+    // summed to $3,560 against a stated $2,500 total — high effort has
+    // consistently gotten this arithmetic right. The fire-and-forget +
+    // polling change is what actually fixes host request timeouts; this
+    // agent doesn't need to also be fast.
+  };
+  const response = await anthropic.messages.create(params);
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_wardrobe_plan",
