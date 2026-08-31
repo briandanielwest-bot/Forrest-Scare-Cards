@@ -315,7 +315,7 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
-                •  {it.label}
+                •  {it.label} — {moneyRange(it.low, it.high)}
                 {it.phaseName ? `  (${it.phaseName})` : ""}
               </Text>
             ))}
