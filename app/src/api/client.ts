@@ -196,9 +196,9 @@ export function askKylaAboutPlan(sessionId: string, question: string, purchasedK
   });
 }
 
-// One-off Houston style questions answered by Campbell's almanac — no
+// One-off Houston style questions answered by the concierge's almanac. No
 // session needed ("what do I wear to a Rodeo gala?").
-export function askCampbell(question: string) {
+export function askConcierge(question: string) {
   return request<{ reply: string }>("/api/almanac/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

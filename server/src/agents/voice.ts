@@ -2,7 +2,7 @@
  * Shared voice rules and the mechanical backstop behind them.
  *
  * Every agent that writes customer-facing prose (Kyla interviewing, Kyla
- * answering plan questions, Moon writing the plan) carries the same block,
+ * answering plan questions, Elena writing the plan) carries the same block,
  * so the house voice can't drift between the three of them.
  *
  * The em-dash rule is the one worth explaining. Telling a model "at most

@@ -3,7 +3,7 @@ import { ActivityIndicator, Linking, Pressable, SectionList, StyleSheet, Text, T
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppContext } from "../context/AppContext";
 import { fetchStores } from "../api/client";
-import { AskCampbell } from "../components/AskCampbell";
+import { AskConcierge } from "../components/AskConcierge";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, StoreCategory } from "../types";
 
@@ -105,7 +105,7 @@ export function StoreDirectoryScreen() {
         sections={sections}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<AskCampbell />}
+        ListHeaderComponent={<AskConcierge />}
         renderSectionHeader={({ section }) => <Text style={styles.sectionHeader}>{section.title}</Text>}
         renderItem={({ item }) => (
           <View style={styles.card}>

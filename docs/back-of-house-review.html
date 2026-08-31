@@ -60,20 +60,20 @@
     <div class="table-scroll"><table>
       <tr><th>Agent</th><th>Job</th><th>What they hand off, and to whom</th></tr>
       <tr><td>Kyla</td><td>Interview → profile</td><td>Typed profile + free-text notes (his goal, urgency, handle-with-care flags) → everyone</td></tr>
-      <tr><td>Watt</td><td>Photo → fit/face/body read</td><td>Assessment → Moon (runs in parallel, costs no time)</td></tr>
-      <tr><td>Campbell</td><td>Climate, calendar, city intel</td><td>A pre-written brief baked into everyone's knowledge; answers directory questions live</td></tr>
-      <tr><td>4 buying directors</td><td>Store vetting per category</td><td>Top 3–4 picks with 25-word expert takes → Moon (they start working the moment the interview ends)</td></tr>
-      <tr><td>Moon</td><td>The plan</td><td>The full playbook → the customer, and back to Kyla for plan chat</td></tr>
+      <tr><td>Theo</td><td>Photo → fit/face/body read</td><td>Assessment → Elena (runs in parallel, costs no time)</td></tr>
+      <tr><td>Marisol</td><td>Climate, calendar, city intel</td><td>A pre-written brief baked into everyone's knowledge; answers directory questions live</td></tr>
+      <tr><td>4 buying directors</td><td>Store vetting per category</td><td>Top 3–4 picks with 25-word expert takes → Elena (they start working the moment the interview ends)</td></tr>
+      <tr><td>Elena</td><td>The plan</td><td>The full playbook → the customer, and back to Kyla for plan chat</td></tr>
       <tr><td>Kyla (plan chat)</td><td>Post-plan questions</td><td>Reads the plan, the store directory, his purchases, and his outfit matrix</td></tr>
       <tr><td>Ryan</td><td>Monthly researcher</td><td>Store status, insider notes, season brief, price brief → everyone's knowledge, automatically</td></tr>
     </table></div>
-    <p>The important design fact: <strong>they already talk — through structured paper, not conversation.</strong> Kyla's "handle with care" notes reach Moon. The directors' takes are merged and de-duplicated before Moon reads them. His purchases reach Kyla's chat. This is how restaurant kitchens work: tickets, not meetings.</p>
+    <p>The important design fact: <strong>they already talk — through structured paper, not conversation.</strong> Kyla's "handle with care" notes reach Elena. The directors' takes are merged and de-duplicated before Elena reads them. His purchases reach Kyla's chat. This is how restaurant kitchens work: tickets, not meetings.</p>
   </section>
 
   <section>
     <p class="eyebrow">The huddle question</p>
-    <h2>Moon already is the huddle</h2>
-    <p>A literal huddle agent — everyone "meets" before the plan is written — sounds right and prices wrong. Every extra meeting is a serial model call: <span class="cost">+6–15s</span> a customer feels, for information Moon already receives in full. He is the one staff member who reads everybody's work before deciding anything; adding a coordinator above him duplicates his job and slows the kitchen.</p>
+    <h2>Elena already is the huddle</h2>
+    <p>A literal huddle agent — everyone "meets" before the plan is written — sounds right and prices wrong. Every extra meeting is a serial model call: <span class="cost">+6–15s</span> a customer feels, for information Elena already receives in full. He is the one staff member who reads everybody's work before deciding anything; adding a coordinator above him duplicates his job and slows the kitchen.</p>
     <p><strong>The principle for this app: improve the tickets, not the meetings.</strong> Every idea below follows it — richer handoffs, better timing, more memory — and almost none of it adds a second to the customer's wait.</p>
   </section>
 
@@ -96,13 +96,13 @@
     <div class="card">
       <p class="verdict build">Build third · zero latency · quality floor</p>
       <h3>3. The deterministic inspector</h3>
-      <p>Code, not an agent: after Moon writes a plan and before the customer sees it, mechanical checks run — banned colors appearing in items, made-to-measure lead times inside an urgent phase, plan total wildly off the stated budget, a store id that isn't in the directory. Failures trigger the existing auto-retry. The budget-math check already works this way and has caught real errors; this widens the net for free. An agent "editor" doing the same review would cost <span class="cost">+6–10s</span> per plan — build the code version, keep the agent version in the drawer.</p>
+      <p>Code, not an agent: after Elena writes a plan and before the customer sees it, mechanical checks run — banned colors appearing in items, made-to-measure lead times inside an urgent phase, plan total wildly off the stated budget, a store id that isn't in the directory. Failures trigger the existing auto-retry. The budget-math check already works this way and has caught real errors; this widens the net for free. An agent "editor" doing the same review would cost <span class="cost">+6–10s</span> per plan — build the code version, keep the agent version in the drawer.</p>
     </div>
 
     <div class="card">
       <p class="verdict build">Build fourth · zero latency · sharper handoff</p>
       <h3>4. The typed client brief</h3>
-      <p>Kyla's most important intelligence — his goal in his own words, urgency, sensitive topics, quick wins — currently travels as free-text notes with agreed prefixes. Formalizing them as named fields in her submission (goal, urgentEvent, handleWithCare, quickWin) makes the handoff un-droppable: Moon and the inspector can rely on structure instead of parsing prose. Small change, permanent reliability gain.</p>
+      <p>Kyla's most important intelligence — his goal in his own words, urgency, sensitive topics, quick wins — currently travels as free-text notes with agreed prefixes. Formalizing them as named fields in her submission (goal, urgentEvent, handleWithCare, quickWin) makes the handoff un-droppable: Elena and the inspector can rely on structure instead of parsing prose. Small change, permanent reliability gain.</p>
     </div>
 
     <div class="card">
@@ -114,7 +114,7 @@
     <div class="card">
       <p class="verdict build">Worth building · tiny cost, once per customer</p>
       <h3>6. The late-photo courtesy pass</h3>
-      <p>The directors start work the moment the interview ends — usually before Watt finishes reading photos. That's the right trade (it's why plans feel fast), but it means frame and collar picks lean on stated preferences alone when the photo lands late. A cheap fix: when Watt's read arrives after the directors finished, re-run <em>only</em> the accessories director with the face data — <span class="cost">~4s</span>, hidden inside the planner's minute, only when photos were actually uploaded.</p>
+      <p>The directors start work the moment the interview ends — usually before Theo finishes reading photos. That's the right trade (it's why plans feel fast), but it means frame and collar picks lean on stated preferences alone when the photo lands late. A cheap fix: when Theo's read arrives after the directors finished, re-run <em>only</em> the accessories director with the face data — <span class="cost">~4s</span>, hidden inside the planner's minute, only when photos were actually uploaded.</p>
     </div>
   </section>
 
@@ -122,8 +122,8 @@
     <p class="eyebrow">Considered and rejected</p>
     <h2>Ideas that don't earn their latency</h2>
     <ul>
-      <li><strong>A huddle/coordinator agent</strong> — duplicates Moon, costs <span class="cost">+6–15s</span>, adds a failure point. The tickets are the meeting.</li>
-      <li><strong>Agent-to-agent live chatter</strong> (directors querying each other mid-run) — multiplies calls and wait time; their outputs already meet on Moon's desk. Kitchens fall apart when the line cooks hold conferences.</li>
+      <li><strong>A huddle/coordinator agent</strong> — duplicates Elena, costs <span class="cost">+6–15s</span>, adds a failure point. The tickets are the meeting.</li>
+      <li><strong>Agent-to-agent live chatter</strong> (directors querying each other mid-run) — multiplies calls and wait time; their outputs already meet on Elena's desk. Kitchens fall apart when the line cooks hold conferences.</li>
       <li><strong>Live web search during plan generation</strong> — would make every plan <span class="cost">+15–30s</span> slower and non-deterministic. Ryan's researched briefs exist precisely so runtime never searches. Keep research offline, on a schedule.</li>
       <li><strong>An agent QC editor on every plan</strong> — the deterministic inspector catches the mechanical failures free; save the model-review pass for when real-user plans show failure modes code can't catch.</li>
     </ul>
