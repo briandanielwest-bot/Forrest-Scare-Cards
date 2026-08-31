@@ -135,7 +135,7 @@ function OutfitMatrix({ sessionId }: { sessionId: string | null }) {
 
 // Post-plan chat: Kyla answers questions about her picks, right on the
 // plan. Local exchange list only — the server keeps the real history.
-function AskKyla({ sessionId }: { sessionId: string | null }) {
+function AskKyla({ sessionId, purchasedKeys }: { sessionId: string | null; purchasedKeys: string[] }) {
   const [question, setQuestion] = React.useState("");
   const [exchanges, setExchanges] = React.useState<{ q: string; a: string }[]>([]);
   const [asking, setAsking] = React.useState(false);
@@ -148,7 +148,7 @@ function AskKyla({ sessionId }: { sessionId: string | null }) {
     setAsking(true);
     setQuestion("");
     try {
-      const { reply } = await askKylaAboutPlan(sessionId, q);
+      const { reply } = await askKylaAboutPlan(sessionId, q, purchasedKeys);
       setExchanges((prev) => [...prev, { q, a: reply }]);
     } catch (e) {
       setError(
@@ -354,7 +354,7 @@ export function PlanScreen({ navigation }: Props) {
           <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
 
-        <AskKyla sessionId={sessionId} />
+        <AskKyla sessionId={sessionId} purchasedKeys={purchasedKeys} />
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
           <Text style={styles.directoryButtonText}>Browse the full Houston store directory</Text>
