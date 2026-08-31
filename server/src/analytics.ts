@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { isDbEnabled, query } from "./db";
 
 /**
  * The receipt book. Fire-and-forget event log (one JSON line per event)
@@ -13,6 +14,12 @@ const DATA_DIR = process.env.DATA_DIR ?? path.join(__dirname, "..", ".data");
 const LOG_PATH = path.join(DATA_DIR, "events.jsonl");
 
 export function track(event: string, props: Record<string, unknown> = {}): void {
+  if (isDbEnabled()) {
+    void query("INSERT INTO events (event, props) VALUES ($1, $2)", [event, JSON.stringify(props)]).catch(() => {
+      // Never let the receipt book take down the kitchen.
+    });
+    return;
+  }
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.appendFileSync(LOG_PATH, JSON.stringify({ t: new Date().toISOString(), event, ...props }) + "\n");

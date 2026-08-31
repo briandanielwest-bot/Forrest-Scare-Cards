@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireSession } from "../sessionStore";
+import { requireSession, saveSession } from "../sessionStore";
 import { generateWardrobePlan } from "../agents/orchestrator";
 import { askAboutPlan } from "../agents/planQA";
 import { buildOutfitMatrix } from "../agents/outfits";
@@ -29,14 +29,14 @@ async function generatePlanWithRetry(session: SessionState): Promise<void> {
 // Only this route actually calls Claude — the GET status poll below is a
 // cheap in-memory read a client hits every few seconds for minutes while a
 // plan builds, so it deliberately stays outside this limiter.
-planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
+planRouter.post("/generate", agentRouteLimiter, async (req, res, next) => {
   try {
     const { sessionId } = req.body as { sessionId?: string };
     if (!sessionId) {
       return res.status(400).json({ error: "sessionId is required" });
     }
 
-    const session = requireSession(sessionId);
+    const session = await requireSession(sessionId);
     if (!session.styleProfile) {
       return res.status(409).json({ error: "Finish the interview before generating a plan" });
     }
@@ -63,6 +63,7 @@ planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
           ),
         );
         track("plan_generated", { seconds: Math.round((Date.now() - t0) / 1000), storeIds });
+        saveSession(session);
       })
       .catch((err) => {
         session.planStatus = "error";
@@ -91,7 +92,7 @@ planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
     }
     let session;
     try {
-      session = requireSession(sessionId);
+      session = await requireSession(sessionId);
     } catch {
       return res.status(404).json({ error: "This session has expired (the server restarted)" });
     }
@@ -117,7 +118,7 @@ planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
     if (!sessionId) return res.status(400).json({ error: "sessionId is required" });
     let session;
     try {
-      session = requireSession(sessionId);
+      session = await requireSession(sessionId);
     } catch {
       return res.status(404).json({ error: "This session has expired (the server restarted)" });
     }
@@ -130,10 +131,10 @@ planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
   }
 });
 
-planRouter.get("/:sessionId", (req, res) => {
+planRouter.get("/:sessionId", async (req, res) => {
   let session;
   try {
-    session = requireSession(req.params.sessionId);
+    session = await requireSession(req.params.sessionId);
   } catch {
     // Sessions live in memory, so a server restart mid-generation (e.g. a
     // deploy) loses them. Tell the truth in a way the phone can display,
