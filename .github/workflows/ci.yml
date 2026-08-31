@@ -1,0 +1,31 @@
+name: CI
+
+# Typechecks both halves of the app on every push and PR to main —
+# replaces the stock "NodeJS with Webpack" template (this repo doesn't
+# use webpack), so the badge is green AND catches real mistakes before
+# Vercel/Render pick up the merge.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Server — install & typecheck
+        working-directory: server
+        run: |
+          npm ci
+          npx tsc --noEmit
+      - name: App — install & typecheck
+        working-directory: app
+        run: |
+          npm ci
+          npx tsc --noEmit

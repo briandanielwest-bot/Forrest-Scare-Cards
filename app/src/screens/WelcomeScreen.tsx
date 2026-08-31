@@ -9,19 +9,9 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
-// Agent names (other than Kyla) are a fan homage to Houston sports
-// legends, matched to each role — not affiliated with or endorsed by the
-// people they honor. The disclaimer renders under the team grid.
-const TEAM = [
-  { name: "Kyla", role: "Interviewer" },
-  { name: "Watt", role: "Photo Analyst" },
-  { name: "Biggio", role: "Bespoke Scout" },
-  { name: "Drexler", role: "Designer Scout" },
-  { name: "Olajuwon", role: "Footwear Scout" },
-  { name: "Wagner", role: "Accessories Scout" },
-  { name: "Campbell", role: "Climate & Culture" },
-  { name: "Moon", role: "Final Plan" },
-];
+import { KylaPortrait } from "../components/KylaPortrait";
+import { TeamAvatar } from "../components/TeamAvatar";
+import { TEAM } from "../data/team";
 
 export function WelcomeScreen({ navigation }: Props) {
   const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages, setStyleProfile, setInterviewDone } =
@@ -94,7 +84,7 @@ export function WelcomeScreen({ navigation }: Props) {
           />
           <Step
             number="3"
-            text="Four Houston store scouts and Moon, the quarterback, turn all of that into your full, phased rebuild plan."
+            text="Your buying directors — tailoring, designer floors, footwear, accessories — and Moon, your head planner, turn all of that into your full, phased rebuild plan."
           />
         </View>
 
@@ -111,10 +101,11 @@ export function WelcomeScreen({ navigation }: Props) {
         <View style={styles.teamCard}>
           <Text style={styles.teamTitle}>Meet the team</Text>
           <View style={styles.teamRow}>
-            {TEAM.map((agent) => (
-              <View key={agent.name} style={styles.teamPill}>
-                <Text style={styles.teamPillName}>{agent.name}</Text>
-                <Text style={styles.teamPillRole}>{agent.role}</Text>
+            {TEAM.map((member) => (
+              <View key={member.id} style={styles.teamPill}>
+                {member.id === "kyla" ? <KylaPortrait size={44} /> : <TeamAvatar look={member.look} size={44} />}
+                <Text style={styles.teamPillName}>{member.name}</Text>
+                <Text style={styles.teamPillRole}>{member.title}</Text>
               </View>
             ))}
           </View>
@@ -216,9 +207,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
     minWidth: "30%",
+    flexBasis: "30%",
+    flexGrow: 1,
+    alignItems: "center",
+    gap: 4,
   },
-  teamPillName: { color: colors.gold, fontWeight: "700", fontSize: 13 },
-  teamPillRole: { color: colors.cream, opacity: 0.75, fontSize: 11, marginTop: 2 },
+  teamPillName: { color: colors.gold, fontWeight: "700", fontSize: 13, textAlign: "center" },
+  teamPillRole: { color: colors.cream, opacity: 0.75, fontSize: 10, marginTop: 1, textAlign: "center" },
   teamDisclaimer: { color: colors.cream, opacity: 0.55, fontSize: 10, lineHeight: 14, marginTop: spacing.xs },
   footer: {
     padding: spacing.lg,

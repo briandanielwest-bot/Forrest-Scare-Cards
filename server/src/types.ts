@@ -54,6 +54,9 @@ export interface WardrobeItem {
   /** Structured in-store script (current plans). */
   sayThis?: string;
   keySpecs?: string[];
+  /** One optional high-value extra — a trap to refuse, a logistic, a store fact. */
+  tip?: string;
+  /** Legacy structured fields from older stored plans. */
   decline?: string;
   whyThisStore?: string;
   logistics?: string;

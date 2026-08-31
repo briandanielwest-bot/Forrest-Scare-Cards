@@ -23,20 +23,19 @@ RULES
 - EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. The whyThisStore field carries the justification; a "rightNow" note on a store (live-researched current intel — a sale, a move, a program) belongs in logistics or phase timing when it genuinely helps ("their sale is running — buy this phase first").
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
 - Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the five in-store script fields below.
-- THE IN-STORE SCRIPT IS FIVE SHORT FIELDS, NOT A PARAGRAPH — he reads them standing in the store, so every word has to earn its place. Respect the word caps hard; cutting a good detail beats a dense blob.
-  - sayThis (max 30 words): the literal opening line to the salesperson, specific enough to act on — fabric, color, cut, budget ("I'm looking for a navy tropical-wool suit, slim through the body, around $550 with alterations").
-  - keySpecs (2-3 bullets, max 12 words each): the specs that matter for HIS fit, face, and coloring — drawn from his stated preferences and, if provided, the photo assessment's fit/face/body reads (for shirts, knits, jackets, neckwear: let the face read drive collar spread, neckline, lapel).
-  - decline (max 18 words): the one thing to say no to if offered — the cut, fabric, color, or upsell that fights his style.
-  - whyThisStore (max 15 words): why THIS store earns the trip, from its knownFor ("paper pattern on file — reorders fit forever").
-  - logistics (max 22 words): walk-in vs appointment per the store's howToBuy, phone if listed, what to bring, turnaround. Fold a "rightNow" sale/timing note here when it helps.
-  - Voice rules for all five: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape — say "the photo review showed..."); no field repeats another's content.
+- THE IN-STORE SCRIPT IS LEAN: an opening line, 1-2 specs, and at most one tip. He reads it standing in a store; the shortest script he'll actually use beats the most complete one he won't.
+  - sayThis (required, max 22 words): the literal opening line to the salesperson — fabric, color, cut, budget ("Navy tropical-wool suit, trim through the body, around $550 all in").
+  - keySpecs (required, 1-2 bullets, max 10 words each): only the specs that matter for HIS fit, face, and coloring — from his preferences and, if provided, the photo reads.
+  - tip (OPTIONAL, max 16 words): the single most valuable extra for THIS item — a trap to refuse, an appointment/lead-time logistic, or a store fact — whichever matters most. OMIT the field entirely when nothing clears that bar; a plan where every item has a tip is a plan that ignored this rule.
+  - Voice rules: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape — say "the photo review showed..."); no field repeats another's content.
 - ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it and let whyThisStore justify the drive. Where several items land in the same part of town, note it so he can knock them out in one trip — a plan that respects Houston traffic is a plan that actually gets executed.
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
 - Respect his stated budget total and cadence — the sum of essential+recommended items across the plan should be a realistic fit for his budget, not wildly over it. If his budget can't realistically cover everything on his wish list, prioritize essentials and be upfront about what's a stretch goal.
 - BUDGET ARITHMETIC IS NON-NEGOTIABLE: before calling submit_wardrobe_plan, add up your perPhaseUsd amounts and confirm they sum to totalBudgetUsd or less — never more. The budget card renders these numbers side by side, and phases that outsum the stated total read as a math error, because they are one. Deliberate stretch goals belong at $0 in the phase totals with the real price stated in the item's text.
 - If a photo assessment is provided, actively use its fit/color/silhouette guidance AND its faceShape/faceGuidance/bodyType reads to shape specific item choices (fits, collar styles, necklines, lapels, colors to seek or avoid) AND to personalize sayThis/keySpecs/decline as described above. If his faceShape is known, he visibly wears glasses in the photos or an eyewear store was vetted, and the budget has room, a frames item (usually nice-to-have) with shape-specific guidance is a high-impact, low-cost addition most men never think of.
-- Write a short, punchy intro narrative and a short, hyped final pep talk in your voice — the pep talk is the locker-room send-off before he runs the plan.
-- If the profile notes carry a "North star:" line — what he wants people to think when he walks in — it outranks everything stylistic: open the intro narrative from it, let it settle close calls between items, and bring it back in the pep talk ("every piece here is pointed at 'walks in like he owns the room'").
+- CONCISION IS A FEATURE — he reads this on a phone, standing in stores. Hard caps: introNarrative MAX 90 words (his situation, the promise, how the plan works — no filler); climateNotes MAX 70 words; each phase goal MAX 40 words; each item description MAX 30 words; generalBuyingTips at most 6 tips of MAX 20 words each. When a sentence isn't specific to HIM or actionable, cut it.
+- The final word of the plan belongs to KYLA, the stylist who interviewed him — write finalPepTalk in HER voice, not yours: 3-4 sentences MAX (under 55 words), warm, bossy, funny, personal — her sharpest callback from his profile, one concrete first move, and a confident send-off ("Go. And send me the fitting-room mirror pic."). No football framing in this one field — it's her sign-off, and it's the last thing he reads.
+- If the profile notes carry a "North star:" line — what he wants people to think when he walks in — it outranks everything stylistic: open the intro narrative from what HE wants people to think, let it settle close calls between items, and echo it in the final sign-off. NEVER print the words "north star" anywhere in the plan — use his actual words instead; the concept is internal machinery, not customer-facing language.
 - If the notes carry an "Urgent:" line (an event inside ~2 weeks), Phase 1 exists to win that event: only same-week-attainable pieces (in-stock + fast alterations, never made-to-measure lead times), and say plainly in that phase's goal what he should wear to the event itself — even if it's mostly clothes he already owns, dialed in by a tailor.
 - Call submit_wardrobe_plan exactly once with the complete plan.
 
@@ -60,26 +59,19 @@ const WARDROBE_ITEM_SCHEMA = {
     },
     sayThis: {
       type: "string",
-      description: "The exact opening line to say to the salesperson, in quotes-ready form. MAX 30 words.",
+      description: "The exact opening line to say to the salesperson, in quotes-ready form. MAX 22 words.",
     },
     keySpecs: {
       type: "array",
       items: { type: "string" },
-      minItems: 2,
-      maxItems: 3,
-      description: "2-3 fit/color specs that matter for THIS man. Each a short phrase, MAX 12 words.",
+      minItems: 1,
+      maxItems: 2,
+      description: "1-2 fit/color specs that matter for THIS man. Each a short phrase, MAX 10 words.",
     },
-    decline: {
+    tip: {
       type: "string",
-      description: "The one thing to say no to if offered. MAX 18 words.",
-    },
-    whyThisStore: {
-      type: "string",
-      description: "Why this store earns the trip, from its knownFor. MAX 15 words.",
-    },
-    logistics: {
-      type: "string",
-      description: "Walk-in vs appointment, phone if listed, what to bring, turnaround. MAX 22 words.",
+      description:
+        "OPTIONAL — the single most valuable extra: a trap to refuse, a lead-time logistic, or a store fact. MAX 16 words. Omit when nothing clears the bar.",
     },
   },
   required: [
@@ -92,9 +84,6 @@ const WARDROBE_ITEM_SCHEMA = {
     "recommendedStoreIds",
     "sayThis",
     "keySpecs",
-    "decline",
-    "whyThisStore",
-    "logistics",
   ],
 } as const;
 
@@ -105,8 +94,14 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
     type: "object",
     properties: {
       guideTitle: { type: "string", description: "A catchy title for this man's personal guide." },
-      introNarrative: { type: "string" },
-      climateNotes: { type: "string", description: "How Houston's climate specifically shapes this plan." },
+      introNarrative: {
+        type: "string",
+        description: "His situation and the promise, personal and punchy. HARD MAX 90 words.",
+      },
+      climateNotes: {
+        type: "string",
+        description: "How Houston's climate specifically shapes this plan. HARD MAX 70 words.",
+      },
       phases: {
         type: "array",
         items: {
@@ -138,8 +133,17 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
         },
         required: ["totalBudgetUsd", "perPhaseUsd"],
       },
-      generalBuyingTips: { type: "array", items: { type: "string" } },
-      finalPepTalk: { type: "string" },
+      generalBuyingTips: {
+        type: "array",
+        items: { type: "string" },
+        maxItems: 6,
+        description: "At most 6 tips, each HARD MAX 20 words.",
+      },
+      finalPepTalk: {
+        type: "string",
+        description:
+          "Kyla the stylist's personal sign-off, in her warm, bossy, funny voice: 3-4 sentences, HARD MAX 55 words. Her sharpest callback, one concrete first move, a confident send-off.",
+      },
     },
     required: ["guideTitle", "introNarrative", "climateNotes", "phases", "budgetSummary", "generalBuyingTips", "finalPepTalk"],
   },
@@ -202,10 +206,12 @@ Build the complete wardrobe plan now.`;
     messages: [{ role: "user", content: userMessage }] as Anthropic.MessageParam[],
     tools: [SUBMIT_PLAN_TOOL],
     tool_choice: { type: "tool" as const, name: "submit_wardrobe_plan" },
-    // Left at default (high) effort deliberately: dropping to "medium" was
-    // tried and reverted after a live test produced budget phases that
-    // summed to $3,560 against a stated $2,500 total — high effort has
-    // consistently gotten this arithmetic right.
+    // Medium effort is the planner's biggest latency lever. It was tried
+    // and reverted once when a live test produced phases summing to $3,560
+    // against a $2,500 total — that exact failure is now caught by the
+    // budget backstop in normalizeWardrobePlan and turned into an automatic
+    // retry, so the fast path is the default and the math stays guaranteed.
+    output_config: { effort: "medium" as const },
   };
 
   // The planner is the run's dominant wall-clock cost (~2 min of pure
@@ -295,6 +301,25 @@ function normalizeWardrobePlan(raw: unknown): WardrobePlan {
   }
   if ((plan.phases as unknown[]).some((p) => !p || typeof p !== "object" || !Array.isArray((p as any).items))) {
     throw new Error("Wardrobe planner returned a phase without a valid items array — retry plan generation");
+  }
+
+  // Budget arithmetic backstop: phases outsumming the stated total was the
+  // one live failure that forced the planner onto max effort. Validating it
+  // here (and letting generatePlanWithRetry regenerate) is what makes the
+  // faster default effort safe — the failure mode became a retry, not a
+  // shipped math error. Small float slack; $0-stretch phases are fine.
+  const bs = plan.budgetSummary as { totalBudgetUsd?: unknown; perPhaseUsd?: unknown } | undefined;
+  const total = Number(bs?.totalBudgetUsd);
+  if (Array.isArray(bs?.perPhaseUsd) && Number.isFinite(total) && total > 0) {
+    const phaseSum = (bs!.perPhaseUsd as { amountUsd?: unknown }[]).reduce(
+      (sum, p) => sum + (Number(p?.amountUsd) || 0),
+      0,
+    );
+    if (phaseSum > total + 1) {
+      throw new Error(
+        `Wardrobe planner budget error: phases sum to $${phaseSum} against a $${total} total — retry plan generation`,
+      );
+    }
   }
 
   return plan as unknown as WardrobePlan;
