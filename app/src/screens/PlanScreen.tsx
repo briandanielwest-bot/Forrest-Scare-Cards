@@ -160,7 +160,7 @@ export function PlanScreen({ navigation }: Props) {
 
   async function handleCopyPlan() {
     if (!wardrobePlan) return;
-    const text = buildPlanText(wardrobePlan, (id) => storeById(id)?.name ?? id);
+    const text = buildPlanText(wardrobePlan, storeById);
     try {
       if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(text);
@@ -308,7 +308,8 @@ function AtAGlance({ plan }: { plan: WardrobePlan }) {
 
 // Renders the whole plan as clean plain text — what he pastes into Notes,
 // texts to himself, or shows at a store counter.
-function buildPlanText(plan: WardrobePlan, storeName: (id: string) => string): string {
+function buildPlanText(plan: WardrobePlan, storeById: (id: string) => HoustonStore | undefined): string {
+  const storeName = (id: string) => storeById(id)?.name ?? id;
   const lines: string[] = [plan.guideTitle ?? "Your Houston Wardrobe Plan", ""];
   lines.push(`TOTAL BUDGET: ${money(plan.budgetSummary?.totalBudgetUsd)}`, "");
   for (const phase of asArray<WardrobePlan["phases"][number]>(plan.phases)) {
@@ -322,6 +323,16 @@ function buildPlanText(plan: WardrobePlan, storeName: (id: string) => string): s
       if (item.tip) lines.push(`  Tip: ${cleanText(item.tip)}`);
     }
     lines.push("");
+  }
+  // The counter conversation needs phones and neighborhoods, not just names.
+  const runs = buildStoreRuns(plan, storeById);
+  if (runs.length > 0) {
+    lines.push("== STORE CONTACTS ==");
+    for (const run of runs) {
+      const s = run.store;
+      const bits = [s?.neighborhood, s?.contact].filter(Boolean).join(" · ");
+      lines.push(`${s?.name ?? run.storeId}${bits ? ` — ${bits}` : ""}`);
+    }
   }
   return lines.join("\n");
 }
