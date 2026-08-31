@@ -190,9 +190,15 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "researchedAt": "2026-08-31"
   },
   "neiman-marcus-galleria": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Brioni",
+      "David Yurman"
+    ],
+    "pricePoints": [
+      "men's suit: $595-$3,490",
+      "men's suit (clearance, extra 25% off): $198-$1,995"
+    ],
+    "insiderTake": "Parent Saks Global's Chapter 11 means deep clearance (up to 70% off suits); ask for a personal shopper/stylist directly — this huge 3-level flagship can leave walk-ins un-greeted.",
     "researchedAt": "2026-08-31"
   },
   "saks-galleria": {
@@ -213,9 +219,26 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "researchedAt": "2026-08-31"
   },
   "nordstrom-galleria": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "BOSS (Hugo Boss)",
+      "Ermenegildo Zegna / Z Zegna",
+      "Canali",
+      "Emporio Armani",
+      "Ted Baker London",
+      "Eton",
+      "David Donahue",
+      "Hart Schaffner Marx",
+      "Peter Millar",
+      "Indochino (made-to-measure shop-in-shop)"
+    ],
+    "pricePoints": [
+      "dress shirt (Nordstrom house brand): $99.50",
+      "dress shirt (Eton): $175-$290",
+      "basic alterations on full-price suits/sport coats/tuxedos: free",
+      "tailoring on non-Nordstrom trousers: ~$58",
+      "tailoring on non-Nordstrom jacket (waist/seat/sleeves): ~$74-$95"
+    ],
+    "insiderTake": "Ask for a personal stylist (free) and use the in-store Indochino counter for made-to-measure — alterations are complimentary on full-price suits, run by Nordstrom's largest in-house tailor team.",
     "researchedAt": "2026-08-31"
   },
   "zegna-houston": {
@@ -253,69 +276,181 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "researchedAt": "2026-08-31"
   },
   "hermes-river-oaks": {
-    "brands": [],
+    "brands": [
+      "Hermès"
+    ],
     "pricePoints": [],
-    "insiderTake": "",
+    "insiderTake": "Leather goods (bags) run on a strict allocation system tied to purchase history and relationship with a specific sales associate — ready-to-wear, ties, and shoes are far easier to walk in and buy.",
     "researchedAt": "2026-08-31"
   },
   "louis-vuitton-mens-galleria": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Louis Vuitton"
+    ],
+    "pricePoints": [
+      "Keepall Bandouliere 50 (silver monogram mirror canvas): ~$10,500"
+    ],
+    "insiderTake": "Its real edge isn't the racks of ready-to-wear but the on-site hot-stamping leather personalization and fragrance-engraving counter — ask for these services specifically, not just sales floor help.",
     "researchedAt": "2026-08-31"
   },
   "the-black-tux-galleria": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "The Black Tux (in-house label)",
+      "J. Mueser (Jake Mueser leads design direction since 2025)"
+    ],
+    "pricePoints": [
+      "dress shirt (buy): $65-$95",
+      "black suit (buy): $425-$695",
+      "complete tuxedo rental (9-piece outfit): $129-$250",
+      "wool/merino tuxedo rental: $159-$275"
+    ],
+    "insiderTake": "The Galleria 'showroom' is actually inside Nordstrom's 1st-floor Men's department, not a standalone store; ask for a Fit Specialist and bring 5+ groomsmen for a $200 credit.",
     "researchedAt": "2026-08-31"
   },
   "als-formal-wear": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Michael Kors",
+      "Allure Men",
+      "David Tutera",
+      "Ike Behar",
+      "Jean Yves",
+      "Johnny Wilde",
+      "Dapper & Dashing",
+      "Perry Ellis",
+      "Savvi Black Label",
+      "Xedo"
+    ],
+    "pricePoints": [
+      "tuxedo/suit rental: $100-$180",
+      "wedding party rental (each outfit): from $174.99",
+      "wedding registration fee: $60"
+    ],
+    "insiderTake": "Al's now operates under the multi-brand Dapper & Dashing network, not as the old family-run local chain; use their free wedding registration and 6-rental group minimum to unlock a free outfit.",
     "researchedAt": "2026-08-31"
   },
   "dxl-big-tall": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Polo Ralph Lauren",
+      "Brooks Brothers",
+      "Nautica",
+      "Robert Graham",
+      "Psycho Bunny",
+      "Tommy Bahama",
+      "Columbia",
+      "Levi's",
+      "Michael Kors",
+      "Harbor Bay (DXL house label)"
+    ],
+    "pricePoints": [
+      "Polo Ralph Lauren Soft Touch Polo Shirt: $125.00",
+      "Polo Ralph Lauren Oxford Sport Shirt: $140.00",
+      "Nautica Stretch Pique Polo Shirt: $70.00",
+      "Psycho Bunny Classic Polo Shirt: $130.00",
+      "Reebok Golf Speedwick Stripe Polo Shirt: $60.00 (sale $41.99)"
+    ],
+    "insiderTake": "Brands and inventory vary by store location, so call the Westheimer store (713-439-1666) ahead to confirm true 8X/waist-72 stock; curbside pickup is available if you'd rather skip browsing.",
     "researchedAt": "2026-08-31"
   },
   "sid-mashburn": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Sid Mashburn (house label)",
+      "Edward Green",
+      "Alden",
+      "Clarks",
+      "Blundstone",
+      "Barbara Shaum",
+      "adidas",
+      "Tretorn",
+      "Diadora"
+    ],
+    "pricePoints": [
+      "starter suit: $950",
+      "core suit (sharkskin/high-twist wool): $1,695",
+      "spread collar dress shirt: $185-195",
+      "button-down sport shirt: $145",
+      "dress trouser: $450",
+      "chore jacket: $450-550"
+    ],
+    "insiderTake": "Made-to-measure (suits, sport coats, extra trousers) is in-store only, not sold online — ask for a fitting; expect a turntable playing and a bourbon while you browse.",
     "researchedAt": "2026-08-31"
   },
   "suitsupply-river-oaks-district": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Suitsupply"
+    ],
+    "pricePoints": [
+      "ready-to-wear suit: from $399",
+      "sport coat/blazer: $399-$599",
+      "Custom Made suit: from $498",
+      "Custom Made shirt: from $119",
+      "Custom Made overcoat: from $499"
+    ],
+    "insiderTake": "Ask for stylist Farhan Janjua (Yelp-praised for fit/tie advice); Custom Made semi-bespoke line beats off-the-rack for value—RTW includes alterations but staff quality varies by rep.",
     "researchedAt": "2026-08-31"
   },
   "rye-51": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Diesel",
+      "John Varvatos",
+      "Earnest Sewn",
+      "Candiani Denim",
+      "R51 (house label)"
+    ],
+    "pricePoints": [
+      "R51 x Candiani Denim Italian Stretch Jean: $248",
+      "R51 Flex Terry Comfort Stretch 5-Pocket Pant: $114-228",
+      "The Voyager Performance 5-Pocket Pant: $148",
+      "R51 Brushed Knit 5-Pocket Check Pant: $173.60"
+    ],
+    "insiderTake": "Rye 51 now doubles as the old Q Clothier custom shop—ask for stylist Jared Tietjens for made-to-measure suits/shirts/jeans (4-6 wks); off-the-rack denim is secondary to their tailoring.",
     "researchedAt": "2026-08-31"
   },
   "premium-goods": {
-    "brands": [],
+    "brands": [
+      "Nike",
+      "Air Jordan",
+      "adidas",
+      "Yeezy",
+      "Converse",
+      "Vans",
+      "Billionaire Boys Club",
+      "HUF",
+      "Kappa",
+      "Premiumgoods. (in-house label)"
+    ],
     "pricePoints": [],
-    "insiderTake": "",
+    "insiderTake": "Hyped Jordan drops run via online raffle with in-store pickup (229+ raffles so far)—ask for staff like Dominique or Brandon; Premiumkids next door covers grade-school sizes.",
     "researchedAt": "2026-08-31"
   },
   "buck-mason": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Buck Mason",
+      "McGregor (Buck Mason x McGregor collab)",
+      "Red Rabbit (Buck Mason x Red Rabbit collab)"
+    ],
+    "pricePoints": [
+      "core t-shirt: from $45",
+      "Draped Twill One Pocket Shirt: $138",
+      "Felted Field Shirt: $248",
+      "Japanese Denim Maverick Slim Jean: $198-228",
+      "California Cashmere crewneck sweater: from $175",
+      "Red Rabbit x Buck Mason buckle belt: $498"
+    ],
+    "insiderTake": "Ask for Blake for a free fit consultation—staff correct the common mistake of sizing down tees. Note the in-store 'Book Mason' bookshop and vintage car, unique to this location.",
     "researchedAt": "2026-08-31"
   },
   "marine-layer-rice-village": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Marine Layer"
+    ],
+    "pricePoints": [
+      "Signature Crew Tee: $54",
+      "Signature Jacquard Crew Tee: $54",
+      "Signature Crew Graphic Tee: $48",
+      "Casual button-down/stretch shirt: $69-$158",
+      "Re-Spun Take Back Bag (recycling): $20"
+    ],
+    "insiderTake": "Their real differentiator is the Re-Spun program (mail old cotton tees to Trashie for store credit), not tailoring; Marine Layer's other Houston store, Highland Village, has since closed.",
     "researchedAt": "2026-08-31"
   },
   "manready-mercantile": {
@@ -325,21 +460,60 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "researchedAt": "2026-08-31"
   },
   "lucchese": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Lucchese",
+      "Lucchese 1883",
+      "Lela Rose X Lucchese",
+      "Lucchese x Dallas Cowboys"
+    ],
+    "pricePoints": [
+      "classic men's boot (Charleston): $895",
+      "exotic boot (Cecil Exotic): $695",
+      "premium exotic boot (Priscilla Exotic): $2,995",
+      "belt: $195",
+      "boot bag: $45",
+      "140th Anniversary limited-edition boot: $15,995"
+    ],
+    "insiderTake": "Ask for the dedicated custom design suite—Highland Village's 5,000 sq ft flagship was built for true made-to-order boots (~6-month build), not just off-the-shelf pairs.",
     "researchedAt": "2026-08-31"
   },
   "cavenders": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Ariat",
+      "Justin",
+      "Lucchese",
+      "Tony Lama",
+      "Twisted X",
+      "Wrangler",
+      "Stetson",
+      "Old Gringo",
+      "Laredo",
+      "Cavender's (house label)"
+    ],
+    "pricePoints": [
+      "Ariat Endeavor waterproof composite-toe work boot: $179.99",
+      "Justin Shane Frontier cowboy boots: $204.99",
+      "Ariat Slingshot cowboy boots: $239.99",
+      "Wolverine I-90 EPX work boot: $109.98-$159.99",
+      "Cavender's-brand pirarucu exotic cowboy boots: $299.98-$499.99",
+      "Cavender's exotic cowhide/orix boots: $399.99"
+    ],
+    "insiderTake": "Join My Cavender's for early sale access and easy returns; use the Rebates page for cash-back on select boots — best for boot breadth/fit, not tailoring.",
     "researchedAt": "2026-08-31"
   },
   "tecovas-rice-village": {
-    "brands": [],
-    "pricePoints": [],
-    "insiderTake": "",
+    "brands": [
+      "Tecovas"
+    ],
+    "pricePoints": [
+      "men's cowboy boots: $295-$375",
+      "women's cowboy boots: $395-$445",
+      "exotic boots (caiman/lizard): $495-$775",
+      "men's denim jeans: $100-$250",
+      "belts: $50-$250",
+      "wallets: $100-$500"
+    ],
+    "insiderTake": "Free boot shines and complimentary leather branding/monogramming are available even on boots they didn't make—plus book a custom appointment for one-on-one made-to-order fittings.",
     "researchedAt": "2026-08-31"
   },
   "republic-boot-co": {

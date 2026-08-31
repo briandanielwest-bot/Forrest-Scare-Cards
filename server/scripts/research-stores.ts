@@ -24,7 +24,7 @@ import { HOUSTON_STORES } from "../src/data/houstonStores";
 
 const anthropic = new Anthropic();
 const MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
-const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 6 } as const;
+const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 3 } as const;
 
 async function runWithSearch(system: string, user: string, maxTokens: number): Promise<string> {
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: user }];
@@ -177,7 +177,7 @@ Find real, currently operating businesses only — verify each appears to exist 
 Answer ONLY this JSON:
 {"candidates": [{"name": "<exact business name>", "neighborhood": "<Houston area/neighborhood>", "whatItIs": "<one sentence: what they sell and to whom, max 25 words>", "whyNotable": "<what makes this place worth a Houston man's drive — the specific thing, max 25 words>", "website": "<url or empty string>", "evidence": "<where you found it: publication, review site, or the store's own site, max 12 words>"}]}
 Return up to 8 candidates, best first. Empty array if nothing new and real turned up.`,
-    5000,
+    3000,
   );
   const raw = extractJson<{ candidates?: Candidate[] }>(text);
   return Array.isArray(raw.candidates) ? raw.candidates : [];
@@ -214,7 +214,7 @@ Find:
 Answer ONLY this JSON:
 {"brands": ["<brand>", ...], "pricePoints": ["<item: price>", ...], "insiderTake": "<max 35 words, specific and useful, empty string if nothing solid found>"}
 Up to 10 brands and 6 price points. Empty arrays are correct answers when research doesn't confirm specifics — an empty array beats a guess.`,
-    5000,
+    3000,
   );
   const raw = extractJson<{ brands?: unknown; pricePoints?: unknown; insiderTake?: unknown }>(text);
   const clean = (v: unknown, max: number): string[] =>

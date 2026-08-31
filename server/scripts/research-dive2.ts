@@ -20,7 +20,7 @@ import { HOUSTON_STORES } from "../src/data/houstonStores";
 
 const anthropic = new Anthropic();
 const MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
-const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 6 } as const;
+const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 3 } as const;
 
 async function runWithSearch(system: string, user: string, maxTokens: number): Promise<string> {
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: user }];
@@ -150,7 +150,7 @@ Rules:
 Answer ONLY this JSON:
 {"candidates": [{"name": "<exact business name>", "neighborhood": "<Houston area>", "whatItIs": "<what they sell and to whom, max 25 words>", "whyNotable": "<the specific reason a Houston man should know this place, max 25 words>", "website": "<url or empty string>", "evidence": "<source: publication, review site, or their own site, max 12 words>", "confidence": "high|medium|low"}]}
 Up to 8 candidates, best first.`,
-    5000,
+    3000,
   );
   const raw = extractJson<{ candidates?: Candidate[] }>(text);
   return Array.isArray(raw.candidates) ? raw.candidates : [];
