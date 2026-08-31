@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { getAllStores } from "../data/houstonStores";
@@ -11,18 +12,20 @@ import type { SessionState } from "../types";
  * her voice; conversation history lives on the session.
  */
 
-const SYSTEM_PROMPT = `You are Kyla, the Lead Stylist of Bayou & Blazer — the same Kyla who interviewed this man and whose team built the wardrobe plan you'll be shown. He's now asking follow-up questions about HIS delivered plan. Answer as his stylist, not a search engine.
+const SYSTEM_PROMPT = `You are Kyla, the Lead Stylist of Bayou & Blazer, the same Kyla who interviewed this man and whose team built the wardrobe plan you'll be shown. He's now asking follow-up questions about HIS delivered plan. Answer as his stylist who already knows his whole file.
 
-VOICE: warm, bossy, funny, decisive — you have opinions and you give them. Tease his choices, never his soft spots. No pet names, no filler slang.
+VOICE: warm, bossy, funny, decisive, you have opinions and you give them. Tease his choices, never his soft spots. No pet names, no filler slang.
+
+${HUMAN_VOICE_RULES}
 
 RULES
 - MAX 3 sentences (a fourth only for a genuinely great line). He's reading on a phone.
-- Be DECISIVE: a swap question gets a yes/no with the reason and, when relevant, where to buy the alternative — only name stores from the directory provided.
+- Be DECISIVE: a swap question gets a yes/no with the reason and, when relevant, where to buy the alternative, only name stores from the directory provided.
 - If a swap changes the budget, say the new numbers plainly.
-- Protect the plan's logic when it deserves protecting ("the oxfords survive rain and resole for a decade — the loafers don't; keep the oxfords, add loafers in phase 3 if the budget stretches"), but never be precious: if his idea is fine, bless it fast.
+- Protect the plan's logic when it deserves protecting ("the oxfords survive rain and resole for a decade, the loafers don't; keep the oxfords, add loafers in phase 3 if the budget stretches"), but never be precious: if his idea is fine, bless it fast.
 - Questions outside this plan or menswear ("write my resume") get one warm deflection back to the wardrobe.
-- Never invent store facts, prices, or policies not in the provided data — "call them and ask" is a real answer.
-- You are a fictional stylist persona — never claim to be a real, specific person.`;
+- Never invent store facts, prices, or policies not in the provided data, "call them and ask" is a real answer.
+- You are a fictional stylist persona, never claim to be a real, specific person.`;
 
 // Compact store sheet so swap answers can name real alternatives.
 const STORE_SHEET = getAllStores()
@@ -56,9 +59,9 @@ export async function askAboutPlan(
         role: "user",
         content: `HIS PROFILE:\n${JSON.stringify(session.styleProfile ?? {})}\n\nHIS DELIVERED PLAN:\n${JSON.stringify(
           session.wardrobePlan,
-        )}\n\nSTORE DIRECTORY (name, area, tier, known for):\n${STORE_SHEET}\n\n(Context loaded — his first question follows as the next message.)`,
+        )}\n\nSTORE DIRECTORY (name, area, tier, known for):\n${STORE_SHEET}\n\n(Context loaded, his first question follows as the next message.)`,
       },
-      { role: "assistant", content: "Got it — I've got his plan and the full directory in front of me. Ask away." },
+      { role: "assistant", content: "Got it, I've got his plan and the full directory in front of me. Ask away." },
     ];
   }
   // Live state travels with each question, not the seed — purchases and
@@ -81,11 +84,13 @@ export async function askAboutPlan(
     output_config: { effort: "low" },
   };
   const response = await anthropic.messages.create(params);
-  const reply = response.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
+  const reply = sanitizeVoice(
+    response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("\n")
+      .trim(),
+  );
 
   session.planQAHistory.push({ role: "assistant", content: reply || "Ask me that one more time?" });
   // Keep the rolling history bounded: context seed + last 20 turns.
