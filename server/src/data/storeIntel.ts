@@ -29,7 +29,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "made-to-measure suit: realistic all-in cost incl. alterations ~$1,300",
       "made-to-measure suit (top-tier fabric/mill, e.g. Oxxford): $2,000+"
     ],
-    "insiderTake": "Outcome hinges on your assigned clothier, not the brand; Houston clients specifically praise rep Dusty Schroeder—ask by name and get fabric-tier/alteration costs itemized upfront.",
+    "insiderTake": "Outcome hinges on your assigned clothier, not the brand; Houston clients specifically praise rep Dusty Schroeder. Ask for him by name and get fabric-tier/alteration costs itemized upfront.",
     "researchedAt": "2026-08-31"
   },
   "norton-ditto": {
@@ -71,7 +71,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "women's shirts (Classic/Boyfriend/Tunic): $275-$345",
       "custom shirt in Thomas Mason fabrics: $195-$595"
     ],
-    "insiderTake": "Collars/cuffs use fabric lining, not glued fusing—one of only three shirtmakers worldwide to do this. Bespoke requires a 5-shirt minimum first order; MTM is faster and cheaper if you just want a great fit.",
+    "insiderTake": "Collars/cuffs use fabric lining, not glued fusing, one of only three shirtmakers worldwide to do this. Bespoke requires a 5-shirt minimum first order; MTM is faster and cheaper if you just want a great fit.",
     "researchedAt": "2026-08-31"
   },
   "q-clothier": {
@@ -79,13 +79,13 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Q Clothier"
     ],
     "pricePoints": [],
-    "insiderTake": "The Kirby Dr shop sits inside Arrive with an in-store whiskey bar and is physically connected to sister casual shop Rye51 — linger there during your consultation and fittings.",
+    "insiderTake": "The Kirby Dr shop sits inside Arrive with an in-store whiskey bar and is physically connected to sister casual shop Rye51, linger there during your consultation and fittings.",
     "researchedAt": "2026-08-31"
   },
   "kuffs-houston": {
     "brands": [],
     "pricePoints": [],
-    "insiderTake": "It's essentially a one-woman operation (Kathryn Hinte, clothier since 1993) doing true home/office fittings by appointment — no walk-in showroom, so book ahead rather than dropping by.",
+    "insiderTake": "It's essentially a one-woman operation (Kathryn Hinte, clothier since 1993) doing true home/office fittings by appointment, no walk-in showroom, so book ahead rather than dropping by.",
     "researchedAt": "2026-08-31"
   },
   "lucho": {
@@ -93,7 +93,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Lucho"
     ],
     "pricePoints": [],
-    "insiderTake": "Ask about their fast ~7-day custom suit turnaround and built-in alterations service — Lucho's real strength is made-to-measure fit and personal tailor relationships, not off-the-rack shopping.",
+    "insiderTake": "Ask about their fast ~7-day custom suit turnaround and built-in alterations service, Lucho's real strength is made-to-measure fit and personal tailor relationships, not off-the-rack shopping.",
     "researchedAt": "2026-08-31"
   },
   "bill-walker-clothier": {
@@ -110,7 +110,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "34 Heritage"
     ],
     "pricePoints": [],
-    "insiderTake": "Ask for Philip Linkous or Shelley Walker Caldwell—longtime senior staff who personally run fittings; the shop's real strength is custom tailoring/fabric sourcing (e.g. Scabal), not its casual racks.",
+    "insiderTake": "Ask for Philip Linkous or Shelley Walker Caldwell, longtime senior staff who personally run fittings; the shop's real strength is custom tailoring/fabric sourcing (e.g. Scabal), not its casual racks.",
     "researchedAt": "2026-08-31"
   },
   "blu-fine-menswear": {
@@ -141,7 +141,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "pricePoints": [
       "made-to-measure suit: from $399"
     ],
-    "insiderTake": "Ask about the Perfect Fit Promise: if your first suit doesn't fit right, they remake it free — trust the in-store stylist measurement over any self-measure online order.",
+    "insiderTake": "Ask about the Perfect Fit Promise: if your first suit doesn't fit right, they remake it free. Trust the in-store stylist measurement over any self-measure online order.",
     "researchedAt": "2026-08-31"
   },
   "bzach-clothier": {
@@ -149,7 +149,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Bzach"
     ],
     "pricePoints": [],
-    "insiderTake": "Ask for Balu by name — reviews across all Bzach locations consistently credit him, not just 'the store,' for fit, fabric picks, and fast turnaround.",
+    "insiderTake": "Ask for Balu by name, reviews across all Bzach locations consistently credit him, not just 'the store,' for fit, fabric picks, and fast turnaround.",
     "researchedAt": "2026-08-31"
   },
   "festari-for-men": {
@@ -169,7 +169,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "made-to-measure/custom suit: $1,100-$10,000",
       "Zegna linen ready-to-wear trousers: $998"
     ],
-    "insiderTake": "Ask for Rudy Festari himself—he still personally consults and, for time-strapped clients, will do fittings at your home or office rather than the Post Oak store.",
+    "insiderTake": "Ask for Rudy Festari himself. He still personally consults and, for time-strapped clients, will do fittings at your home or office rather than the Post Oak store.",
     "researchedAt": "2026-08-31"
   },
   "m-penner": {
@@ -198,7 +198,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "men's suit: $595-$3,490",
       "men's suit (clearance, extra 25% off): $198-$1,995"
     ],
-    "insiderTake": "Parent Saks Global's Chapter 11 means deep clearance (up to 70% off suits); ask for a personal shopper/stylist directly — this huge 3-level flagship can leave walk-ins un-greeted.",
+    "insiderTake": "Parent Saks Global's Chapter 11 means deep clearance (up to 70% off suits); ask for a personal shopper/stylist directly, this huge 3-level flagship can leave walk-ins un-greeted.",
     "researchedAt": "2026-08-31"
   },
   "saks-galleria": {
@@ -238,7 +238,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "tailoring on non-Nordstrom trousers: ~$58",
       "tailoring on non-Nordstrom jacket (waist/seat/sleeves): ~$74-$95"
     ],
-    "insiderTake": "Ask for a personal stylist (free) and use the in-store Indochino counter for made-to-measure — alterations are complimentary on full-price suits, run by Nordstrom's largest in-house tailor team.",
+    "insiderTake": "Ask for a personal stylist (free) and use the in-store Indochino counter for made-to-measure, alterations are complimentary on full-price suits, run by Nordstrom's largest in-house tailor team.",
     "researchedAt": "2026-08-31"
   },
   "zegna-houston": {
@@ -256,7 +256,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Oasi Cashmere cardigan: $2,750",
       "cashmere scarf: $630"
     ],
-    "insiderTake": "Ask for the Su Misura appointment and the invite-only Vellus Aureum fabric event—Zegna is strongest at made-to-measure tailoring, not the streetwear/sneaker capsules it also stocks.",
+    "insiderTake": "Ask for the Su Misura appointment and the invite-only Vellus Aureum fabric event, Zegna is strongest at made-to-measure tailoring, not the streetwear/sneaker capsules it also stocks.",
     "researchedAt": "2026-08-31"
   },
   "brioni-river-oaks": {
@@ -280,7 +280,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Hermès"
     ],
     "pricePoints": [],
-    "insiderTake": "Leather goods (bags) run on a strict allocation system tied to purchase history and relationship with a specific sales associate — ready-to-wear, ties, and shoes are far easier to walk in and buy.",
+    "insiderTake": "Leather goods (bags) run on a strict allocation system tied to purchase history and relationship with a specific sales associate, ready-to-wear, ties, and shoes are far easier to walk in and buy.",
     "researchedAt": "2026-08-31"
   },
   "louis-vuitton-mens-galleria": {
@@ -290,7 +290,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
     "pricePoints": [
       "Keepall Bandouliere 50 (silver monogram mirror canvas): ~$10,500"
     ],
-    "insiderTake": "Its real edge isn't the racks of ready-to-wear but the on-site hot-stamping leather personalization and fragrance-engraving counter — ask for these services specifically, not just sales floor help.",
+    "insiderTake": "Its real edge isn't the racks of ready-to-wear but the on-site hot-stamping leather personalization and fragrance-engraving counter. Ask for those services specifically rather than sales floor help.",
     "researchedAt": "2026-08-31"
   },
   "the-black-tux-galleria": {
@@ -371,7 +371,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "dress trouser: $450",
       "chore jacket: $450-550"
     ],
-    "insiderTake": "Made-to-measure (suits, sport coats, extra trousers) is in-store only, not sold online — ask for a fitting; expect a turntable playing and a bourbon while you browse.",
+    "insiderTake": "Made-to-measure (suits, sport coats, extra trousers) is in-store only and never sold online, so ask for a fitting; expect a turntable playing and a bourbon while you browse.",
     "researchedAt": "2026-08-31"
   },
   "suitsupply-river-oaks-district": {
@@ -385,7 +385,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Custom Made shirt: from $119",
       "Custom Made overcoat: from $499"
     ],
-    "insiderTake": "Ask for stylist Farhan Janjua (Yelp-praised for fit/tie advice); Custom Made semi-bespoke line beats off-the-rack for value—RTW includes alterations but staff quality varies by rep.",
+    "insiderTake": "Ask for stylist Farhan Janjua (Yelp-praised for fit/tie advice); Custom Made semi-bespoke line beats off-the-rack for value, RTW includes alterations but staff quality varies by rep.",
     "researchedAt": "2026-08-31"
   },
   "rye-51": {
@@ -402,7 +402,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "The Voyager Performance 5-Pocket Pant: $148",
       "R51 Brushed Knit 5-Pocket Check Pant: $173.60"
     ],
-    "insiderTake": "Rye 51 now doubles as the old Q Clothier custom shop—ask for stylist Jared Tietjens for made-to-measure suits/shirts/jeans (4-6 wks); off-the-rack denim is secondary to their tailoring.",
+    "insiderTake": "Rye 51 now doubles as the old Q Clothier custom shop. Ask for stylist Jared Tietjens for made-to-measure suits/shirts/jeans (4-6 wks); off-the-rack denim is secondary to their tailoring.",
     "researchedAt": "2026-08-31"
   },
   "premium-goods": {
@@ -419,7 +419,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Premiumgoods. (in-house label)"
     ],
     "pricePoints": [],
-    "insiderTake": "Hyped Jordan drops run via online raffle with in-store pickup (229+ raffles so far)—ask for staff like Dominique or Brandon; Premiumkids next door covers grade-school sizes.",
+    "insiderTake": "Hyped Jordan drops run via online raffle with in-store pickup (229+ raffles so far). Ask for staff like Dominique or Brandon; Premiumkids next door covers grade-school sizes.",
     "researchedAt": "2026-08-31"
   },
   "buck-mason": {
@@ -436,7 +436,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "California Cashmere crewneck sweater: from $175",
       "Red Rabbit x Buck Mason buckle belt: $498"
     ],
-    "insiderTake": "Ask for Blake for a free fit consultation—staff correct the common mistake of sizing down tees. Note the in-store 'Book Mason' bookshop and vintage car, unique to this location.",
+    "insiderTake": "Ask for Blake for a free fit consultation, staff correct the common mistake of sizing down tees. Note the in-store 'Book Mason' bookshop and vintage car, unique to this location.",
     "researchedAt": "2026-08-31"
   },
   "marine-layer-rice-village": {
@@ -474,7 +474,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "boot bag: $45",
       "140th Anniversary limited-edition boot: $15,995"
     ],
-    "insiderTake": "Ask for the dedicated custom design suite—Highland Village's 5,000 sq ft flagship was built for true made-to-order boots (~6-month build), not just off-the-shelf pairs.",
+    "insiderTake": "Ask for the dedicated custom design suite, Highland Village's 5,000 sq ft flagship was built for true made-to-order boots (~6-month build), not just off-the-shelf pairs.",
     "researchedAt": "2026-08-31"
   },
   "cavenders": {
@@ -498,7 +498,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "Cavender's-brand pirarucu exotic cowboy boots: $299.98-$499.99",
       "Cavender's exotic cowhide/orix boots: $399.99"
     ],
-    "insiderTake": "Join My Cavender's for early sale access and easy returns; use the Rebates page for cash-back on select boots — best for boot breadth/fit, not tailoring.",
+    "insiderTake": "Join My Cavender's for early sale access and easy returns; use the Rebates page for cash-back on select boots, best for boot breadth/fit, not tailoring.",
     "researchedAt": "2026-08-31"
   },
   "tecovas-rice-village": {
@@ -513,7 +513,7 @@ export const STORE_INTEL: Record<string, StoreIntel> = {
       "belts: $50-$250",
       "wallets: $100-$500"
     ],
-    "insiderTake": "Free boot shines and complimentary leather branding/monogramming are available even on boots they didn't make—plus book a custom appointment for one-on-one made-to-order fittings.",
+    "insiderTake": "Free boot shines and complimentary leather branding/monogramming are available even on boots they didn't make, plus book a custom appointment for one-on-one made-to-order fittings.",
     "researchedAt": "2026-08-31"
   },
   "republic-boot-co": {

@@ -71,7 +71,7 @@ export function InterviewScreen({ navigation }: Props) {
         setInterviewDone(true);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Kyla didn't get that — try again?");
+      setError(e instanceof Error ? e.message : "Kyla didn't get that, try again?");
     } finally {
       setStreamingText(null);
       setSending(false);

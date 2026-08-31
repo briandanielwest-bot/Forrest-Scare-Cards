@@ -102,7 +102,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
         if (Date.now() - startedAtRef.current > MAX_POLL_MS) {
           setError(
             "This ran way past normal. The usual culprits: the free-tier server was asleep and is still waking up, " +
-              "or a rare bad generation triggered an automatic retry. Your interview is saved — tap Try again.",
+              "or a rare bad generation triggered an automatic retry. Your interview is saved, tap Try again.",
           );
           return;
         }
@@ -155,7 +155,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
             {draftedPhases.length > 0 ? (
               <View style={styles.draftBox}>
                 <Text style={styles.draftLabel}>
-                  YOUR PLAN, DRAFTING LIVE — {draftedPhases.length} {draftedPhases.length === 1 ? "PIECE" : "PIECES"} IN
+                  DRAFTING YOUR PLAN: {draftedPhases.length} {draftedPhases.length === 1 ? "PIECE" : "PIECES"} IN
                 </Text>
                 {draftedPhases.slice(-5).map((name, i) => (
                   <Text key={i} style={styles.draftLine}>

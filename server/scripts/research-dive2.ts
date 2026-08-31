@@ -105,22 +105,22 @@ const DEEP_ANGLES: { id: string; prompt: string }[] = [
   // --- The map: neighborhood sweeps ---
   { id: "nbhd-heights-washington", prompt: "Men's clothing stores, tailors, boutiques, and menswear shops physically located in the Houston Heights, Washington Avenue corridor, or Sawyer Yards." },
   { id: "nbhd-montrose-midtown", prompt: "Men's clothing stores, vintage shops with menswear, tailors, and boutiques in Montrose, Midtown, or the Museum District of Houston." },
-  { id: "nbhd-galleria-uptown", prompt: "Menswear stores in Houston's Galleria/Uptown and Post Oak area beyond the big department stores — smaller shops, custom clothiers, and specialty retailers." },
+  { id: "nbhd-galleria-uptown", prompt: "Menswear stores in Houston's Galleria/Uptown and Post Oak area beyond the big department stores, smaller shops, custom clothiers, and specialty retailers." },
   { id: "nbhd-river-oaks-kirby", prompt: "Menswear shops, custom clothiers, and men's boutiques in River Oaks, Upper Kirby, Highland Village, and West University in Houston." },
   { id: "nbhd-east-north", prompt: "Men's clothing and custom tailoring in EaDo, the East End, Northside, Near Northside, and Second Ward Houston." },
   { id: "nbhd-southwest-bellaire", prompt: "Men's clothing stores and tailors along Bellaire Boulevard, in Sharpstown, Chinatown Houston, Gulfton, and southwest Houston." },
   // --- The culture: Houston's actual communities ---
-  { id: "culture-african", prompt: "Houston tailors and clothiers serving the Nigerian, Ghanaian, and West African communities — custom suits, agbada, and formal menswear. Houston has one of the largest Nigerian populations in the US." },
-  { id: "culture-southasian-mideast", prompt: "Houston men's tailors and formalwear shops serving South Asian (Indian, Pakistani) and Middle Eastern communities — sherwani, custom suiting, and men's formal wear, especially in Hillcroft/Mahatma Gandhi District." },
-  { id: "culture-vietnamese-latino", prompt: "Vietnamese-owned tailors and Latino-owned menswear or western wear shops in Houston — including Bellaire's Little Saigon and Latino shopping districts." },
+  { id: "culture-african", prompt: "Houston tailors and clothiers serving the Nigerian, Ghanaian, and West African communities, custom suits, agbada, and formal menswear. Houston has one of the largest Nigerian populations in the US." },
+  { id: "culture-southasian-mideast", prompt: "Houston men's tailors and formalwear shops serving South Asian (Indian, Pakistani) and Middle Eastern communities, sherwani, custom suiting, and men's formal wear, especially in Hillcroft/Mahatma Gandhi District." },
+  { id: "culture-vietnamese-latino", prompt: "Vietnamese-owned tailors and Latino-owned menswear or western wear shops in Houston, including Bellaire's Little Saigon and Latino shopping districts." },
   // --- The record: what local media actually reported ---
-  { id: "media-local-press", prompt: "Menswear stores in Houston covered by CultureMap Houston, PaperCity Magazine, Houstonia, the Houston Chronicle, or Texas Monthly — best men's shops, new store openings, and profiles of local clothiers." },
-  { id: "media-new-openings", prompt: "Men's clothing stores, boutiques, or custom clothiers that opened in Houston in the last two years — new arrivals and recently expanded shops." },
+  { id: "media-local-press", prompt: "Menswear stores in Houston covered by CultureMap Houston, PaperCity Magazine, Houstonia, the Houston Chronicle, or Texas Monthly, best men's shops, new store openings, and profiles of local clothiers." },
+  { id: "media-new-openings", prompt: "Men's clothing stores, boutiques, or custom clothiers that opened in Houston in the last two years, new arrivals and recently expanded shops." },
   // --- The gaps: categories we may be thin on ---
   { id: "gap-shoes-leather", prompt: "Houston shoe repair, cobblers, custom leather goods makers, and shoe stores that carry quality men's dress shoes (Goodyear-welted, resoleable)." },
-  { id: "gap-bigtall-athletic", prompt: "Houston menswear for big and tall men, and shops that fit athletic or muscular builds well — including tailors known for that work." },
-  { id: "gap-formal-rental", prompt: "Houston tuxedo shops, black-tie formalwear, and formal rental for men beyond the national chains — including shops for galas and weddings." },
-  { id: "gap-workwear-uniform", prompt: "Houston workwear and uniform retailers that also serve professional men — flame-resistant clothing for energy workers, and quality work boots and shirts that read professional on site visits." },
+  { id: "gap-bigtall-athletic", prompt: "Houston menswear for big and tall men, and shops that fit athletic or muscular builds well, including tailors known for that work." },
+  { id: "gap-formal-rental", prompt: "Houston tuxedo shops, black-tie formalwear, and formal rental for men beyond the national chains, including shops for galas and weddings." },
+  { id: "gap-workwear-uniform", prompt: "Houston workwear and uniform retailers that also serve professional men, flame-resistant clothing for energy workers, and quality work boots and shirts that read professional on site visits." },
 ];
 
 interface Candidate {
@@ -135,16 +135,16 @@ interface Candidate {
 
 async function discover(angle: { id: string; prompt: string }, knownNames: string[]): Promise<Candidate[]> {
   const text = await runWithSearch(
-    "You are a Houston retail researcher with a bias toward finding real places others miss. Search the live web, then answer ONLY with a single JSON object — no prose outside it.",
+    "You are a Houston retail researcher with a bias toward finding real places others miss. Search the live web, then answer ONLY with a single JSON object, no prose outside it.",
     `Research this: ${angle.prompt}
 
-ALREADY IN OUR DIRECTORY — exclude these and obvious duplicates:
+ALREADY IN OUR DIRECTORY: exclude these and obvious duplicates:
 ${knownNames.join(", ")}
 
 Rules:
 - Real, currently operating Houston-area businesses only.
 - Report what you find WITH a confidence rating rather than dropping anything uncertain: "high" = live website or multiple current sources; "medium" = credible listing or recent reviews; "low" = mentioned but thin evidence. A human reviews these, so a medium-confidence real shop is more useful than an empty list.
-- Small, local, family-owned, and community-serving businesses are the POINT of this search — do not skip a place for being obscure or having a weak web presence. That is exactly what we're looking for.
+- Small, local, family-owned, and community-serving businesses are the POINT of this search, do not skip a place for being obscure or having a weak web presence. That is exactly what we're looking for.
 - Do not invent businesses. If a search genuinely surfaces nothing, return an empty array.
 
 Answer ONLY this JSON:

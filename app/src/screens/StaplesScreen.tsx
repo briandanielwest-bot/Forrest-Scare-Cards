@@ -16,8 +16,8 @@ export function StaplesScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.lede}>
-          Four Houston industries, three career levels, and the two pieces Kyla would march you out to buy first —
-          on the house.
+          Pick your industry and where you are in your career. Kyla names the two pieces she'd march you out to buy
+          first, on the house.
         </Text>
 
         <View style={styles.chipRow}>
