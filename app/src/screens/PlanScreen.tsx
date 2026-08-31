@@ -151,6 +151,7 @@ export function PlanScreen({ navigation }: Props) {
 
         <StoreRunList runs={buildStoreRuns(plan, storeById)} />
 
+        <Text style={styles.sectionHeader}>The game plan</Text>
         <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
         <View style={styles.calloutCard}>
@@ -315,15 +316,17 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
-                •  {it.label}
+                •  {it.label} — {moneyRange(it.low, it.high)}
                 {it.phaseName ? `  (${it.phaseName})` : ""}
               </Text>
             ))}
             <View style={styles.runLinkRow}>
               {run.store?.website ? (
-                <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8}>
-                  <Text style={styles.runStoreLink}>
-                    {run.store.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} →
+                <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8} style={styles.runLinkShrink}>
+                  {/* Domain only — full store URLs overflowed the card and
+                      pushed the Map link out of reach (seen live). */}
+                  <Text style={styles.runStoreLink} numberOfLines={1}>
+                    {run.store.website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]} →
                   </Text>
                 </Pressable>
               ) : null}
@@ -503,7 +506,8 @@ const styles = StyleSheet.create({
   runStoreContact: { color: colors.gold, fontSize: 13, fontWeight: "700" },
   runItem: { color: colors.cream, fontSize: 13, lineHeight: 19 },
   runStoreLink: { color: colors.gold, fontSize: 12, fontWeight: "700", textDecorationLine: "underline", marginTop: 2 },
-  runLinkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  runLinkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
+  runLinkShrink: { flexShrink: 1 },
   tipsCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border, gap: spacing.xs },
   tipText: { ...typography.body },
   pepCard: { backgroundColor: colors.gold, borderRadius: radii.md, padding: spacing.md },
