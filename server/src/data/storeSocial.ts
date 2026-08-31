@@ -44,5 +44,99 @@ export const STORE_SOCIAL: Record<string, StoreSocial> = {
   "brioni-river-oaks": {
     "instagram": "brioni_official",
     "active": false
+  },
+  "tom-james": {
+    "facebook": "https://www.facebook.com/TomJameshouston/",
+    "active": false
+  },
+  "bill-walker-clothier": {
+    "instagram": "billwalkerclothier",
+    "active": true
+  },
+  "bzach-clothier": {
+    "instagram": "bzachhouston",
+    "facebook": "https://www.facebook.com/bzachhouston/",
+    "active": true
+  },
+  "festari-for-men": {
+    "instagram": "festariformen",
+    "facebook": "https://www.facebook.com/festariformen/",
+    "active": false
+  },
+  "neiman-marcus-galleria": {
+    "instagram": "neimanmarcushouston",
+    "active": true
+  },
+  "louis-vuitton-mens-galleria": {
+    "instagram": "louisvuitton",
+    "facebook": "https://www.facebook.com/LouisVuitton",
+    "active": true
+  },
+  "the-black-tux-galleria": {
+    "instagram": "theblacktux",
+    "facebook": "https://www.facebook.com/theblacktux",
+    "active": true
+  },
+  "dxl-big-tall": {
+    "facebook": "https://www.facebook.com/DXLHoustonTX5393WestheimerRoad/",
+    "active": true
+  },
+  "sid-mashburn": {
+    "instagram": "sidmashburn",
+    "facebook": "https://www.facebook.com/mashburnhouston/",
+    "active": true
+  },
+  "suitsupply-river-oaks-district": {
+    "facebook": "https://www.facebook.com/SuitsupplyHouston/",
+    "active": true
+  },
+  "rye-51": {
+    "instagram": "rye51_houston",
+    "facebook": "https://www.facebook.com/RYE51Houston/",
+    "active": false
+  },
+  "premium-goods": {
+    "instagram": "premiumgoodshtx",
+    "facebook": "https://www.facebook.com/premiumgoodshtx/",
+    "active": true
+  },
+  "manready-mercantile": {
+    "instagram": "manreadymerc",
+    "facebook": "https://www.facebook.com/manreadymerc/",
+    "active": true
+  },
+  "tecovas-rice-village": {
+    "instagram": "tecovas",
+    "facebook": "https://www.facebook.com/Tecovashouston/",
+    "active": true
+  },
+  "pinto-ranch": {
+    "instagram": "pintoranch",
+    "facebook": "https://www.facebook.com/pintoranch/",
+    "active": true
+  },
+  "allen-edmonds-houston": {
+    "instagram": "allenedmonds",
+    "active": true
+  },
+  "qc-tailors": {
+    "instagram": "qualitycustomtailors",
+    "facebook": "https://www.facebook.com/p/Quality-Custom-Tailors-100054619051765/",
+    "active": false
+  },
+  "warby-parker-rice-village": {
+    "instagram": "warbyparker",
+    "facebook": "https://www.facebook.com/warbyparker",
+    "active": true
+  },
+  "kuhl-linscomb": {
+    "instagram": "kuhllinscomb",
+    "facebook": "https://www.facebook.com/kuhl.linscomb/",
+    "active": true
+  },
+  "zadok-jewelers": {
+    "instagram": "zadokjewelers",
+    "facebook": "https://www.facebook.com/zadokjewelers/",
+    "active": true
   }
 };
