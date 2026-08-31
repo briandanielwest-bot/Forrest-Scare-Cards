@@ -12,7 +12,9 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 
-const POLL_INTERVAL_MS = 3000;
+// 2s keeps the finished plan from sitting unseen — with ~70s generations,
+// the poll traffic is trivial (the GET is exempt from rate limiting).
+const POLL_INTERVAL_MS = 2000;
 // Long enough to read a name, a title, and a duty line without rushing —
 // the wait is where the app shows the actual work being done for him.
 const ROTATE_INTERVAL_MS = 5000;

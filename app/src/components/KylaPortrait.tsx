@@ -17,10 +17,10 @@ const KYLA_SVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
 <path d="M50 11 C30 11 22 26 22 41 C22 57 25 67 20 79 L39 79 C35 67 33 56 33 46 L67 46 C67 56 65 67 61 79 L80 79 C75 67 78 57 78 41 C78 26 70 11 50 11 Z" fill="#3B2314"/>
 <rect x="45" y="56" width="10" height="13" fill="#E8BD97"/>
 <path d="M18 100 C18 83 32 76 50 76 C68 76 82 83 82 100 Z" fill="#1F3A34"/>
-<path d="M43.5 76 L50 87 L56.5 76 Z" fill="#F6F1E6"/>
-<circle cx="45" cy="79" r="1.6" fill="#EEE6D8"/>
-<circle cx="50" cy="81" r="1.6" fill="#EEE6D8"/>
-<circle cx="55" cy="79" r="1.6" fill="#EEE6D8"/>
+<path d="M46.8 76 L50 80.5 L53.2 76 Z" fill="#EFCBA8"/>
+<circle cx="46" cy="77.5" r="1.4" fill="#EEE6D8"/>
+<circle cx="50" cy="79" r="1.4" fill="#EEE6D8"/>
+<circle cx="54" cy="77.5" r="1.4" fill="#EEE6D8"/>
 <circle cx="34" cy="44" r="2.7" fill="#EFC5A0"/>
 <circle cx="66" cy="44" r="2.7" fill="#EFC5A0"/>
 <circle cx="34" cy="48" r="1.5" fill="none" stroke="#D9A93E" stroke-width="1"/>

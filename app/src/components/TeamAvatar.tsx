@@ -68,15 +68,15 @@ export function TeamAvatar({ look, size }: { look: AvatarLook; size: number }) {
           backgroundColor: look.jacket,
         }}
       />
-      {/* shirt V */}
+      {/* shirt V — skin-tone open neckline on feminine faces, shirt otherwise */}
       <View
         style={{
           position: abs,
-          width: s(0.13),
-          height: s(0.13),
-          bottom: s(0.16),
-          left: s(0.435),
-          backgroundColor: "#F7F3EA",
+          width: look.lips ? s(0.09) : s(0.13),
+          height: look.lips ? s(0.09) : s(0.13),
+          bottom: look.lips ? s(0.2) : s(0.16),
+          left: look.lips ? s(0.455) : s(0.435),
+          backgroundColor: look.lips ? look.skin : "#F7F3EA",
           transform: [{ rotate: "45deg" }],
         }}
       />
