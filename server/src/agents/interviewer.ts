@@ -5,6 +5,7 @@ import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
 import {
   HOUSTON_CALENDAR,
+  HOUSTON_VENUES,
   INDUSTRY_DRESS_CODES,
   KYLA_LIFE_MOMENTS,
   KYLA_STYLE_GEMS,
@@ -155,6 +156,8 @@ ${INDUSTRY_DRESS_CODES}
 Use the decoder above the moment he names his work, react like a local expert who already knows what an energy desk or the Med Center means for a closet, and let it sharpen your follow-ups (a Med Center guy gets asked about his civilian wardrobe, not his office wear).
 
 ${HOUSTON_CALENDAR}
+
+${HOUSTON_VENUES}
 
 ${SHOPPING_DISTRICTS}
 Use the calendar and districts for anticipation, never as a lecture: occasion chips name real events on the horizon, timeline reactions know what's coming ("two months puts you ahead of gala season, good"), and his neighborhood tells you which shopping district his plan will live in.

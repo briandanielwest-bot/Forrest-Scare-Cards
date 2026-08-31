@@ -23,6 +23,19 @@ export const HOUSTON_CALENDAR = `HOUSTON YEAR IN DRESS: month by month
 - Nov-Dec: mild days, real chilly snaps. Peak gala + holiday party season; the two sweaters and one overcoat earn their keep.
 The buying rhythm: hot-weather foundation first (worn 7+ months), winter/gala capsule in Oct, rodeo-season western ahead of February, and conference tailoring (CERAWeek/OTC) ordered 6+ weeks ahead.`;
 
+export const HOUSTON_VENUES = `HOUSTON VENUES AND WHAT THEY DEMAND: use these names, they are current
+A wrong venue name is the fastest way to sound like you have never been here, and stadium naming rights change. These are correct as of 2026; never fall back on an older name you remember.
+- Daikin Park (downtown): the Astros. Renamed from Minute Maid Park in January 2025, so NEVER call it Minute Maid. Retractable roof, so a night game in October is climate-controlled and a warm-weather outfit can strand you. Dress code is dark denim or chinos with a polo, button-down, or a good tee; a light layer for when the roof opens.
+- NRG Park / NRG Stadium (South Loop): the Texans, RodeoHouston (Feb-Mar), and OTC (early May). Rodeo events are where boots and dark denim carry genuine formal standing. Club level and gala tents run dressier than the concourse.
+- Toyota Center (downtown): the Rockets. Courtside is a real dress-up scene in this city; upper bowl is jeans and sneakers.
+- Shell Energy Stadium (EaDo): the Dynamo. Outdoor, so heat and rain both matter; smart-casual with real shoes.
+- George R. Brown Convention Center, "the GRB" (downtown), with the Hilton Americas attached: CERAWeek in late March and most large trade shows. Suit week for energy professionals; the walk between hotel and hall in a suit is why tropical wool exists.
+- Museum of Fine Arts Houston (MFAH, Museum District): the most cosmopolitan black-tie in the city. When an MFAH invitation says black-tie optional, wear the tuxedo.
+- Wortham Theater Center (ballet and opera) and Jones Hall (symphony), both downtown: opening nights are genuine formal; a regular subscription night is a dark suit or a jacket and trousers.
+- Hobby Center (downtown): touring Broadway. Jacket, no tie, is exactly right.
+- The Post Oak Hotel (Uptown) and The Houstonian (Memorial): the two addresses where most charity galas and serious business dinners land.
+- The Ismaili Center, Asia Society Texas, and the Hobby Center also host major cultural galas; all follow the MFAH standard.`;
+
 export const SHOPPING_DISTRICTS = `HOUSTON SHOPPING GEOGRAPHY: cluster errands, respect the drive
 - River Oaks District (Westheimer at Willowick): Hermès, Brioni, Brunello Cucinelli, with Sid Mashburn and Suitsupply (West Ave, Westheimer at Kirby) minutes away. The luxury walking cluster.
 - Galleria / Post Oak: Nordstrom, Neiman Marcus, Saks, Zegna, Louis Vuitton Men's, Indochino, Johnston & Murphy, The Black Tux inside or beside the mall; Festari, Pinto Ranch, Eye Elegance, Zadok on Post Oak; Hamilton Shirts and The Hat Store on Richmond. The densest one-trip zone in the city.
