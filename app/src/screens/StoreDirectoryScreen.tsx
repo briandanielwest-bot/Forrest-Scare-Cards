@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Linking, Pressable, SectionList, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppContext } from "../context/AppContext";
-import { fetchStores } from "../api/client";
+import { askCampbell, fetchStores } from "../api/client";
+import { TeamAvatar } from "../components/TeamAvatar";
+import { TEAM } from "../data/team";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, StoreCategory } from "../types";
 
@@ -18,6 +20,58 @@ function telUrl(contact: string): string | null {
 
 function mapsUrl(store: { name: string; neighborhood: string }): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.name} ${store.neighborhood} Houston TX`)}`;
+}
+
+const campbellLook = TEAM.find((m) => m.id === "campbell")!.look;
+
+// One-question box answered by Campbell, the Houston Concierge — dress
+// codes, seasons, events ("what do I wear to a Rodeo gala?").
+function AskCampbell() {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState<string | null>(null);
+  const [asking, setAsking] = useState(false);
+
+  async function handleAsk() {
+    const q = question.trim();
+    if (!q || asking) return;
+    setAsking(true);
+    setAnswer(null);
+    try {
+      const { reply } = await askCampbell(q);
+      setAnswer(reply);
+    } catch {
+      setAnswer("Campbell's line is busy — try again in a minute.");
+    } finally {
+      setAsking(false);
+    }
+  }
+
+  return (
+    <View style={styles.campbellCard}>
+      <View style={styles.campbellHeader}>
+        <TeamAvatar look={campbellLook} size={34} />
+        <View>
+          <Text style={styles.campbellTitle}>Ask Campbell</Text>
+          <Text style={styles.campbellSub}>Houston dress codes, seasons, events — he's the concierge.</Text>
+        </View>
+      </View>
+      <View style={styles.campbellRow}>
+        <TextInput
+          style={styles.campbellInput}
+          value={question}
+          onChangeText={setQuestion}
+          placeholder="What do I wear to a Rodeo gala?"
+          placeholderTextColor={colors.muted}
+          editable={!asking}
+          onSubmitEditing={handleAsk}
+        />
+        <Pressable style={styles.campbellButton} onPress={handleAsk} disabled={asking || !question.trim()}>
+          {asking ? <ActivityIndicator color={colors.cream} size="small" /> : <Text style={styles.campbellButtonText}>Ask</Text>}
+        </Pressable>
+      </View>
+      {answer ? <Text style={styles.campbellAnswer}>{answer}</Text> : null}
+    </View>
+  );
 }
 
 export function StoreDirectoryScreen() {
@@ -88,6 +142,7 @@ export function StoreDirectoryScreen() {
         sections={sections}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        ListHeaderComponent={<AskCampbell />}
         renderSectionHeader={({ section }) => <Text style={styles.sectionHeader}>{section.title}</Text>}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -193,4 +248,37 @@ const styles = StyleSheet.create({
   linkShrink: { flexShrink: 1 },
   website: { ...typography.small, color: colors.bayou, fontWeight: "700", marginTop: 2 },
   disclaimer: { ...typography.small, textAlign: "center", marginTop: spacing.lg, marginBottom: spacing.xl },
+  campbellCard: {
+    backgroundColor: colors.paper,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.bayou,
+    padding: spacing.md,
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  campbellHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  campbellTitle: { ...typography.title, fontSize: 16 },
+  campbellSub: { ...typography.small, color: colors.muted },
+  campbellRow: { flexDirection: "row", gap: spacing.sm, alignItems: "center" },
+  campbellInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    ...typography.body,
+    fontSize: 14,
+  },
+  campbellButton: {
+    backgroundColor: colors.bayou,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minWidth: 56,
+    alignItems: "center",
+  },
+  campbellButtonText: { color: colors.cream, fontWeight: "800" },
+  campbellAnswer: { ...typography.body, fontSize: 14, lineHeight: 20, color: colors.ink },
 });

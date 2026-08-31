@@ -10,6 +10,7 @@ import { photoRouter } from "./routes/photo";
 import { planRouter } from "./routes/plan";
 import { storesRouter } from "./routes/stores";
 import { sessionRouter } from "./routes/session";
+import { almanacRouter } from "./routes/almanac";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
@@ -42,6 +43,7 @@ app.use("/api/photo", agentRouteLimiter, photoRouter);
 app.use("/api/plan", planRouter);
 app.use("/api/stores", storesRouter);
 app.use("/api/session", sessionRouter);
+app.use("/api/almanac", agentRouteLimiter, almanacRouter);
 
 app.use((req, res) => {
   res.status(404).json({ error: `No route for ${req.method} ${req.path}` });

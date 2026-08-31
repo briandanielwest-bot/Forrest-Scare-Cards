@@ -237,8 +237,8 @@ export interface InterviewTurnResult {
   quickReplies?: string[];
 }
 
-async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
-  const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
+function buildTurnParams(session: SessionState): WithEffort<Anthropic.MessageCreateParamsNonStreaming> {
+  return {
     // Chat turns live or die on latency — the fast model keeps Kyla snappy.
     model: FAST_AGENT_MODEL,
     max_tokens: 4096,
@@ -252,8 +252,26 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
     // Kyla's reply, so it needs to come back quickly, not exhaustively.
     output_config: { effort: "medium" },
   };
-  const response = await anthropic.messages.create(params);
+}
 
+async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
+  const response = await anthropic.messages.create(buildTurnParams(session));
+  return processTurnResponse(session, response);
+}
+
+// Streaming variant: text deltas flow to the caller as they generate, then
+// the finished message goes through the exact same post-processing.
+export async function runTurnStreaming(
+  session: SessionState,
+  onDelta: (text: string) => void,
+): Promise<InterviewTurnResult> {
+  const stream = anthropic.messages.stream(buildTurnParams(session) as Anthropic.MessageStreamParams);
+  stream.on("text", onDelta);
+  const response = await stream.finalMessage();
+  return processTurnResponse(session, response);
+}
+
+function processTurnResponse(session: SessionState, response: Anthropic.Message): InterviewTurnResult {
   session.interviewHistory.push({ role: "assistant", content: response.content });
 
   let reply = "";
@@ -325,4 +343,13 @@ export async function continueInterview(
 ): Promise<InterviewTurnResult> {
   session.interviewHistory.push({ role: "user", content: userMessage });
   return runTurn(session);
+}
+
+export async function continueInterviewStreaming(
+  session: SessionState,
+  userMessage: string,
+  onDelta: (text: string) => void,
+): Promise<InterviewTurnResult> {
+  session.interviewHistory.push({ role: "user", content: userMessage });
+  return runTurnStreaming(session, onDelta);
 }
