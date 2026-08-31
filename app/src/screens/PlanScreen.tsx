@@ -28,6 +28,20 @@ function cleanText(text: string | undefined | null): string {
   return (text ?? "").replace(/\\n/g, "\n");
 }
 
+// The UI wraps sayThis in curly quotes itself; the model sometimes quotes
+// it too (seen live: “"I want a navy suit…"”) — strip any quotes it added.
+function unquote(text: string): string {
+  return text.replace(/^["“”']+/, "").replace(/["“”']+$/, "");
+}
+
+// Stretch-goal items are deliberately budgeted at $0 today, and "$0 – $0"
+// reads like a bug — label the intent instead.
+function moneyRange(low: number | undefined | null, high: number | undefined | null): string {
+  const lo = Number(low) || 0;
+  const hi = Number(high) || 0;
+  return lo === 0 && hi === 0 ? "$0 today — buy later" : `${money(lo)} – ${money(hi)}`;
+}
+
 // `?? []` doesn't guard against a field that EXISTS but isn't an array
 // (seen live: the model returned phases as a JSON string, crashing .map).
 // The server now normalizes that, but the client must never crash on a
@@ -202,9 +216,7 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
           <View key={run.storeId} style={styles.runStore}>
             <View style={styles.runStoreHeader}>
               <Text style={styles.runStoreName}>{name}</Text>
-              <Text style={styles.runStoreBudget}>
-                {money(low)} – {money(high)}
-              </Text>
+              <Text style={styles.runStoreBudget}>{moneyRange(low, high)}</Text>
             </View>
             {run.store?.neighborhood ? <Text style={styles.runStoreMeta}>{run.store.neighborhood}</Text> : null}
             {run.store?.contact ? (
@@ -267,16 +279,14 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
         </View>
       </View>
       <Text style={styles.itemDescription}>{cleanText(item.description)}</Text>
-      <Text style={styles.itemBudget}>
-        {money(item.estimatedBudgetLowUsd)} – {money(item.estimatedBudgetHighUsd)}
-      </Text>
+      <Text style={styles.itemBudget}>{moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)}</Text>
       {asArray<string>(item.recommendedStoreIds).length > 0 && (
         <Text style={styles.itemStores}>Where: {asArray<string>(item.recommendedStoreIds).map(storeName).join(", ")}</Text>
       )}
       {item.sayThis ? (
         <View style={styles.scriptBox}>
           <Text style={styles.scriptLabel}>WHAT TO SAY IN-STORE</Text>
-          <Text style={styles.sayThis}>“{cleanText(item.sayThis)}”</Text>
+          <Text style={styles.sayThis}>“{unquote(cleanText(item.sayThis))}”</Text>
           {asArray<string>(item.keySpecs).map((spec, i) => (
             <Text key={i} style={styles.scriptText}>
               •  {cleanText(spec)}
