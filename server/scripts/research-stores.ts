@@ -270,9 +270,28 @@ async function main() {
   }
 
   if (phase === "enrich" || phase === "both") {
-    console.log(`[research] enriching ${HOUSTON_STORES.length} stores…`);
-    const intel: Record<string, StoreIntel> = {};
-    const results = await pool(HOUSTON_STORES, 3, async (store) => {
+    // Resume by default: a store with researched brands or prices is left
+    // alone, so a re-run after a failure only pays for what's missing.
+    const force = process.argv.includes("--force");
+    const existing: Record<string, StoreIntel> = {};
+    if (!force) {
+      try {
+        const mod = await import("../src/data/storeIntel");
+        Object.assign(existing, mod.STORE_INTEL as Record<string, StoreIntel>);
+      } catch {
+        // No prior run — enrich everything.
+      }
+    }
+    const hasIntel = (id: string) => {
+      const prior = existing[id];
+      return Boolean(prior && (prior.brands.length > 0 || prior.pricePoints.length > 0 || prior.insiderTake));
+    };
+    const todo = HOUSTON_STORES.filter((s) => !hasIntel(s.id));
+    console.log(
+      `[research] enriching ${todo.length} store(s)${todo.length < HOUSTON_STORES.length ? ` (${HOUSTON_STORES.length - todo.length} already researched — resuming)` : ""}…`,
+    );
+    const intel: Record<string, StoreIntel> = { ...existing };
+    const results = await pool(todo, 3, async (store) => {
       try {
         const i = await withRetry(store.id, () => enrich(store));
         console.log(`  ${store.id}: ${i.brands.length} brands, ${i.pricePoints.length} prices`);
@@ -282,7 +301,11 @@ async function main() {
         return [store.id, { brands: [], pricePoints: [], insiderTake: "", researchedAt: new Date().toISOString().slice(0, 10) }] as const;
       }
     });
-    for (const [id, i] of results) intel[id] = i;
+    for (const [id, i] of results) {
+      // Never let a failed re-run erase intel a previous run captured.
+      if (i.brands.length > 0 || i.pricePoints.length > 0 || i.insiderTake) intel[id] = i;
+      else if (!intel[id]) intel[id] = i;
+    }
 
     fs.writeFileSync(
       path.join(__dirname, "..", "src", "data", "storeIntel.ts"),
