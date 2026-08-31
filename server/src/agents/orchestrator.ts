@@ -31,6 +31,7 @@ export async function generateWardrobePlan(session: SessionState): Promise<Wardr
   const climateBrief = getHoustonClimateStyleBrief();
 
   // Scouts and photo analysis overlap — scouts only need the profile.
+  session.planStage = "scouts";
   const t0 = Date.now();
   const [scoutReports] = await Promise.all([
     runAllScouts(session.styleProfile, climateBrief),
@@ -39,6 +40,7 @@ export async function generateWardrobePlan(session: SessionState): Promise<Wardr
   const tScouts = Date.now();
   console.log(`[orchestrator] scouts + photo wait: ${((tScouts - t0) / 1000).toFixed(1)}s`);
 
+  session.planStage = "planner";
   const plan = await buildWardrobePlan({
     profile: session.styleProfile,
     photoAssessment: session.photoAssessment,

@@ -25,6 +25,14 @@ export function InterviewScreen({ navigation }: Props) {
     useAppContext();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [dots, setDots] = useState("•");
+
+  // Animated "Kyla is typing" dots while her reply is in flight.
+  React.useEffect(() => {
+    if (!sending) return;
+    const interval = setInterval(() => setDots((d) => (d.length >= 3 ? "•" : d + "•")), 400);
+    return () => clearInterval(interval);
+  }, [sending]);
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
@@ -73,15 +81,21 @@ export function InterviewScreen({ navigation }: Props) {
       <SafeAreaView style={styles.container} edges={["bottom"]}>
         <FlatList
           ref={listRef}
-          data={chatMessages}
+          data={sending ? [...chatMessages, { id: "typing", role: "assistant" as const, text: "typing" }] : chatMessages}
           keyExtractor={(m) => m.id}
           contentContainerStyle={styles.list}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
-          renderItem={({ item }) => (
-            <View style={[styles.bubble, item.role === "user" ? styles.userBubble : styles.assistantBubble]}>
-              <Text style={item.role === "user" ? styles.userText : styles.assistantText}>{item.text}</Text>
-            </View>
-          )}
+          renderItem={({ item }) =>
+            item.id === "typing" ? (
+              <View style={[styles.bubble, styles.assistantBubble, styles.typingBubble]}>
+                <Text style={styles.typingText}>Kyla is typing {dots}</Text>
+              </View>
+            ) : (
+              <View style={[styles.bubble, item.role === "user" ? styles.userBubble : styles.assistantBubble]}>
+                <Text style={item.role === "user" ? styles.userText : styles.assistantText}>{item.text}</Text>
+              </View>
+            )
+          }
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -129,6 +143,8 @@ const styles = StyleSheet.create({
   assistantBubble: { backgroundColor: colors.paper, alignSelf: "flex-start", borderWidth: 1, borderColor: colors.border },
   userBubble: { backgroundColor: colors.bayou, alignSelf: "flex-end" },
   assistantText: { ...typography.body },
+  typingBubble: { paddingVertical: spacing.sm },
+  typingText: { ...typography.small, color: colors.muted, fontStyle: "italic" },
   userText: { ...typography.body, color: colors.cream },
   chipRow: {
     flexDirection: "row",

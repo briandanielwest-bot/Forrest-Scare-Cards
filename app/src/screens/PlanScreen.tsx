@@ -105,6 +105,9 @@ export function PlanScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.guideTitle}>{plan.guideTitle}</Text>
+
+        <AtAGlance plan={plan} />
+
         <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
         <View style={styles.calloutCard}>
@@ -158,6 +161,28 @@ export function PlanScreen({ navigation }: Props) {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function AtAGlance({ plan }: { plan: WardrobePlan }) {
+  const phases = asArray<WardrobePlan["phases"][number]>(plan.phases);
+  const items = phases.flatMap((p) => asArray<WardrobeItem>(p.items));
+  const stores = new Set(items.flatMap((i) => asArray<string>(i.recommendedStoreIds)));
+  const stats: [string, string][] = [
+    [String(phases.length), phases.length === 1 ? "phase" : "phases"],
+    [String(items.length), "items"],
+    [String(stores.size), "stores"],
+    [money(plan.budgetSummary?.totalBudgetUsd), "budget"],
+  ];
+  return (
+    <View style={styles.glanceRow}>
+      {stats.map(([value, label]) => (
+        <View key={label} style={styles.glanceStat}>
+          <Text style={styles.glanceValue}>{value}</Text>
+          <Text style={styles.glanceLabel}>{label}</Text>
+        </View>
+      ))}
+    </View>
   );
 }
 
@@ -266,6 +291,18 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
   content: { padding: spacing.lg, gap: spacing.lg },
   guideTitle: { ...typography.display },
+  glanceRow: { flexDirection: "row", gap: spacing.sm },
+  glanceStat: {
+    flex: 1,
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+  },
+  glanceValue: { color: colors.bayou, fontWeight: "800", fontSize: 16 },
+  glanceLabel: { ...typography.small, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.5 },
   narrative: { ...typography.body },
   calloutCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border },
   calloutLabel: { ...typography.subtitle, marginBottom: spacing.xs },

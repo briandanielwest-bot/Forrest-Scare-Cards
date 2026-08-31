@@ -79,6 +79,7 @@ planRouter.get("/:sessionId", (req, res) => {
   }
   res.json({
     status: session.planStatus,
+    stage: session.planStage,
     plan: session.wardrobePlan,
     error: session.planError,
   });

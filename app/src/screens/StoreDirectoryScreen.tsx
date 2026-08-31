@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, SectionList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, SectionList, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppContext } from "../context/AppContext";
 import { fetchStores } from "../api/client";
@@ -14,6 +14,7 @@ export function StoreDirectoryScreen() {
   const { stores, setStores, categoryLabels, setCategoryLabels } = useAppContext();
   const [loading, setLoading] = useState(stores.length === 0);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (stores.length > 0) return;
@@ -27,8 +28,17 @@ export function StoreDirectoryScreen() {
   }, []);
 
   const sections = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const visible = q
+      ? stores.filter((s) =>
+          [s.name, s.neighborhood, s.description, s.bestFor, s.knownFor ?? "", s.catersTo ?? "", ...s.styleTags]
+            .join(" ")
+            .toLowerCase()
+            .includes(q),
+        )
+      : stores;
     const byCategory = new Map<StoreCategory, HoustonStore[]>();
-    for (const store of stores) {
+    for (const store of visible) {
       const list = byCategory.get(store.category) ?? [];
       list.push(store);
       byCategory.set(store.category, list);
@@ -37,7 +47,7 @@ export function StoreDirectoryScreen() {
       title: categoryLabels?.[category] ?? category,
       data,
     }));
-  }, [stores, categoryLabels]);
+  }, [stores, categoryLabels, query]);
 
   if (loading) {
     return (
@@ -57,6 +67,13 @@ export function StoreDirectoryScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <TextInput
+        style={styles.search}
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search 40+ stores — try 'boots', 'custom', 'Heights'…"
+        placeholderTextColor={colors.muted}
+      />
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -97,6 +114,17 @@ export function StoreDirectoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
   center: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.cream },
+  search: {
+    margin: spacing.md,
+    marginBottom: 0,
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    ...typography.body,
+  },
   list: { padding: spacing.md, gap: spacing.sm },
   sectionHeader: {
     ...typography.subtitle,
