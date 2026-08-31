@@ -1,10 +1,10 @@
 import React from "react";
-import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { fetchStores } from "../api/client";
+import { askKylaAboutPlan, fetchStores } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, WardrobeItem, WardrobePlan, StorePriority } from "../types";
@@ -83,9 +83,79 @@ function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonSt
   return Array.from(runs.values()).sort((a, b) => b.items.length - a.items.length);
 }
 
+// Post-plan chat: Kyla answers questions about her picks, right on the
+// plan. Local exchange list only — the server keeps the real history.
+function AskKyla({ sessionId }: { sessionId: string | null }) {
+  const [question, setQuestion] = React.useState("");
+  const [exchanges, setExchanges] = React.useState<{ q: string; a: string }[]>([]);
+  const [asking, setAsking] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function handleAsk() {
+    const q = question.trim();
+    if (!q || !sessionId || asking) return;
+    setError(null);
+    setAsking(true);
+    setQuestion("");
+    try {
+      const { reply } = await askKylaAboutPlan(sessionId, q);
+      setExchanges((prev) => [...prev, { q, a: reply }]);
+    } catch (e) {
+      setError(
+        e instanceof Error && /session/i.test(e.message)
+          ? "Kyla's memory of this session has expired (the server restarted) — she can chat again on your next plan."
+          : "Kyla didn't get that — try again?",
+      );
+    } finally {
+      setAsking(false);
+    }
+  }
+
+  if (!sessionId) return null;
+  return (
+    <View style={styles.askCard}>
+      <View style={styles.pepHeader}>
+        <KylaPortrait size={34} />
+        <Text style={styles.askTitle}>Questions? Ask Kyla</Text>
+      </View>
+      <Text style={styles.askHint}>Swaps, sizing, "why this store" — she knows every pick in this plan.</Text>
+      {exchanges.map((ex, i) => (
+        <View key={i} style={styles.askExchange}>
+          <Text style={styles.askQ}>You: {ex.q}</Text>
+          <Text style={styles.askA}>{ex.a}</Text>
+        </View>
+      ))}
+      {error ? <Text style={styles.askError}>{error}</Text> : null}
+      <View style={styles.askRow}>
+        <TextInput
+          style={styles.askInput}
+          value={question}
+          onChangeText={setQuestion}
+          placeholder="Can I swap the oxfords for loafers?"
+          placeholderTextColor={colors.muted}
+          editable={!asking}
+          onSubmitEditing={handleAsk}
+        />
+        <Pressable style={styles.askButton} onPress={handleAsk} disabled={asking || !question.trim()}>
+          {asking ? <ActivityIndicator color={colors.cream} size="small" /> : <Text style={styles.askButtonText}>Ask</Text>}
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 export function PlanScreen({ navigation }: Props) {
-  const { wardrobePlan, stores, setStores, setCategoryLabels, storeById, resetSession, purchasedKeys, togglePurchased } =
-    useAppContext();
+  const {
+    wardrobePlan,
+    sessionId,
+    stores,
+    setStores,
+    setCategoryLabels,
+    storeById,
+    resetSession,
+    purchasedKeys,
+    togglePurchased,
+  } = useAppContext();
   const [copied, setCopied] = React.useState(false);
 
   async function handleCopyPlan() {
@@ -199,6 +269,8 @@ export function PlanScreen({ navigation }: Props) {
           </View>
           <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
+
+        <AskKyla sessionId={sessionId} />
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
           <Text style={styles.directoryButtonText}>Browse the full Houston store directory</Text>
@@ -575,6 +647,40 @@ const styles = StyleSheet.create({
   checkMark: { color: colors.cream, fontWeight: "800", fontSize: 13, lineHeight: 15 },
   itemPurchased: { opacity: 0.55 },
   itemCategoryDone: { textDecorationLine: "line-through" },
+  askCard: {
+    backgroundColor: colors.paper,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.bayou,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  askTitle: { ...typography.title, fontSize: 16 },
+  askHint: { ...typography.small, color: colors.muted },
+  askExchange: { gap: 2, borderLeftWidth: 3, borderLeftColor: colors.gold, paddingLeft: spacing.sm },
+  askQ: { ...typography.small, fontWeight: "800", color: colors.bayouDark },
+  askA: { ...typography.body, fontSize: 14, lineHeight: 20 },
+  askError: { ...typography.small, color: colors.danger },
+  askRow: { flexDirection: "row", gap: spacing.sm, alignItems: "center" },
+  askInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    ...typography.body,
+    fontSize: 14,
+  },
+  askButton: {
+    backgroundColor: colors.bayou,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minWidth: 56,
+    alignItems: "center",
+  },
+  askButtonText: { color: colors.cream, fontWeight: "800" },
   copyButton: {
     backgroundColor: colors.bayou,
     borderRadius: radii.pill,

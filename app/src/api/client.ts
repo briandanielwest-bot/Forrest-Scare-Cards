@@ -28,6 +28,58 @@ export function sendInterviewMessage(sessionId: string, message: string) {
   });
 }
 
+export interface InterviewReply {
+  reply: string;
+  done: boolean;
+  profile?: StyleProfile;
+  quickReplies?: string[];
+}
+
+// Streaming turn: Kyla's words arrive as she writes them (web only — RN
+// native fetch can't read response streams, so callers fall back to
+// sendInterviewMessage there or on any failure).
+export async function sendInterviewMessageStream(
+  sessionId: string,
+  message: string,
+  onDelta: (fullTextSoFar: string) => void,
+): Promise<InterviewReply> {
+  const res = await fetch(`${API_BASE_URL}/api/interview/message/stream`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, message }),
+  });
+  if (!res.ok || !res.body) {
+    throw new Error(`stream unavailable (${res.status})`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let text = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    // SSE frames are separated by a blank line; keep any partial frame.
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop() ?? "";
+    for (const frame of frames) {
+      const line = frame.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      const payload = JSON.parse(line.slice(6)) as { delta?: string; final?: InterviewReply; error?: string };
+      if (payload.delta) {
+        text += payload.delta;
+        onDelta(text);
+      } else if (payload.final) {
+        return payload.final;
+      } else if (payload.error) {
+        throw new Error(payload.error);
+      }
+    }
+  }
+  throw new Error("stream ended without a final message");
+}
+
 export interface PickedPhoto {
   uri: string;
   fileName?: string | null;
@@ -87,4 +139,24 @@ export function getPlanStatus(sessionId: string) {
 
 export function fetchStores() {
   return request<{ stores: HoustonStore[]; categoryLabels: Record<StoreCategory, string> }>("/api/stores");
+}
+
+// Post-plan Q&A with Kyla — she answers questions about the delivered plan
+// ("can I swap the oxfords for loafers?") with the plan and profile in hand.
+export function askKylaAboutPlan(sessionId: string, question: string) {
+  return request<{ reply: string }>("/api/plan/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, question }),
+  });
+}
+
+// One-off Houston style questions answered by Campbell's almanac — no
+// session needed ("what do I wear to a Rodeo gala?").
+export function askCampbell(question: string) {
+  return request<{ reply: string }>("/api/almanac/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
 }

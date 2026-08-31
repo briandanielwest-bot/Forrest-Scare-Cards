@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { sendInterviewMessage } from "../api/client";
+import { sendInterviewMessage, sendInterviewMessageStream, type InterviewReply } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { ChatMessage } from "../types";
@@ -38,6 +38,8 @@ export function InterviewScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
+  const [streamingText, setStreamingText] = useState<string | null>(null);
+
   async function sendText(message: string) {
     if (!message || !sessionId || sending) return;
 
@@ -47,7 +49,19 @@ export function InterviewScreen({ navigation }: Props) {
     setSending(true);
 
     try {
-      const result = await sendInterviewMessage(sessionId, message);
+      let result: InterviewReply;
+      if (Platform.OS === "web") {
+        // Her words render as she writes them; any streaming failure falls
+        // back to the plain request so a turn is never lost.
+        try {
+          result = await sendInterviewMessageStream(sessionId, message, (text) => setStreamingText(text));
+        } catch {
+          setStreamingText(null);
+          result = await sendInterviewMessage(sessionId, message);
+        }
+      } else {
+        result = await sendInterviewMessage(sessionId, message);
+      }
       setChatMessages((prev) => [
         ...prev,
         { id: `a-${Date.now()}`, role: "assistant", text: result.reply, quickReplies: result.quickReplies },
@@ -59,6 +73,7 @@ export function InterviewScreen({ navigation }: Props) {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kyla didn't get that — try again?");
     } finally {
+      setStreamingText(null);
       setSending(false);
       requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
     }
@@ -91,7 +106,13 @@ export function InterviewScreen({ navigation }: Props) {
       <SafeAreaView style={styles.container} edges={["bottom"]}>
         <FlatList
           ref={listRef}
-          data={sending ? [...chatMessages, { id: "typing", role: "assistant" as const, text: "typing" }] : chatMessages}
+          data={
+            streamingText
+              ? [...chatMessages, { id: "streaming", role: "assistant" as const, text: streamingText }]
+              : sending
+                ? [...chatMessages, { id: "typing", role: "assistant" as const, text: "typing" }]
+                : chatMessages
+          }
           keyExtractor={(m) => m.id}
           contentContainerStyle={styles.list}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}

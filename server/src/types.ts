@@ -102,6 +102,8 @@ export interface SessionState {
   /** Which pipeline stage generation is in, for honest progress UI. */
   planStage?: "scouts" | "planner";
   planError?: string;
+  /** Rolling post-plan Q&A history with Kyla (seeded with plan context). */
+  planQAHistory?: Anthropic.MessageParam[];
 }
 
 export interface UploadedImage {

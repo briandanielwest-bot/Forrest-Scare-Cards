@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireSession } from "../sessionStore";
 import { generateWardrobePlan } from "../agents/orchestrator";
+import { askAboutPlan } from "../agents/planQA";
 import { agentRouteLimiter } from "../rateLimiter";
 import type { SessionState } from "../types";
 
@@ -59,6 +60,30 @@ planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
       });
 
     res.status(202).json({ status: "generating" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Post-plan Q&A with Kyla — short synchronous turns (~3-5s), rate limited
+// like every other Claude-calling route.
+planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
+  try {
+    const { sessionId, question } = req.body as { sessionId?: string; question?: string };
+    if (!sessionId || !question?.trim()) {
+      return res.status(400).json({ error: "sessionId and question are required" });
+    }
+    let session;
+    try {
+      session = requireSession(sessionId);
+    } catch {
+      return res.status(404).json({ error: "This session has expired (the server restarted)" });
+    }
+    if (!session.wardrobePlan) {
+      return res.status(409).json({ error: "No plan yet for this session" });
+    }
+    const reply = await askAboutPlan(session, question.trim().slice(0, 1000));
+    res.json({ reply });
   } catch (err) {
     next(err);
   }
