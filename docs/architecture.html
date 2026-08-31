@@ -1,0 +1,203 @@
+<title>Bayou & Blazer Architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Archivo:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground: #F7F3EA; --paper: #FFFFFF; --ink: #22201B; --muted: #6B675C;
+    --bayou: #1F3A34; --gold: #B08A27; --flag: #8A3B2E; --flag-ground: #F6E7E1;
+    --line: #E2DCCB; --card: #FDFBF5; --good: #2F5D42; --good-ground: #E7EFE8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #171B19; --paper: #1F2522; --ink: #EDE8DB; --muted: #A39E90;
+      --bayou: #9DC3B2; --gold: #D9B24C; --flag: #E5967F; --flag-ground: #33231E;
+      --line: #35403A; --card: #232A26; --good: #9DC3B2; --good-ground: #22302A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #171B19; --paper: #1F2522; --ink: #EDE8DB; --muted: #A39E90;
+    --bayou: #9DC3B2; --gold: #D9B24C; --flag: #E5967F; --flag-ground: #33231E;
+    --line: #35403A; --card: #232A26; --good: #9DC3B2; --good-ground: #22302A;
+  }
+  body { background: var(--ground); color: var(--ink); font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; line-height: 1.6; font-size: 16px; }
+  .wrap { max-width: 48rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header.brand { border-bottom: 3px solid var(--bayou); padding-bottom: 1.4rem; margin-bottom: 2.4rem; }
+  .doc-kind { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 700; font-size: clamp(1.9rem, 5vw, 2.5rem); margin: .2rem 0 0; color: var(--bayou); text-wrap: balance; }
+  .standfirst { color: var(--muted); max-width: 62ch; margin: .8rem 0 0; }
+  section { margin: 0 0 2.6rem; }
+  .eyebrow { font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin: 0 0 .3rem; }
+  h2 { font-family: "Fraunces", Georgia, serif; font-weight: 700; font-size: 1.4rem; margin: 0 0 .9rem; text-wrap: balance; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.3rem 0 .35rem; }
+  p { margin: 0 0 .9rem; max-width: 66ch; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; max-width: 64ch; }
+  li { margin-bottom: .45rem; }
+  .table-scroll { overflow-x: auto; margin: 0 0 1rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+  th { text-align: left; font-size: .7rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--bayou); padding: .45rem .7rem .45rem 0; }
+  td { border-bottom: 1px solid var(--line); padding: .5rem .7rem .5rem 0; vertical-align: top; }
+  td:first-child { font-weight: 700; white-space: nowrap; }
+  .num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; font-size: .9em; white-space: nowrap; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.05rem 1.2rem; margin: 0 0 .9rem; }
+  .good-box { background: var(--good-ground); border-left: 4px solid var(--good); border-radius: 0 10px 10px 0; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .diagram { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
+  .footer-note { border-top: 1px solid var(--line); padding-top: 1.2rem; color: var(--muted); font-size: .85rem; max-width: 65ch; }
+  code { font-family: "IBM Plex Mono", monospace; font-size: .85em; background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 0 .3em; }
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <p class="doc-kind">Architecture &amp; Feature Reference · Final Build · August 31, 2026</p>
+    <h1>Bayou &amp; Blazer Architecture</h1>
+    <p class="standfirst">The complete record of what was built: every agent, every feature, every data system, the measured latency budget, the quality machinery — and the expansion roadmap for new markets and the women's application. Final validation: <strong>16 of 16 surface checks passed.</strong></p>
+  </header>
+
+  <section>
+    <p class="eyebrow">System at a glance</p>
+    <h2>One conversation in, one buyable plan out</h2>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+  U([Customer]) --> K[Kyla · Lead Stylist<br/>interview, streamed replies, chips]
+  K -->|typed profile + client brief| PW[Experts pre-warm<br/>during photo screen]
+  U --> W[Watt · Fit and Build<br/>photo read, async]
+  PW --> B[Biggio · Tailoring]
+  PW --> D[Drexler · Designer Floors]
+  PW --> O[Olajuwon · Footwear]
+  PW --> G[Wagner · Accessories]
+  W -.->|late face read| G
+  B & D & O & G -->|top picks, merged and deduped| M[Moon · Head of Planning<br/>streams the draft ticker]
+  C[Campbell · Houston Concierge<br/>climate, calendar, season, prices] -.->|cached briefs| K & B & D & O & G & M
+  M -->|inspected plan| P([The Plan])
+  P --> QA[Kyla · Plan Chat<br/>knows purchases + outfits]
+  P --> OM[Outfit Matrix<br/>on demand]
+  P --> MC[Claim Codes<br/>full dossier, any device]
+  R[Ryan · Monthly Researcher<br/>web search, cron] -.->|store status, briefs| C
+    </pre></div>
+    <p>The design principle that made it fast: <strong>agents talk through structured paper, prepared in advance, off the clock</strong> — cached knowledge briefs, typed handoffs, pre-warmed work — never through meetings at runtime.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">The team</p>
+    <h2>Nine staff, each tuned to its job</h2>
+    <div class="table-scroll"><table>
+      <tr><th>Agent</th><th>Role</th><th>Model / effort</th><th>Key mechanics</th></tr>
+      <tr><td>Kyla</td><td>Interview → profile</td><td>Sonnet · medium</td><td>Cached persona + calendar/districts/prices; SSE streaming; anticipatory chips; magic question; typed client brief (northStar, urgentEvent, handleWithCare); four-line send-off</td></tr>
+      <tr><td>Watt</td><td>Photo → fit/face/body</td><td>Sonnet · medium</td><td>Async 202; on-device resize first; overlapped with experts so it costs no wait</td></tr>
+      <tr><td>Campbell</td><td>City intelligence</td><td>Pure data + Sonnet Q&amp;A</td><td>Climate/calendar/district/price briefs baked into every cached prompt; almanac box on the directory (plain text, ≤110 words)</td></tr>
+      <tr><td>Biggio / Drexler / Olajuwon / Wagner</td><td>Category buying directors</td><td>Sonnet · low, parallel</td><td>Pre-warm at interview submit; top 3–4 picks, 25-word takes; Wagner re-runs with a late face read (~4s, photo runs only)</td></tr>
+      <tr><td>Moon</td><td>The plan</td><td>Opus · medium</td><td>Cached system (rules + prices + climate); fast-mode attempt with fallback; streams the draft ticker; budget arithmetic + retry</td></tr>
+      <tr><td>Kyla (plan chat)</td><td>Post-plan Q&amp;A</td><td>Sonnet · low</td><td>Full plan + directory + live purchases + outfit names in context; rolling history; survives claim-code restore</td></tr>
+      <tr><td>Ryan</td><td>Offline researcher</td><td>Sonnet + web search</td><td>Monthly + seasonal crons; store status, insider notes, season brief, price brief; recency and apology guards</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Latency budget</p>
+    <h2>Measured, not estimated</h2>
+    <div class="table-scroll"><table>
+      <tr><th>Moment</th><th>Measured</th><th>What hides it</th></tr>
+      <tr><td>Interview opens</td><td class="num">~0.1s</td><td>Opener prefetched while he reads the Welcome screen</td></tr>
+      <tr><td>Kyla reply</td><td class="num">4–9s</td><td>Words stream as she writes; typing dots with her face</td></tr>
+      <tr><td>Photo analysis</td><td class="num">10–14s</td><td>Runs while he's still on the photo screen</td></tr>
+      <tr><td>Experts vet stores</td><td class="num">5–8s</td><td>Pre-warmed at interview submit — usually done before he taps build</td></tr>
+      <tr><td>Plan generation</td><td class="num">54–78s</td><td>Team spotlight + elapsed timer + tip/store deck + live draft ticker from ~20s</td></tr>
+      <tr><td>Plan chat answer</td><td class="num">4–7s</td><td>—</td></tr>
+      <tr><td>Outfit matrix</td><td class="num">10–12s once</td><td>On-demand button, then cached</td></tr>
+      <tr><td>Save / restore code</td><td class="num">&lt;0.5s</td><td>Disk, no model</td></tr>
+      <tr><td>Ask Campbell</td><td class="num">4–6s</td><td>—</td></tr>
+    </table></div>
+    <p>The honest bottleneck is Moon's minute — and it's now a minute the customer <em>watches work happen in</em>: his own items appearing line by line, Kyla's tips, real store facts. Fast-mode (already wired with automatic fallback) halves it whenever Anthropic capacity opens.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Data systems</p>
+    <h2>The knowledge the agents stand on</h2>
+    <ul>
+      <li><strong>Store directory</strong> — 43 curated Houston stores with knownFor, catersTo, howToBuy, contact, price tier; closed stores auto-filtered.</li>
+      <li><strong>Houston knowledge packs</strong> — events calendar (CERAWeek, OTC, rodeo, gala season), shopping districts with drive times, industry dress-code decoder, face/body playbook, price-and-timing reality tables, Kyla's style gems and life-moments playbook.</li>
+      <li><strong>Self-refreshing layer (Ryan)</strong> — monthly web research writes generated files: per-store status + insider notes, a rolling 90-day season brief, a retailer price brief. Seasonal crons add weekly pulses in Nov–Dec and July plus pre-event sweeps. Guards reject stale-dated facts and search-failure apologies.</li>
+      <li><strong>Claim-code memory</strong> — file-backed dossiers (profile, plan, purchases, photo read, chat history, outfit matrix) under human-readable codes; guest-first, no passwords.</li>
+      <li><strong>The receipt book</strong> — append-only event ledger (interviews, plans with store ids, saves, restores, questions, outfits) with an aggregate <code>/api/stats</code> — the countable evidence for store-partnership deals.</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">Feature inventory</p>
+    <h2>Everything the customer touches</h2>
+    <ul>
+      <li>Instant-open streamed interview with anticipatory quick-reply chips, Kyla's portrait in chat, Enter-to-send</li>
+      <li>Optional photo read (on-device resize, async, graceful when unreadable)</li>
+      <li>The plan, in buying order: timeline with first-move banner and per-store item/price lines → store run list (phones, maps, known-for, prices) → full item detail with lean in-store scripts (say-this, specs, one tip) → buying tips → Kyla's personal sign-off</li>
+      <li>Living checklist: tap-to-buy check-offs with a progress bar; copy-plan hand-over text with store contacts</li>
+      <li>Ask Kyla plan chat (purchase-aware), on-demand outfit matrix, claim-code save/restore, Ask Campbell on the store directory, searchable directory with monthly "right now" notes</li>
+      <li>Hold screen: team spotlight with legend-true lines, elapsed timer, tappable tip/store-fact deck, live plan-draft ticker</li>
+      <li>Starter Staples showcase (4 industries × 3 levels), Kyla-fronted Welcome with team portraits</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">Quality machinery</p>
+    <h2>What keeps bad output from shipping</h2>
+    <ul>
+      <li><strong>The deterministic inspector</strong> — every plan checked in code before serving: phase sums vs total, one-time plans vs stated budget (the "$400 became $1,600" class), banned colors in item names, unknown store ids. Failures auto-regenerate.</li>
+      <li><strong>Schema-enforced caps</strong> — word limits live in tool schemas, not just prompts; script fields structurally limited to what a man reads standing in a store.</li>
+      <li><strong>Conversational guardrails</strong> — never re-ask the answered, never accuse of dodging, budget-ambiguity chip with conservative default, send-off travels with the submit call, "north star" never printed.</li>
+      <li><strong>Resilience</strong> — plan retry (2 attempts), streaming fallback to plain requests, photo-failure and session-loss messages that tell the truth, rate limiting on Claude-calling routes only, trust-proxy correct.</li>
+      <li><strong>Validation history</strong> — five personas end-to-end (terse $400 first-jobber, western oil-field manager, three-week groom, decide-everything developer, standard UI) plus a 16/16 full-surface sweep on the final build; exact budgets in every validated plan.</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">Operations</p>
+    <h2>How it runs</h2>
+    <ul>
+      <li><strong>Topology</strong> — Expo web app on Vercel (auto-deploy from <code>main</code>); Node/Express + TypeScript API on Render (auto-deploy from <code>main</code>); Anthropic API for all agent calls.</li>
+      <li><strong>CI</strong> — GitHub Actions typechecks server and app on every push/PR to main.</li>
+      <li><strong>Refresh</strong> — <code>refresh-data.yml</code> on monthly + seasonal crons (needs <code>ANTHROPIC_API_KEY</code> secret); commits regenerated data, Render redeploys.</li>
+      <li><strong>Cost profile</strong> — roughly $0.60–1.50 of API per plan; pennies per chat turn; hosting from free (with cold starts) to ~$8/month with a persistent disk, which also makes claim codes survive redeploys (<code>DATA_DIR</code>).</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">Large improvements ahead</p>
+    <h2>The big builds, in order of impact</h2>
+    <ol>
+      <li><strong>Real accounts + database.</strong> Postgres (or managed equivalent) behind the claim-code system: email/passkey login, plans that survive anything, shareable read-only plan links, returning-customer Kyla by default. The foundation every revenue feature stands on.</li>
+      <li><strong>Progressive plan render.</strong> The ticker proves the stream parses; the next step renders finished phases as cards while Moon writes the rest — first phase readable in ~20 seconds.</li>
+      <li><strong>Native apps.</strong> The Expo codebase already targets iOS/Android; App Store presence needs accounts, push notifications (phase reminders: "Week 3 — shoe week"), and the $99/yr Apple program.</li>
+      <li><strong>Seasonal re-engagement.</strong> With accounts: Kyla emails/pushes at the calendar moments the app already knows — "Gala season's six weeks out; your tux plan is ready."</li>
+      <li><strong>Store portal.</strong> Give partner stores a login to see (aggregate) referral counts and post their own trunk-show dates into the directory — turns the receipt book into a product.</li>
+      <li><strong>Business items from the playbook doc</strong> — persona renaming before monetization, LLC, trademark, hosting upgrade.</li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="eyebrow">New markets</p>
+    <h2>The city-pack playbook</h2>
+    <p>Everything city-specific already lives in swappable data, which makes a new market a research project, not an engineering one:</p>
+    <ol>
+      <li><strong>Research the pack</strong> — 40+ stores with knownFor/catersTo/howToBuy, the city's events calendar, shopping districts with drive times, industry decoder (Dallas: finance/tech/defense; Austin: tech/startup/music). Ryan's script re-verifies it monthly from day one.</li>
+      <li><strong>Localize the voices</strong> — Kyla's Houston references and the team's homage names become city-true equivalents; the climate brief rewrites (Dallas heat is real but the AC-swing culture differs; Austin is business-casual-first).</li>
+      <li><strong>Ship behind a city selector</strong> — one codebase, one brand, <code>?city=dallas</code> loading the pack; never a separate app per city.</li>
+      <li><strong>Sequence</strong> — Dallas first (closest culture match, same store chains plus strong independents), Austin second, then San Antonio/Fort Worth. Each launch re-runs the Houston GTM: local face, event-timed pushes, independent-store partnerships.</li>
+      <li><strong>Gate</strong> — expand only after Houston shows paying users; a second city doubles research and marketing surface, not revenue, until the model is proven.</li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="eyebrow">The women's application</p>
+    <h2>Same engine, richer catalog</h2>
+    <p>Kyla is, if anything, more natural here — and the pipeline needs no structural change. The workstream:</p>
+    <ol>
+      <li><strong>Store pack</strong> — Houston womenswear directory (Tootsies, Elizabeth Anthony, Saks/NM women's floors, Abejas, local boutiques, tailors who do womenswear well) with the same knownFor/catersTo depth.</li>
+      <li><strong>Knowledge packs</strong> — women's fit-and-body playbook (the face/body decoder generalizes), occasion decoder (galas, work codes by industry, weddings-as-guest rules differ meaningfully), price-reality tables (alterations pricing differs, MTM is rarer, designer resale matters more).</li>
+      <li><strong>Interview adjustments</strong> — dress codes and categories expand (dresses, skirts, suiting, occasion wear); sizes work differently (and vary by brand — Kyla should say so); the magic question and care craft carry over unchanged.</li>
+      <li><strong>Planner adjustments</strong> — category taxonomy, outfit matrix gains accessories weight, gala season carries more load.</li>
+      <li><strong>Product shape</strong> — one app, "Who are we dressing today?" at the start; shared brand, shared store relationships, shared claim codes. Realistic effort: a few focused weeks, mostly research and prompt work, no new architecture.</li>
+    </ol>
+    <div class="good-box">
+      <p><strong>The through-line for every expansion:</strong> the engine is done. Growth is data packs and voice — researched once, refreshed monthly by machinery that already exists.</p>
+    </div>
+  </section>
+
+  <p class="footer-note">Compiled from the live codebase and this session's measured validation runs, August 31, 2026. Companion documents: the Bayou &amp; Blazer Playbook (business plan) and the Back of House Review (agent architecture decisions).</p>
+</div>
