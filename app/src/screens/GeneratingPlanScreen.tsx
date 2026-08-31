@@ -1,45 +1,53 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
 import { getPlanStatus, startPlanGeneration } from "../api/client";
-import { colors, spacing, typography } from "../theme/theme";
+import { TeamAvatar } from "../components/TeamAvatar";
+import { TEAM } from "../data/team";
+import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 
-// Each line pairs the agent's namesake Houston sports legend with the
-// actual job that agent is doing right now (fan homage — see WelcomeScreen).
-const STATUS_LINES = [
-  "Kyla is walking your profile into the war room…",
-  "Watt is still breaking down your photos like Thursday-night film…",
-  "Olajuwon is giving your shoe game the Dream Shake…",
-  "Drexler is gliding through the Galleria's designer floors…",
-  "Biggio is grinding through Houston's custom tailors, ready for anything…",
-  "Wagner is coming out of the bullpen to close out your accessories…",
-  "Campbell is powering your plan straight through Houston's humidity…",
-  "Moon is reading the field and calling your full wardrobe game plan…",
-];
-
 const POLL_INTERVAL_MS = 3000;
+// Long enough to read a name, a title, and a duty line without rushing —
+// the wait is where the app shows the actual work being done for him.
+const ROTATE_INTERVAL_MS = 5000;
 // Six agents with full store knowledge take a while on a rich profile —
 // observed real generations run past 4 minutes, so the cutoff sits at 6.
 const MAX_POLL_MS = 6 * 60 * 1000;
 
+const STAGE_CAPTION: Record<string, string> = {
+  warmup: "YOUR TEAM IS GETTING BRIEFED",
+  scouts: "YOUR BUYING TEAM IS ON THE FLOOR",
+  planner: "MOON IS WRITING YOUR PLAN — THE LONG PART",
+};
+
 export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();
   const [error, setError] = useState<string | null>(null);
-  const [statusIndex, setStatusIndex] = useState(0);
+  const [memberIndex, setMemberIndex] = useState(0);
   const [stage, setStage] = useState<"scouts" | "planner" | undefined>(undefined);
   const startedAtRef = useRef(Date.now());
 
+  // Spotlight the people actually working right now: the buying directors
+  // while the scouts run, Moon (with Kyla checking his work) once the
+  // planner takes over, everyone during warm-up.
+  const activeMembers = useMemo(() => {
+    if (stage === "planner") return TEAM.filter((m) => m.id === "moon" || m.id === "kyla");
+    if (stage === "scouts") return TEAM.filter((m) => m.stage === "scouts" || m.id === "watt");
+    return TEAM;
+  }, [stage]);
+
   useEffect(() => {
+    setMemberIndex(0);
     const interval = setInterval(() => {
-      setStatusIndex((i) => (i + 1) % STATUS_LINES.length);
-    }, 1800);
+      setMemberIndex((i) => (i + 1) % activeMembers.length);
+    }, ROTATE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeMembers]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -58,7 +66,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
           return;
         }
         if (result.status === "error") {
-          setError(result.error ?? "The agents hit a snag building your plan.");
+          setError(result.error ?? "The team hit a snag building your plan.");
           return;
         }
         if (Date.now() - startedAtRef.current > MAX_POLL_MS) {
@@ -86,6 +94,9 @@ export function GeneratingPlanScreen({ navigation }: Props) {
     };
   }, [sessionId]);
 
+  const member = activeMembers[memberIndex % activeMembers.length];
+  const caption = stage === "planner" ? STAGE_CAPTION.planner : stage === "scouts" ? STAGE_CAPTION.scouts : STAGE_CAPTION.warmup;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -99,14 +110,19 @@ export function GeneratingPlanScreen({ navigation }: Props) {
         ) : (
           <>
             <ActivityIndicator size="large" color={colors.gold} />
-            <Text style={styles.stage}>
-              {stage === "planner"
-                ? "MOON IS WRITING YOUR PLAN — THE LONG PART"
-                : stage === "scouts"
-                  ? "SCOUTS ARE ON THE FLOOR"
-                  : "WARMING UP"}
+            <Text style={styles.stage}>{caption}</Text>
+
+            <View style={styles.memberCard}>
+              <TeamAvatar look={member.look} size={84} />
+              <Text style={styles.memberName}>{member.name}</Text>
+              <Text style={styles.memberTitle}>{member.title.toUpperCase()}</Text>
+              <Text style={styles.memberDuty}>{member.duty}</Text>
+            </View>
+
+            <Text style={styles.valueLine}>
+              A real team pass takes a few minutes — 40+ vetted Houston stores, your budget, your build, and your
+              calendar, checked piece by piece.
             </Text>
-            <Text style={styles.status}>{STATUS_LINES[statusIndex]}</Text>
           </>
         )}
       </View>
@@ -118,7 +134,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bayou, justifyContent: "center" },
   content: { alignItems: "center", gap: spacing.lg, padding: spacing.lg },
   stage: { color: colors.gold, fontSize: 12, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
-  status: { ...typography.body, color: colors.cream, textAlign: "center" },
+  memberCard: {
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    borderRadius: radii.lg,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.xs,
+    alignSelf: "stretch",
+  },
+  memberName: { color: colors.cream, fontSize: 20, fontWeight: "800", marginTop: spacing.sm },
+  memberTitle: { color: colors.gold, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 },
+  memberDuty: { ...typography.body, color: colors.cream, opacity: 0.9, textAlign: "center", marginTop: spacing.xs },
+  valueLine: { ...typography.small, color: colors.cream, opacity: 0.65, textAlign: "center", paddingHorizontal: spacing.md },
   error: { color: "#FFD9CE", textAlign: "center", fontSize: 16 },
   retry: { color: colors.gold, textAlign: "center", marginTop: spacing.md, fontWeight: "700" },
 });

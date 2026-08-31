@@ -122,6 +122,12 @@ export function PlanScreen({ navigation }: Props) {
 
         <AtAGlance plan={plan} />
 
+        {/* Read order matches how he'll actually use it: WHEN to buy,
+            then WHERE (with what), then the full detail per item. */}
+        <BuyingTimeline plan={plan} />
+
+        <StoreRunList runs={buildStoreRuns(plan, storeById)} />
+
         <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
         <View style={styles.calloutCard}>
@@ -129,15 +135,7 @@ export function PlanScreen({ navigation }: Props) {
           <Text style={styles.calloutText}>{cleanText(plan.climateNotes)}</Text>
         </View>
 
-        <View style={styles.budgetCard}>
-          <Text style={styles.budgetTotal}>{money(plan.budgetSummary?.totalBudgetUsd)} total budget</Text>
-          {asArray<{ phaseName: string; amountUsd: number }>(plan.budgetSummary?.perPhaseUsd).map((p, i) => (
-            <View key={p.phaseName ?? i} style={styles.budgetRow}>
-              <Text style={styles.budgetPhase}>{p.phaseName ?? "Phase"}</Text>
-              <Text style={styles.budgetAmount}>{money(p.amountUsd)}</Text>
-            </View>
-          ))}
-        </View>
+        <Text style={styles.sectionHeader}>The full breakdown — every item, with your in-store script</Text>
 
         {asArray<WardrobePlan["phases"][number]>(plan.phases).map((phase, i) => (
           <View key={phase.name ?? i} style={styles.phaseCard}>
@@ -151,8 +149,6 @@ export function PlanScreen({ navigation }: Props) {
           </View>
         ))}
 
-        <StoreRunList runs={buildStoreRuns(plan, storeById)} />
-
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
           {asArray<string>(plan.generalBuyingTips).map((tip, i) => (
@@ -163,6 +159,7 @@ export function PlanScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.pepCard}>
+          <Text style={styles.pepLabel}>A NOTE FROM KYLA</Text>
           <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
 
@@ -196,6 +193,38 @@ function AtAGlance({ plan }: { plan: WardrobePlan }) {
           <Text style={styles.glanceLabel}>{label}</Text>
         </View>
       ))}
+    </View>
+  );
+}
+
+// The top-of-report summary: when he's buying, what each phase is, and
+// what it costs — the whole plan's shape in five lines, before any detail.
+function BuyingTimeline({ plan }: { plan: WardrobePlan }) {
+  const phases = asArray<WardrobePlan["phases"][number]>(plan.phases);
+  const amounts = asArray<{ phaseName: string; amountUsd: number }>(plan.budgetSummary?.perPhaseUsd);
+  if (phases.length === 0) return null;
+  return (
+    <View style={styles.timelineCard}>
+      <Text style={styles.timelineHeader}>Your buying timeline</Text>
+      {phases.map((phase, i) => {
+        const amount = amounts.find((a) => a.phaseName === phase.name)?.amountUsd ?? amounts[i]?.amountUsd;
+        const itemCount = asArray<WardrobeItem>(phase.items).length;
+        return (
+          <View key={phase.name ?? i} style={styles.timelineRow}>
+            <View style={styles.timelineLeft}>
+              <Text style={styles.timelineWhen}>{phase.timingLabel || `Phase ${i + 1}`}</Text>
+              <Text style={styles.timelineWhat}>
+                {phase.name ?? "Phase"} · {itemCount} {itemCount === 1 ? "item" : "items"}
+              </Text>
+            </View>
+            <Text style={styles.timelineAmount}>{amount != null ? money(amount) : ""}</Text>
+          </View>
+        );
+      })}
+      <View style={[styles.timelineRow, styles.timelineTotalRow]}>
+        <Text style={styles.timelineTotalLabel}>Total</Text>
+        <Text style={styles.timelineAmount}>{money(plan.budgetSummary?.totalBudgetUsd)}</Text>
+      </View>
     </View>
   );
 }
@@ -343,6 +372,31 @@ const styles = StyleSheet.create({
   calloutLabel: { ...typography.subtitle, marginBottom: spacing.xs },
   calloutText: { ...typography.body },
   budgetCard: { backgroundColor: colors.blazerNavy, borderRadius: radii.md, padding: spacing.md, gap: spacing.xs },
+  sectionHeader: {
+    ...typography.subtitle,
+    color: colors.bayou,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    fontSize: 13,
+    marginTop: spacing.sm,
+  },
+  timelineCard: {
+    backgroundColor: colors.paper,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  timelineHeader: { ...typography.title, fontSize: 18, color: colors.bayouDark },
+  timelineRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
+  timelineLeft: { flexShrink: 1 },
+  timelineWhen: { ...typography.small, color: colors.bayou, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.5 },
+  timelineWhat: { ...typography.body, fontSize: 14 },
+  timelineAmount: { color: colors.bayouDark, fontWeight: "800", fontSize: 15 },
+  timelineTotalRow: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
+  timelineTotalLabel: { ...typography.body, fontWeight: "800" },
+  pepLabel: { color: colors.bayouDark, fontWeight: "800", fontSize: 11, letterSpacing: 1.2, marginBottom: 4 },
   budgetTotal: { color: colors.cream, fontSize: 20, fontWeight: "800", marginBottom: spacing.xs },
   budgetRow: { flexDirection: "row", justifyContent: "space-between" },
   budgetPhase: { color: colors.cream, opacity: 0.85 },
