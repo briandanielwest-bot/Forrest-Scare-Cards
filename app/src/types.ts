@@ -43,6 +43,7 @@ export interface WardrobeItem {
   recommendedStoreIds: string[];
   sayThis?: string;
   keySpecs?: string[];
+  tip?: string;
   decline?: string;
   whyThisStore?: string;
   logistics?: string;

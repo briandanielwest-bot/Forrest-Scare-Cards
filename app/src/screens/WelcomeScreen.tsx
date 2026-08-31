@@ -9,6 +9,7 @@ import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
+import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
 import { TEAM } from "../data/team";
 
@@ -102,7 +103,7 @@ export function WelcomeScreen({ navigation }: Props) {
           <View style={styles.teamRow}>
             {TEAM.map((member) => (
               <View key={member.id} style={styles.teamPill}>
-                <TeamAvatar look={member.look} size={44} />
+                {member.id === "kyla" ? <KylaPortrait size={44} /> : <TeamAvatar look={member.look} size={44} />}
                 <Text style={styles.teamPillName}>{member.name}</Text>
                 <Text style={styles.teamPillRole}>{member.title}</Text>
               </View>

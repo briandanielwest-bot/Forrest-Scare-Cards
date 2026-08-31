@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
 import { getPlanStatus, startPlanGeneration } from "../api/client";
+import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
 import { TEAM } from "../data/team";
 import { colors, radii, spacing, typography } from "../theme/theme";
@@ -113,7 +114,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
             <Text style={styles.stage}>{caption}</Text>
 
             <View style={styles.memberCard}>
-              <TeamAvatar look={member.look} size={84} />
+              {member.id === "kyla" ? <KylaPortrait size={84} /> : <TeamAvatar look={member.look} size={84} />}
               <Text style={styles.memberName}>{member.name}</Text>
               <Text style={styles.memberTitle}>{member.title.toUpperCase()}</Text>
               <Text style={styles.memberDuty}>{member.duty}</Text>

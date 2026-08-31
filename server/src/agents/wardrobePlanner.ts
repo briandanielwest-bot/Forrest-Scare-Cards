@@ -23,10 +23,10 @@ RULES
 - EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. The whyThisStore field carries the justification; a "rightNow" note on a store (live-researched current intel — a sale, a move, a program) belongs in logistics or phase timing when it genuinely helps ("their sale is running — buy this phase first").
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
 - Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the five in-store script fields below.
-- THE IN-STORE SCRIPT IS LEAN: an opening line plus 1-2 specs, and NOTHING else unless it genuinely earns its place. He reads it standing in a store; the shortest script he'll actually use beats the most complete one he won't.
+- THE IN-STORE SCRIPT IS LEAN: an opening line, 1-2 specs, and at most one tip. He reads it standing in a store; the shortest script he'll actually use beats the most complete one he won't.
   - sayThis (required, max 22 words): the literal opening line to the salesperson — fabric, color, cut, budget ("Navy tropical-wool suit, trim through the body, around $550 all in").
   - keySpecs (required, 1-2 bullets, max 10 words each): only the specs that matter for HIS fit, face, and coloring — from his preferences and, if provided, the photo reads.
-  - decline / whyThisStore / logistics are OPTIONAL — omit each unless there's a real trap to refuse (max 14 words), a non-obvious reason this store wins (max 12), or a genuine logistic like an appointment or lead time (max 16). Most items should carry at most ONE of the three; an item where all three are obvious carries none.
+  - tip (OPTIONAL, max 16 words): the single most valuable extra for THIS item — a trap to refuse, an appointment/lead-time logistic, or a store fact — whichever matters most. OMIT the field entirely when nothing clears that bar; a plan where every item has a tip is a plan that ignored this rule.
   - Voice rules: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape — say "the photo review showed..."); no field repeats another's content.
 - ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it and let whyThisStore justify the drive. Where several items land in the same part of town, note it so he can knock them out in one trip — a plan that respects Houston traffic is a plan that actually gets executed.
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
@@ -68,17 +68,10 @@ const WARDROBE_ITEM_SCHEMA = {
       maxItems: 2,
       description: "1-2 fit/color specs that matter for THIS man. Each a short phrase, MAX 10 words.",
     },
-    decline: {
+    tip: {
       type: "string",
-      description: "OPTIONAL — only when there's a real trap to refuse. MAX 14 words.",
-    },
-    whyThisStore: {
-      type: "string",
-      description: "OPTIONAL — only when the reason isn't obvious from the plan. MAX 12 words.",
-    },
-    logistics: {
-      type: "string",
-      description: "OPTIONAL — only for appointments, lead times, or things to bring. MAX 16 words.",
+      description:
+        "OPTIONAL — the single most valuable extra: a trap to refuse, a lead-time logistic, or a store fact. MAX 16 words. Omit when nothing clears the bar.",
     },
   },
   required: [
@@ -213,10 +206,12 @@ Build the complete wardrobe plan now.`;
     messages: [{ role: "user", content: userMessage }] as Anthropic.MessageParam[],
     tools: [SUBMIT_PLAN_TOOL],
     tool_choice: { type: "tool" as const, name: "submit_wardrobe_plan" },
-    // Left at default (high) effort deliberately: dropping to "medium" was
-    // tried and reverted after a live test produced budget phases that
-    // summed to $3,560 against a stated $2,500 total — high effort has
-    // consistently gotten this arithmetic right.
+    // Medium effort is the planner's biggest latency lever. It was tried
+    // and reverted once when a live test produced phases summing to $3,560
+    // against a $2,500 total — that exact failure is now caught by the
+    // budget backstop in normalizeWardrobePlan and turned into an automatic
+    // retry, so the fast path is the default and the math stays guaranteed.
+    output_config: { effort: "medium" as const },
   };
 
   // The planner is the run's dominant wall-clock cost (~2 min of pure
@@ -306,6 +301,25 @@ function normalizeWardrobePlan(raw: unknown): WardrobePlan {
   }
   if ((plan.phases as unknown[]).some((p) => !p || typeof p !== "object" || !Array.isArray((p as any).items))) {
     throw new Error("Wardrobe planner returned a phase without a valid items array — retry plan generation");
+  }
+
+  // Budget arithmetic backstop: phases outsumming the stated total was the
+  // one live failure that forced the planner onto max effort. Validating it
+  // here (and letting generatePlanWithRetry regenerate) is what makes the
+  // faster default effort safe — the failure mode became a retry, not a
+  // shipped math error. Small float slack; $0-stretch phases are fine.
+  const bs = plan.budgetSummary as { totalBudgetUsd?: unknown; perPhaseUsd?: unknown } | undefined;
+  const total = Number(bs?.totalBudgetUsd);
+  if (Array.isArray(bs?.perPhaseUsd) && Number.isFinite(total) && total > 0) {
+    const phaseSum = (bs!.perPhaseUsd as { amountUsd?: unknown }[]).reduce(
+      (sum, p) => sum + (Number(p?.amountUsd) || 0),
+      0,
+    );
+    if (phaseSum > total + 1) {
+      throw new Error(
+        `Wardrobe planner budget error: phases sum to $${phaseSum} against a $${total} total — retry plan generation`,
+      );
+    }
   }
 
   return plan as unknown as WardrobePlan;

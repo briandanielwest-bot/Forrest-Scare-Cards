@@ -330,6 +330,12 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
               •  {cleanText(spec)}
             </Text>
           ))}
+          {item.tip ? (
+            <Text style={styles.scriptText}>
+              <Text style={styles.scriptTag}>Tip: </Text>
+              {cleanText(item.tip)}
+            </Text>
+          ) : null}
           {item.decline ? (
             <Text style={styles.scriptText}>
               <Text style={styles.scriptTag}>Skip: </Text>

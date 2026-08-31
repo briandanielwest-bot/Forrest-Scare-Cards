@@ -15,6 +15,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
 import { sendInterviewMessage } from "../api/client";
+import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { ChatMessage } from "../types";
 
@@ -87,12 +88,22 @@ export function InterviewScreen({ navigation }: Props) {
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
           renderItem={({ item }) =>
             item.id === "typing" ? (
-              <View style={[styles.bubble, styles.assistantBubble, styles.typingBubble]}>
-                <Text style={styles.typingText}>Kyla is typing {dots}</Text>
+              <View style={styles.assistantRow}>
+                <KylaPortrait size={28} />
+                <View style={[styles.bubble, styles.assistantBubble, styles.typingBubble]}>
+                  <Text style={styles.typingText}>Kyla is typing {dots}</Text>
+                </View>
+              </View>
+            ) : item.role === "user" ? (
+              <View style={[styles.bubble, styles.userBubble]}>
+                <Text style={styles.userText}>{item.text}</Text>
               </View>
             ) : (
-              <View style={[styles.bubble, item.role === "user" ? styles.userBubble : styles.assistantBubble]}>
-                <Text style={item.role === "user" ? styles.userText : styles.assistantText}>{item.text}</Text>
+              <View style={styles.assistantRow}>
+                <KylaPortrait size={28} />
+                <View style={[styles.bubble, styles.assistantBubble]}>
+                  <Text style={styles.assistantText}>{item.text}</Text>
+                </View>
               </View>
             )
           }
@@ -140,7 +151,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
   list: { padding: spacing.md, gap: spacing.sm },
   bubble: { maxWidth: "85%", borderRadius: radii.md, padding: spacing.md, marginBottom: spacing.sm },
-  assistantBubble: { backgroundColor: colors.paper, alignSelf: "flex-start", borderWidth: 1, borderColor: colors.border },
+  assistantRow: { flexDirection: "row", alignItems: "flex-end", gap: 6, marginBottom: 0 },
+  assistantBubble: { backgroundColor: colors.paper, alignSelf: "flex-start", borderWidth: 1, borderColor: colors.border, flexShrink: 1 },
   userBubble: { backgroundColor: colors.bayou, alignSelf: "flex-end" },
   assistantText: { ...typography.body },
   typingBubble: { paddingVertical: spacing.sm },
