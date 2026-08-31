@@ -22,7 +22,7 @@ import { HOUSTON_STORES } from "../src/data/houstonStores";
 
 const anthropic = new Anthropic();
 const MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
-const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 4 } as const;
+const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 3 } as const;
 
 async function runWithSearch(system: string, user: string, maxTokens: number): Promise<string> {
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: user }];

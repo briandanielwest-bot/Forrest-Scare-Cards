@@ -24,7 +24,7 @@ import { HOUSTON_STORES } from "../src/data/houstonStores";
 
 const anthropic = new Anthropic();
 const MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
-const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 6 } as const;
+const WEB_SEARCH = { type: "web_search_20260209", name: "web_search", max_uses: 3 } as const;
 
 async function runWithSearch(system: string, user: string, maxTokens: number): Promise<string> {
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: user }];
@@ -177,7 +177,7 @@ Find real, currently operating businesses only — verify each appears to exist 
 Answer ONLY this JSON:
 {"candidates": [{"name": "<exact business name>", "neighborhood": "<Houston area/neighborhood>", "whatItIs": "<one sentence: what they sell and to whom, max 25 words>", "whyNotable": "<what makes this place worth a Houston man's drive — the specific thing, max 25 words>", "website": "<url or empty string>", "evidence": "<where you found it: publication, review site, or the store's own site, max 12 words>"}]}
 Return up to 8 candidates, best first. Empty array if nothing new and real turned up.`,
-    5000,
+    3000,
   );
   const raw = extractJson<{ candidates?: Candidate[] }>(text);
   return Array.isArray(raw.candidates) ? raw.candidates : [];
@@ -214,7 +214,7 @@ Find:
 Answer ONLY this JSON:
 {"brands": ["<brand>", ...], "pricePoints": ["<item: price>", ...], "insiderTake": "<max 35 words, specific and useful, empty string if nothing solid found>"}
 Up to 10 brands and 6 price points. Empty arrays are correct answers when research doesn't confirm specifics — an empty array beats a guess.`,
-    5000,
+    3000,
   );
   const raw = extractJson<{ brands?: unknown; pricePoints?: unknown; insiderTake?: unknown }>(text);
   const clean = (v: unknown, max: number): string[] =>
@@ -270,9 +270,28 @@ async function main() {
   }
 
   if (phase === "enrich" || phase === "both") {
-    console.log(`[research] enriching ${HOUSTON_STORES.length} stores…`);
-    const intel: Record<string, StoreIntel> = {};
-    const results = await pool(HOUSTON_STORES, 3, async (store) => {
+    // Resume by default: a store with researched brands or prices is left
+    // alone, so a re-run after a failure only pays for what's missing.
+    const force = process.argv.includes("--force");
+    const existing: Record<string, StoreIntel> = {};
+    if (!force) {
+      try {
+        const mod = await import("../src/data/storeIntel");
+        Object.assign(existing, mod.STORE_INTEL as Record<string, StoreIntel>);
+      } catch {
+        // No prior run — enrich everything.
+      }
+    }
+    const hasIntel = (id: string) => {
+      const prior = existing[id];
+      return Boolean(prior && (prior.brands.length > 0 || prior.pricePoints.length > 0 || prior.insiderTake));
+    };
+    const todo = HOUSTON_STORES.filter((s) => !hasIntel(s.id));
+    console.log(
+      `[research] enriching ${todo.length} store(s)${todo.length < HOUSTON_STORES.length ? ` (${HOUSTON_STORES.length - todo.length} already researched — resuming)` : ""}…`,
+    );
+    const intel: Record<string, StoreIntel> = { ...existing };
+    const results = await pool(todo, 3, async (store) => {
       try {
         const i = await withRetry(store.id, () => enrich(store));
         console.log(`  ${store.id}: ${i.brands.length} brands, ${i.pricePoints.length} prices`);
@@ -282,7 +301,11 @@ async function main() {
         return [store.id, { brands: [], pricePoints: [], insiderTake: "", researchedAt: new Date().toISOString().slice(0, 10) }] as const;
       }
     });
-    for (const [id, i] of results) intel[id] = i;
+    for (const [id, i] of results) {
+      // Never let a failed re-run erase intel a previous run captured.
+      if (i.brands.length > 0 || i.pricePoints.length > 0 || i.insiderTake) intel[id] = i;
+      else if (!intel[id]) intel[id] = i;
+    }
 
     fs.writeFileSync(
       path.join(__dirname, "..", "src", "data", "storeIntel.ts"),
