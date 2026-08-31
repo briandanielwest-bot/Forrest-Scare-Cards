@@ -181,16 +181,16 @@ export async function buildWardrobePlan(args: {
   );
 
   const userMessage = `STYLE PROFILE:
-${JSON.stringify(profile, null, 2)}
+${JSON.stringify(profile)}
 
 PHOTO ASSESSMENT:
-${photoAssessment ? JSON.stringify(photoAssessment, null, 2) : "None provided — the man did not upload photos."}
+${photoAssessment ? JSON.stringify(photoAssessment) : "None provided — the man did not upload photos."}
 
 HOUSTON CLIMATE & STYLE BRIEF:
 ${climateBrief}
 
 VETTED STORE CANDIDATES (use ONLY these ids in recommendedStoreIds):
-${JSON.stringify(vettedStores, null, 2)}
+${JSON.stringify(vettedStores)}
 
 Build the complete wardrobe plan now.`;
 

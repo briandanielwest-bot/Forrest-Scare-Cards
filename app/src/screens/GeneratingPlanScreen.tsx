@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -15,42 +15,38 @@ type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 // 2s keeps the finished plan from sitting unseen — with ~70s generations,
 // the poll traffic is trivial (the GET is exempt from rate limiting).
 const POLL_INTERVAL_MS = 2000;
-// Long enough to read a name, a title, and a duty line without rushing —
-// the wait is where the app shows the actual work being done for him.
-const ROTATE_INTERVAL_MS = 5000;
+// Long enough to actually read a name, a title, and a duty line — the
+// whole roster of eight gets a moment across a ~60s generation.
+const ROTATE_INTERVAL_MS = 6000;
 // Six agents with full store knowledge take a while on a rich profile —
 // observed real generations run past 4 minutes, so the cutoff sits at 6.
 const MAX_POLL_MS = 6 * 60 * 1000;
 
-const STAGE_CAPTION: Record<string, string> = {
-  warmup: "YOUR TEAM IS GETTING BRIEFED",
-  scouts: "YOUR BUYING TEAM IS ON THE FLOOR",
-  planner: "MOON IS WRITING YOUR PLAN — THE LONG PART",
-};
+function formatElapsed(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const m = Math.floor(total / 60);
+  const sec = total % 60;
+  return `${m}:${String(sec).padStart(2, "0")}`;
+}
 
 export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();
   const [error, setError] = useState<string | null>(null);
   const [memberIndex, setMemberIndex] = useState(0);
-  const [stage, setStage] = useState<"scouts" | "planner" | undefined>(undefined);
   const startedAtRef = useRef(Date.now());
 
-  // Spotlight the people actually working right now: the buying directors
-  // while the scouts run, Moon (with Kyla checking his work) once the
-  // planner takes over, everyone during warm-up.
-  const activeMembers = useMemo(() => {
-    if (stage === "planner") return TEAM.filter((m) => m.id === "moon" || m.id === "kyla");
-    if (stage === "scouts") return TEAM.filter((m) => m.stage === "scouts" || m.id === "watt");
-    return TEAM;
-  }, [stage]);
+  const [elapsedMs, setElapsedMs] = useState(0);
 
   useEffect(() => {
-    setMemberIndex(0);
     const interval = setInterval(() => {
-      setMemberIndex((i) => (i + 1) % activeMembers.length);
+      setMemberIndex((i) => (i + 1) % TEAM.length);
     }, ROTATE_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [activeMembers]);
+    const ticker = setInterval(() => setElapsedMs(Date.now() - startedAtRef.current), 1000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(ticker);
+    };
+  }, []);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -61,7 +57,6 @@ export function GeneratingPlanScreen({ navigation }: Props) {
       try {
         const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
-        setStage(result.stage);
 
         if (result.status === "done" && result.plan) {
           setWardrobePlan(result.plan);
@@ -73,7 +68,10 @@ export function GeneratingPlanScreen({ navigation }: Props) {
           return;
         }
         if (Date.now() - startedAtRef.current > MAX_POLL_MS) {
-          setError("This is taking much longer than expected — the server may be overloaded. Try again in a bit.");
+          setError(
+            "This ran way past normal. The usual culprits: the free-tier server was asleep and is still waking up, " +
+              "or a rare bad generation triggered an automatic retry. Your interview is saved — tap Try again.",
+          );
           return;
         }
         pollTimer = setTimeout(poll, POLL_INTERVAL_MS);
@@ -97,8 +95,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
     };
   }, [sessionId]);
 
-  const member = activeMembers[memberIndex % activeMembers.length];
-  const caption = stage === "planner" ? STAGE_CAPTION.planner : stage === "scouts" ? STAGE_CAPTION.scouts : STAGE_CAPTION.warmup;
+  const member = TEAM[memberIndex % TEAM.length];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,7 +110,8 @@ export function GeneratingPlanScreen({ navigation }: Props) {
         ) : (
           <>
             <ActivityIndicator size="large" color={colors.gold} />
-            <Text style={styles.stage}>{caption}</Text>
+            <Text style={styles.stage}>YOUR TEAM IS BUILDING YOUR PLAN</Text>
+            <Text style={styles.timer}>{formatElapsed(elapsedMs)}</Text>
 
             <View style={styles.memberCard}>
               {member.id === "kyla" ? <KylaPortrait size={84} /> : <TeamAvatar look={member.look} size={84} />}
@@ -123,8 +121,8 @@ export function GeneratingPlanScreen({ navigation }: Props) {
             </View>
 
             <Text style={styles.valueLine}>
-              A real team pass takes a few minutes — 40+ vetted Houston stores, your budget, your build, and your
-              calendar, checked piece by piece.
+              Usually about a minute. The wait is real work: eight experts reading your profile against 40+ vetted
+              Houston stores, matching every piece to your budget, your build, and this city's calendar.
             </Text>
           </>
         )}
@@ -137,6 +135,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bayou, justifyContent: "center" },
   content: { alignItems: "center", gap: spacing.lg, padding: spacing.lg },
   stage: { color: colors.gold, fontSize: 12, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
+  timer: { color: colors.cream, fontSize: 26, fontWeight: "800", fontVariant: ["tabular-nums"], textAlign: "center" },
   memberCard: {
     alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.08)",

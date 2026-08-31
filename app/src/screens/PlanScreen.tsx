@@ -313,6 +313,7 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
                 );
               })()
             ) : null}
+            {run.store?.knownFor ? <Text style={styles.runStoreKnownFor}>Known for: {run.store.knownFor}</Text> : null}
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
@@ -503,6 +504,7 @@ const styles = StyleSheet.create({
   runStoreName: { color: colors.cream, fontSize: 16, fontWeight: "700", flexShrink: 1 },
   runStoreBudget: { color: colors.gold, fontWeight: "700", fontSize: 13 },
   runStoreMeta: { color: colors.cream, opacity: 0.75, fontSize: 12, lineHeight: 17 },
+  runStoreKnownFor: { color: colors.gold, opacity: 0.95, fontSize: 12, lineHeight: 17, fontWeight: "700" },
   runStoreContact: { color: colors.gold, fontSize: 13, fontWeight: "700" },
   runItem: { color: colors.cream, fontSize: 13, lineHeight: 19 },
   runStoreLink: { color: colors.gold, fontSize: 12, fontWeight: "700", textDecorationLine: "underline", marginTop: 2 },
