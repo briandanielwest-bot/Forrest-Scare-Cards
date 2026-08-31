@@ -82,6 +82,48 @@ Both pieces below have free tiers, so this costs nothing beyond your Claude API 
 
 Netlify or Cloudflare Pages work the same way if you'd rather use those (same build command `npx expo export --platform web`, output directory `dist`) — Vercel's just the path with a config file already in the repo.
 
+## Database (optional, recommended once real people use it)
+
+Without a database the app works fine — sessions live in memory and saved
+plans write to local files. The cost is that a restart or redeploy drops
+any half-finished interview, and files vanish on redeploy unless a disk is
+mounted. Set `DATABASE_URL` and sessions, claim codes, and analytics move
+to Postgres; tables are created automatically on first boot, and if the
+database is ever unreachable the app logs it and keeps serving from memory
+and disk rather than going down.
+
+**Easiest path — let the Blueprint do it.** `render.yaml` now declares a
+Postgres instance and wires `DATABASE_URL` into the web service for you.
+Deploy (or re-sync) the Blueprint on Render and both get provisioned
+together — nothing to copy or paste.
+
+**If your service already exists, or you'd rather click through it:**
+
+1. Render dashboard → **New +** → **Postgres**.
+2. Give it a name, pick the **same region as your web service** (this
+   matters — the free internal connection only works within a region),
+   choose a plan, and create it. Render's free tier is deleted after its
+   trial window; a paid instance starts around $6/month.
+3. Open the database → **Connections** → copy the **Internal Database
+   URL** (not the External one — internal is faster, free of egress
+   charges, and doesn't expose the database to the internet).
+4. Open your web service → **Environment** → **Add Environment Variable**
+   → key `DATABASE_URL`, value the URL you copied → **Save changes**.
+   Render redeploys automatically.
+5. Confirm in the deploy logs:
+   `[db] Postgres connected — sessions, claim codes, and analytics are persistent`
+   If it instead says `DATABASE_URL not set`, the variable landed on the
+   wrong service or wasn't saved.
+
+**Prefer a disk instead of a database?** Add a disk to the web service and
+set `DATA_DIR` to its mount path (e.g. `/var/data`). That makes the file
+storage durable across redeploys, but unlike Postgres it can't be shared
+by more than one instance, and in-flight sessions still reset on restart.
+
+**Other hosts work too** — any Postgres connection string does, including
+Supabase or Neon (both have free tiers). Paste it into `DATABASE_URL` the
+same way; use their pooled/session connection string when offered.
+
 ## Deploying the backend
 
 Two ready-made paths, both verified against this repo's actual `npm run build` / `npm start`:
