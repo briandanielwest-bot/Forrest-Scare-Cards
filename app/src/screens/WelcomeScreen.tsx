@@ -13,11 +13,20 @@ import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
 import { TEAM } from "../data/team";
 
+type InterviewOpener = Awaited<ReturnType<typeof startInterview>>;
+
 export function WelcomeScreen({ navigation }: Props) {
   const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages, setStyleProfile, setInterviewDone } =
     useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Kyla's opening message takes a real model call (~4-5s). Kicking it off
+  // while he's still reading this screen makes "Meet Kyla" open instantly.
+  const prefetchRef = React.useRef<Promise<InterviewOpener | null> | null>(null);
+
+  useEffect(() => {
+    prefetchRef.current = startInterview().catch(() => null);
+  }, []);
 
   useEffect(() => {
     if (stores.length > 0) return;
@@ -35,7 +44,11 @@ export function WelcomeScreen({ navigation }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const { sessionId, reply, quickReplies } = await startInterview();
+      // Use the prefetched opener when it landed; fall back to a fresh
+      // call if the prefetch failed (each is consumed exactly once).
+      const prefetched = prefetchRef.current ? await prefetchRef.current : null;
+      prefetchRef.current = null;
+      const { sessionId, reply, quickReplies } = prefetched ?? (await startInterview());
       // Clears any profile/interviewDone left over from a restored session
       // (e.g. the app was killed after the interview but before a plan was
       // generated) so this fresh interview isn't mistaken for a finished one.
