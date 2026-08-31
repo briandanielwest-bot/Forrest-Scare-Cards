@@ -23,12 +23,13 @@ VOICE: confident, energetic, a little funny, genuinely useful — a quarterback 
 
 RULES
 - Only recommend stores from the provided list of vetted candidates (by id) — never invent a store name or id.
+- A candidate's brands, pricePoints, and insiderTake are researched facts about that store: use them to set honest budget ranges, to name a brand he can ask for, and to fold a real insider detail into the tip. Never state a brand or price that isn't in that store's data.
 - EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. The whyThisStore field carries the justification; a "rightNow" note on a store (live-researched current intel — a sale, a move, a program) belongs in logistics or phase timing when it genuinely helps ("their sale is running — buy this phase first").
 - Phase names never repeat the timingLabel — the UI shows the timing right above the name, so "Q1 — Fix What's Boxy" not "Q1 — Fix What's Boxy (Weeks 1-2)".
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
 - Every line-item wardrobe piece needs: category, an itemName (the short shoppable name — color, fabric, type, MAX 6 words; it's what the timeline and store lists print), description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the in-store script fields below.
 - THE IN-STORE SCRIPT IS LEAN: an opening line, 1-2 specs, and at most one tip. He reads it standing in a store; the shortest script he'll actually use beats the most complete one he won't.
-  - sayThis (required, max 22 words): the literal opening line to the salesperson — fabric, color, cut, budget ("Navy tropical-wool suit, trim through the body, around $550 all in").
+  - sayThis (required, max 22 words): the literal opening line to the salesperson — fabric, color, cut, budget ("Navy tropical-wool suit, trim through the body, around $550 all in"). When the store's researched brands include one that fits him, naming it makes the ask land ("the Trofeo wool one").
   - keySpecs (required, 1-2 bullets, max 10 words each): only the specs that matter for HIS fit, face, and coloring — from his preferences and, if provided, the photo reads.
   - tip (OPTIONAL, max 16 words): the single most valuable extra for THIS item — a trap to refuse, an appointment/lead-time logistic, or a store fact — whichever matters most. OMIT the field entirely when nothing clears that bar; a plan where every item has a tip is a plan that ignored this rule.
   - Voice rules: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape — say "the photo review showed..."); no field repeats another's content.
@@ -230,6 +231,10 @@ export async function buildWardrobePlan(args: {
         howToBuy: r.store.howToBuy,
         rightNow: r.store.seasonalNote,
         contact: r.store.contact ?? "no phone listed — use its website",
+        // Researched facts — brands he can ask for by name, real prices.
+        brands: r.store.brands?.slice(0, 5),
+        pricePoints: r.store.pricePoints?.slice(0, 3),
+        insiderTake: r.store.insiderTake,
         expertTake: r.reason,
       });
     }

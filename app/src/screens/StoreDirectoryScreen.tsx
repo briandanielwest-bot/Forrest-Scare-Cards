@@ -22,6 +22,12 @@ function mapsUrl(store: { name: string; neighborhood: string }): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.name} ${store.neighborhood} Houston TX`)}`;
 }
 
+// Storefront and interior photos live with the businesses that own them —
+// we link to their public galleries rather than copying the images.
+function photosUrl(store: { name: string; neighborhood: string }): string {
+  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${store.name} ${store.neighborhood} Houston store`)}`;
+}
+
 const campbellLook = TEAM.find((m) => m.id === "campbell")!.look;
 
 // One-question box answered by Campbell, the Houston Concierge — dress
@@ -95,7 +101,17 @@ export function StoreDirectoryScreen() {
     const q = query.trim().toLowerCase();
     const visible = q
       ? stores.filter((s) =>
-          [s.name, s.neighborhood, s.description, s.bestFor, s.knownFor ?? "", s.catersTo ?? "", ...s.styleTags]
+          [
+            s.name,
+            s.neighborhood,
+            s.description,
+            s.bestFor,
+            s.knownFor ?? "",
+            s.catersTo ?? "",
+            s.insiderTake ?? "",
+            ...(s.brands ?? []),
+            ...s.styleTags,
+          ]
             .join(" ")
             .toLowerCase()
             .includes(q),
@@ -135,7 +151,7 @@ export function StoreDirectoryScreen() {
         style={styles.search}
         value={query}
         onChangeText={setQuery}
-        placeholder="Search 40+ stores — try 'boots', 'custom', 'Heights'…"
+        placeholder="Search stores or brands — 'Alden', 'custom', 'Heights'…"
         placeholderTextColor={colors.muted}
       />
       <SectionList
@@ -156,6 +172,25 @@ export function StoreDirectoryScreen() {
             {item.knownFor ? <Text style={styles.knownFor}>Known for: {item.knownFor}</Text> : null}
             {item.catersTo ? <Text style={styles.catersTo}>Caters to: {item.catersTo}</Text> : null}
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
+            {item.brands?.length ? (
+              <View style={styles.brandRow}>
+                {item.brands.slice(0, 8).map((b) => (
+                  <Text key={b} style={styles.brandChip}>
+                    {b}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
+            {item.pricePoints?.length ? (
+              <View style={styles.priceBlock}>
+                {item.pricePoints.slice(0, 4).map((pp) => (
+                  <Text key={pp} style={styles.pricePoint}>
+                    • {pp}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
+            {item.insiderTake ? <Text style={styles.insiderTake}>Insider: {item.insiderTake}</Text> : null}
             <Text style={styles.howToBuy}>How to buy: {item.howToBuy}</Text>
             {item.contact ? (
               telUrl(item.contact) ? (
@@ -174,6 +209,9 @@ export function StoreDirectoryScreen() {
                   </Text>
                 </Pressable>
               ) : null}
+              <Pressable onPress={() => Linking.openURL(photosUrl(item))} hitSlop={8}>
+                <Text style={styles.website}>📷 Photos</Text>
+              </Pressable>
               <Pressable onPress={() => Linking.openURL(mapsUrl(item))} hitSlop={8}>
                 <Text style={styles.website}>📍 Map</Text>
               </Pressable>
@@ -182,8 +220,9 @@ export function StoreDirectoryScreen() {
         )}
         ListFooterComponent={
           <Text style={styles.disclaimer}>
-            Directory researched via live web search and re-verified monthly by an AI researcher ("Right now" notes
-            come from the latest check) — still confirm hours and inventory on the store's own site before visiting.
+            Directory researched via live web search and re-verified monthly by an AI researcher — brands, prices, and
+            "Right now" notes come from that research and can change without notice. Photos link to each store's own
+            public galleries. Confirm current stock, pricing, and hours with the store before you drive.
           </Text>
         }
       />
@@ -281,4 +320,27 @@ const styles = StyleSheet.create({
   },
   campbellButtonText: { color: colors.cream, fontWeight: "800" },
   campbellAnswer: { ...typography.body, fontSize: 14, lineHeight: 20, color: colors.ink },
+  brandRow: { flexDirection: "row", flexWrap: "wrap", gap: 4, marginTop: 2 },
+  brandChip: {
+    ...typography.small,
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.bayouDark,
+    backgroundColor: "#E7EFE8",
+    borderRadius: radii.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    overflow: "hidden",
+  },
+  priceBlock: { marginTop: 2, gap: 1 },
+  pricePoint: { ...typography.small, color: colors.ink, fontVariant: ["tabular-nums"] },
+  insiderTake: {
+    ...typography.small,
+    color: colors.bayouDark,
+    fontStyle: "italic",
+    borderLeftWidth: 3,
+    borderLeftColor: colors.gold,
+    paddingLeft: 6,
+    marginTop: 2,
+  },
 });
