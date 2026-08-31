@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
 import { fetchStores } from "../api/client";
+import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, WardrobeItem, WardrobePlan, StorePriority } from "../types";
 
@@ -83,7 +84,8 @@ function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonSt
 }
 
 export function PlanScreen({ navigation }: Props) {
-  const { wardrobePlan, stores, setStores, setCategoryLabels, storeById, resetSession } = useAppContext();
+  const { wardrobePlan, stores, setStores, setCategoryLabels, storeById, resetSession, purchasedKeys, togglePurchased } =
+    useAppContext();
   const [copied, setCopied] = React.useState(false);
 
   async function handleCopyPlan() {
@@ -139,6 +141,8 @@ export function PlanScreen({ navigation }: Props) {
 
         <AtAGlance plan={plan} />
 
+        <ProgressStrip plan={plan} purchasedKeys={purchasedKeys} />
+
         {/* Read order matches how he'll actually use it: WHEN to buy,
             then WHERE (with what), then the full detail per item. */}
         <Pressable style={styles.copyButton} onPress={handleCopyPlan}>
@@ -168,7 +172,13 @@ export function PlanScreen({ navigation }: Props) {
             <Text style={styles.phaseGoal}>{cleanText(phase.goal)}</Text>
 
             {asArray<WardrobeItem>(phase.items).map((item, idx) => (
-              <ItemRow key={idx} item={item} storeName={(id) => storeById(id)?.name ?? id} />
+              <ItemRow
+                key={idx}
+                item={item}
+                storeName={(id) => storeById(id)?.name ?? id}
+                purchased={purchasedKeys.includes(itemKey(i, idx))}
+                onTogglePurchased={() => togglePurchased(itemKey(i, idx))}
+              />
             ))}
           </View>
         ))}
@@ -183,7 +193,10 @@ export function PlanScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.pepCard}>
-          <Text style={styles.pepLabel}>A NOTE FROM KYLA</Text>
+          <View style={styles.pepHeader}>
+            <KylaPortrait size={40} />
+            <Text style={styles.pepLabel}>A NOTE FROM KYLA</Text>
+          </View>
           <Text style={styles.pepText}>{cleanText(plan.finalPepTalk)}</Text>
         </View>
 
@@ -239,6 +252,38 @@ function buildPlanText(plan: WardrobePlan, storeName: (id: string) => string): s
     lines.push("");
   }
   return lines.join("\n");
+}
+
+// Stable per-plan key for check-off state (index-based: plans are
+// immutable once generated).
+function itemKey(phaseIdx: number, idx: number): string {
+  return `p${phaseIdx}i${idx}`;
+}
+
+// "3 of 11 bought · ≈$740 of $2,000" — the plan as a living checklist.
+function ProgressStrip({ plan, purchasedKeys }: { plan: WardrobePlan; purchasedKeys: string[] }) {
+  const phases = asArray<WardrobePlan["phases"][number]>(plan.phases);
+  let total = 0;
+  let bought = 0;
+  let spentMid = 0;
+  phases.forEach((phase, pi) => {
+    asArray<WardrobeItem>(phase.items).forEach((item, ii) => {
+      total += 1;
+      if (purchasedKeys.includes(itemKey(pi, ii))) {
+        bought += 1;
+        spentMid += ((Number(item.estimatedBudgetLowUsd) || 0) + (Number(item.estimatedBudgetHighUsd) || 0)) / 2;
+      }
+    });
+  });
+  if (bought === 0) return null;
+  return (
+    <View style={styles.progressStrip}>
+      <View style={[styles.progressFill, { width: `${Math.min(100, (bought / Math.max(1, total)) * 100)}%` }]} />
+      <Text style={styles.progressText}>
+        {bought} of {total} bought · ≈{money(Math.round(spentMid))} of {money(plan.budgetSummary?.totalBudgetUsd)}
+      </Text>
+    </View>
+  );
 }
 
 // The top-of-report summary: when he's buying, what he's buying, from
@@ -362,14 +407,29 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
   );
 }
 
-function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: string) => string }) {
+function ItemRow({
+  item,
+  storeName,
+  purchased,
+  onTogglePurchased,
+}: {
+  item: WardrobeItem;
+  storeName: (id: string) => string;
+  purchased: boolean;
+  onTogglePurchased: () => void;
+}) {
   return (
-    <View style={styles.item}>
+    <View style={[styles.item, purchased && styles.itemPurchased]}>
       <View style={styles.itemHeader}>
-        <Text style={styles.itemCategory}>
-          {item.quantity > 1 ? `${item.quantity}× ` : ""}
-          {item.itemName ?? item.category}
-        </Text>
+        <Pressable onPress={onTogglePurchased} hitSlop={8} style={styles.checkRow}>
+          <View style={[styles.checkCircle, purchased && styles.checkCircleOn]}>
+            {purchased ? <Text style={styles.checkMark}>✓</Text> : null}
+          </View>
+          <Text style={[styles.itemCategory, purchased && styles.itemCategoryDone]}>
+            {item.quantity > 1 ? `${item.quantity}× ` : ""}
+            {item.itemName ?? item.category}
+          </Text>
+        </Pressable>
         <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] ?? colors.muted }]}>
           <Text style={styles.priorityText}>{item.priority ?? "recommended"}</Text>
         </View>
@@ -481,7 +541,40 @@ const styles = StyleSheet.create({
   timelineAmount: { color: colors.bayouDark, fontWeight: "800", fontSize: 15 },
   timelineTotalRow: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
   timelineTotalLabel: { ...typography.body, fontWeight: "800" },
-  pepLabel: { color: colors.bayouDark, fontWeight: "800", fontSize: 11, letterSpacing: 1.2, marginBottom: 4 },
+  pepHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.xs },
+  pepLabel: { color: colors.bayouDark, fontWeight: "800", fontSize: 11, letterSpacing: 1.2 },
+  progressStrip: {
+    backgroundColor: colors.paper,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.bayou,
+    overflow: "hidden",
+    paddingVertical: 6,
+    alignItems: "center",
+    position: "relative",
+  },
+  progressFill: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "#DCE8DF",
+  },
+  progressText: { ...typography.small, fontWeight: "800", color: colors.bayouDark },
+  checkRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexShrink: 1 },
+  checkCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: colors.bayou,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkCircleOn: { backgroundColor: colors.bayou },
+  checkMark: { color: colors.cream, fontWeight: "800", fontSize: 13, lineHeight: 15 },
+  itemPurchased: { opacity: 0.55 },
+  itemCategoryDone: { textDecorationLine: "line-through" },
   copyButton: {
     backgroundColor: colors.bayou,
     borderRadius: radii.pill,
