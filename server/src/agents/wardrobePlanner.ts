@@ -178,7 +178,9 @@ export async function buildWardrobePlan(args: {
   // comes from the finished, validated message.
   let draftBuffer = "";
   const seenNames = new Set<string>();
-  const nameRegex = /"name"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  // Phases ("name") and pieces ("itemName") both feed the live ticker —
+  // the customer watches his actual plan assemble line by line.
+  const nameRegex = /"(?:name|itemName)"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
   const watchDelta = (partialJson: string) => {
     if (!onPhaseName) return;
     draftBuffer += partialJson;
