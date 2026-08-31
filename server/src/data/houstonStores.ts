@@ -47,6 +47,10 @@ export interface HoustonStore {
   /** Who actually shops there — the store's real clientele. */
   catersTo: string;
   verified: false;
+  /** From the monthly refresh: one current, shopper-useful note. */
+  seasonalNote?: string;
+  /** From the monthly refresh: date this store was last re-verified. */
+  lastVerified?: string;
 }
 
 export const HOUSTON_STORES: HoustonStore[] = [
@@ -455,7 +459,7 @@ export const HOUSTON_STORES: HoustonStore[] = [
     id: "suitsupply-river-oaks-district",
     name: "Suitsupply",
     category: "contemporary-boutique",
-    neighborhood: "River Oaks District",
+    neighborhood: "West Ave / Upper Kirby (2601 Westheimer)",
     priceTier: "$$$",
     styleTags: ["modern", "business", "smart-casual", "made-to-measure"],
     bestFor: "Modern, slimmer-cut suiting at a real price with same-day options and a made-to-measure upgrade path.",
@@ -775,12 +779,29 @@ export const HOUSTON_STORES: HoustonStore[] = [
   },
 ];
 
+import { STORE_FRESHNESS } from "./storeFreshness";
+
+// The monthly refresh job (scripts/refresh-data.ts) re-verifies each store
+// with live web search. Its overlay is applied here: a store flagged
+// "closed" with high confidence disappears from every consumer, and each
+// surviving store carries its current seasonal note + verification date.
+function withFreshness(store: HoustonStore): HoustonStore {
+  const f = STORE_FRESHNESS[store.id];
+  if (!f) return store;
+  return { ...store, seasonalNote: f.note || undefined, lastVerified: f.checkedAt };
+}
+
+function isOperating(store: HoustonStore): boolean {
+  const f = STORE_FRESHNESS[store.id];
+  return !(f && f.status === "closed" && f.confidence === "high");
+}
+
 export function getAllStores(): HoustonStore[] {
-  return HOUSTON_STORES;
+  return HOUSTON_STORES.filter(isOperating).map(withFreshness);
 }
 
 export function getStoresByCategory(category: StoreCategory): HoustonStore[] {
-  return HOUSTON_STORES.filter((s) => s.category === category);
+  return getAllStores().filter((s) => s.category === category);
 }
 
 export const STORE_CATEGORY_LABELS: Record<StoreCategory, string> = {

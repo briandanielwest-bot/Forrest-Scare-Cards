@@ -90,6 +90,8 @@ export interface HoustonStore {
   contact?: string;
   knownFor?: string;
   catersTo?: string;
+  seasonalNote?: string;
+  lastVerified?: string;
 }
 
 export interface ChatMessage {

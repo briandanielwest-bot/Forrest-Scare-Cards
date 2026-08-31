@@ -70,6 +70,7 @@ export function StoreDirectoryScreen() {
             </View>
             <Text style={styles.neighborhood}>{item.neighborhood}</Text>
             <Text style={styles.description}>{item.description}</Text>
+            {item.seasonalNote ? <Text style={styles.seasonalNote}>Right now: {item.seasonalNote}</Text> : null}
             {item.knownFor ? <Text style={styles.knownFor}>Known for: {item.knownFor}</Text> : null}
             {item.catersTo ? <Text style={styles.catersTo}>Caters to: {item.catersTo}</Text> : null}
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
@@ -84,8 +85,8 @@ export function StoreDirectoryScreen() {
         )}
         ListFooterComponent={
           <Text style={styles.disclaimer}>
-            Seed directory researched via live web search, not a real-time feed — always confirm current hours,
-            address, and inventory on the store's own site before visiting.
+            Directory researched via live web search and re-verified monthly by an AI researcher ("Right now" notes
+            come from the latest check) — still confirm hours and inventory on the store's own site before visiting.
           </Text>
         }
       />
@@ -119,6 +120,16 @@ const styles = StyleSheet.create({
   priceTier: { color: colors.gold, fontWeight: "800" },
   neighborhood: { ...typography.small },
   description: { ...typography.body },
+  seasonalNote: {
+    ...typography.small,
+    color: colors.bayouDark,
+    fontWeight: "700",
+    backgroundColor: "#F4E9C9",
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    overflow: "hidden",
+  },
   knownFor: { ...typography.small, color: colors.bayou, fontWeight: "700" },
   catersTo: { ...typography.small, fontStyle: "italic" },
   bestFor: { ...typography.small, fontWeight: "700" },
