@@ -104,6 +104,8 @@ export interface SessionState {
   planError?: string;
   /** Rolling post-plan Q&A history with Kyla (seeded with plan context). */
   planQAHistory?: Anthropic.MessageParam[];
+  /** Cached outfit matrix, generated on demand from the plan. */
+  outfits?: { name: string; occasion: string; pieces: string[] }[];
 }
 
 export interface UploadedImage {

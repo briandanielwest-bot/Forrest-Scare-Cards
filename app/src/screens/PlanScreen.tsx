@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { askKylaAboutPlan, fetchStores } from "../api/client";
+import { askKylaAboutPlan, fetchOutfits, fetchStores, saveMemory, type Outfit } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, WardrobeItem, WardrobePlan, StorePriority } from "../types";
@@ -83,6 +83,56 @@ function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonSt
   return Array.from(runs.values()).sort((a, b) => b.items.length - a.items.length);
 }
 
+// "These pieces make N outfits" — fetched once on demand, the capsule
+// payoff without any cost to plan-generation latency.
+function OutfitMatrix({ sessionId }: { sessionId: string | null }) {
+  const [outfits, setOutfits] = React.useState<Outfit[] | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function handleFetch() {
+    if (!sessionId || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const r = await fetchOutfits(sessionId);
+      setOutfits(r.outfits);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't build the outfits — try again?");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!sessionId) return null;
+  if (!outfits) {
+    return (
+      <View style={styles.outfitTeaser}>
+        <Pressable style={styles.outfitButton} onPress={handleFetch} disabled={loading}>
+          <Text style={styles.outfitButtonText}>
+            {loading ? "Kyla is building your outfits…" : "👔 Show me the outfits these pieces make"}
+          </Text>
+        </Pressable>
+        {error ? <Text style={styles.askError}>{error}</Text> : null}
+      </View>
+    );
+  }
+  return (
+    <View style={styles.outfitCard}>
+      <Text style={styles.outfitHeader}>
+        Your {outfits.length} outfits from this plan
+      </Text>
+      {outfits.map((o, i) => (
+        <View key={i} style={styles.outfitRow}>
+          <Text style={styles.outfitName}>{o.name}</Text>
+          <Text style={styles.outfitOccasion}>{o.occasion}</Text>
+          <Text style={styles.outfitPieces}>{o.pieces.join("  ·  ")}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 // Post-plan chat: Kyla answers questions about her picks, right on the
 // plan. Local exchange list only — the server keeps the real history.
 function AskKyla({ sessionId }: { sessionId: string | null }) {
@@ -155,8 +205,26 @@ export function PlanScreen({ navigation }: Props) {
     resetSession,
     purchasedKeys,
     togglePurchased,
+    memoryCode,
+    setMemoryCode,
   } = useAppContext();
   const [copied, setCopied] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+
+  async function handleSavePlan() {
+    if (!sessionId || saving) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const { code } = await saveMemory(sessionId, purchasedKeys, memoryCode ?? undefined);
+      setMemoryCode(code);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Couldn't save — try again?");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleCopyPlan() {
     if (!wardrobePlan) return;
@@ -221,6 +289,20 @@ export function PlanScreen({ navigation }: Props) {
           </Text>
         </Pressable>
 
+        {memoryCode ? (
+          <Pressable style={styles.saveCard} onPress={handleSavePlan}>
+            <Text style={styles.saveCode}>Your claim code: {memoryCode}</Text>
+            <Text style={styles.saveHint}>
+              {saving ? "Syncing…" : "Screenshot this. Enter it on any device to bring this plan (and your progress) back. Tap to re-sync."}
+            </Text>
+          </Pressable>
+        ) : (
+          <Pressable style={styles.saveButton} onPress={handleSavePlan} disabled={saving}>
+            <Text style={styles.saveButtonText}>{saving ? "Saving…" : "🔑 Save my plan — get a claim code"}</Text>
+          </Pressable>
+        )}
+        {saveError ? <Text style={styles.askError}>{saveError}</Text> : null}
+
         <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
 
         <StoreRunList runs={buildStoreRuns(plan, storeById)} />
@@ -252,6 +334,8 @@ export function PlanScreen({ navigation }: Props) {
             ))}
           </View>
         ))}
+
+        <OutfitMatrix sessionId={sessionId} />
 
         <View style={styles.tipsCard}>
           <Text style={styles.calloutLabel}>Buying tips</Text>
@@ -692,6 +776,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   askButtonText: { color: colors.cream, fontWeight: "800" },
+  saveButton: {
+    borderWidth: 1.5,
+    borderColor: colors.bayou,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.sm + 2,
+    alignItems: "center",
+  },
+  saveButtonText: { color: colors.bayou, fontWeight: "800", fontSize: 14 },
+  saveCard: {
+    backgroundColor: "#F4E9C9",
+    borderRadius: radii.md,
+    padding: spacing.sm,
+    alignItems: "center",
+    gap: 2,
+  },
+  saveCode: { color: colors.bayouDark, fontWeight: "800", fontSize: 16, letterSpacing: 1 },
+  saveHint: { ...typography.small, color: colors.bayouDark, textAlign: "center" },
+  outfitTeaser: { gap: spacing.xs },
+  outfitButton: {
+    backgroundColor: colors.blazerNavy,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.sm + 2,
+    alignItems: "center",
+  },
+  outfitButtonText: { color: colors.cream, fontWeight: "800", fontSize: 14 },
+  outfitCard: {
+    backgroundColor: colors.blazerNavy,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  outfitHeader: { color: colors.cream, fontSize: 18, fontWeight: "800" },
+  outfitRow: { backgroundColor: "rgba(255,255,255,0.08)", borderRadius: radii.sm, padding: spacing.sm, gap: 1 },
+  outfitName: { color: colors.gold, fontWeight: "800", fontSize: 14 },
+  outfitOccasion: { color: colors.cream, opacity: 0.75, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 },
+  outfitPieces: { color: colors.cream, fontSize: 13, lineHeight: 19 },
   copyButton: {
     backgroundColor: colors.bayou,
     borderRadius: radii.pill,

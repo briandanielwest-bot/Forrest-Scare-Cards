@@ -11,6 +11,8 @@ interface PersistedSession {
   interviewDone: boolean;
   /** Keys of plan items the user has checked off as bought. */
   purchasedKeys?: string[];
+  /** Claim code from "Save my plan" — lets him restore on any device. */
+  memoryCode?: string | null;
 }
 
 interface AppContextValue {
@@ -32,6 +34,9 @@ interface AppContextValue {
   setInterviewDone: (done: boolean) => void;
   purchasedKeys: string[];
   togglePurchased: (key: string) => void;
+  setPurchasedKeys: (keys: string[]) => void;
+  memoryCode: string | null;
+  setMemoryCode: (code: string | null) => void;
   resetSession: () => void;
 }
 
@@ -47,6 +52,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [interviewDone, setInterviewDone] = useState(false);
   const [purchasedKeys, setPurchasedKeys] = useState<string[]>([]);
+  const [memoryCode, setMemoryCode] = useState<string | null>(null);
 
   // A phone backgrounding or killing the app mid-flow shouldn't cost a man
   // his finished plan (or the interview he already did). Restore once on
@@ -61,6 +67,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (saved.wardrobePlan) setWardrobePlan(saved.wardrobePlan);
         if (saved.interviewDone) setInterviewDone(saved.interviewDone);
         if (Array.isArray(saved.purchasedKeys)) setPurchasedKeys(saved.purchasedKeys);
+        if (saved.memoryCode) setMemoryCode(saved.memoryCode);
       })
       .catch(() => {
         // Corrupt data or storage unavailable (private browsing-equivalent,
@@ -78,12 +85,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (!hydrated) return;
-    const payload: PersistedSession = { sessionId, styleProfile, wardrobePlan, interviewDone, purchasedKeys };
+    const payload: PersistedSession = { sessionId, styleProfile, wardrobePlan, interviewDone, purchasedKeys, memoryCode };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {
       // Best-effort — losing persistence isn't fatal, the session still
       // works for the rest of this app run.
     });
-  }, [hydrated, sessionId, styleProfile, wardrobePlan, interviewDone, purchasedKeys]);
+  }, [hydrated, sessionId, styleProfile, wardrobePlan, interviewDone, purchasedKeys, memoryCode]);
 
   function resetSession() {
     // Deliberately keeps `stores`/`categoryLabels` cached — the Houston
@@ -94,6 +101,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setChatMessages([]);
     setInterviewDone(false);
     setPurchasedKeys([]);
+    setMemoryCode(null);
     AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
   }
 
@@ -118,9 +126,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       purchasedKeys,
       togglePurchased: (key: string) =>
         setPurchasedKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key])),
+      setPurchasedKeys,
+      memoryCode,
+      setMemoryCode,
       resetSession,
     }),
-    [hydrated, sessionId, styleProfile, wardrobePlan, stores, categoryLabels, chatMessages, interviewDone, purchasedKeys],
+    [hydrated, sessionId, styleProfile, wardrobePlan, stores, categoryLabels, chatMessages, interviewDone, purchasedKeys, memoryCode],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

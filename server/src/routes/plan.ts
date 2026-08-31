@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireSession } from "../sessionStore";
 import { generateWardrobePlan } from "../agents/orchestrator";
 import { askAboutPlan } from "../agents/planQA";
+import { buildOutfitMatrix } from "../agents/outfits";
 import { agentRouteLimiter } from "../rateLimiter";
 import type { SessionState } from "../types";
 
@@ -84,6 +85,25 @@ planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
     }
     const reply = await askAboutPlan(session, question.trim().slice(0, 1000));
     res.json({ reply });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// On-demand outfit matrix — one fast call, cached on the session.
+planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
+  try {
+    const { sessionId } = req.body as { sessionId?: string };
+    if (!sessionId) return res.status(400).json({ error: "sessionId is required" });
+    let session;
+    try {
+      session = requireSession(sessionId);
+    } catch {
+      return res.status(404).json({ error: "This session has expired (the server restarted)" });
+    }
+    if (!session.wardrobePlan) return res.status(409).json({ error: "No plan yet for this session" });
+    const outfits = await buildOutfitMatrix(session);
+    res.json({ outfits });
   } catch (err) {
     next(err);
   }

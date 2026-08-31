@@ -68,7 +68,7 @@ Area: ${store.neighborhood}
 Website: ${store.website}
 
 Answer ONLY this JSON:
-{"status": "open" | "closed" | "unclear", "note": "<one current, shopper-useful fact if any — prioritize insider-grade intel: a sale running, a trunk show or MTM event, a service policy worth knowing (free alterations, same-day tailoring, appointment perks), a move or new location; max 180 chars; empty string if nothing notable>", "confidence": "high" | "low"}
+{"status": "open" | "closed" | "unclear", "note": "<one current, shopper-useful fact if any — prioritize insider-grade intel: a sale running, a trunk show or MTM event, a bestselling or newly arrived line worth asking for by name, a service policy worth knowing (free alterations, same-day tailoring, appointment perks), a move or new location; max 180 chars; empty string if nothing notable>", "confidence": "high" | "low"}
 "closed" ONLY with clear evidence (permanently closed listing, dead business). If searches are ambiguous, use "unclear" with confidence "low". The note must be CURRENT as of today's date — reject anything dated in the past (a "holiday" event months ago, last winter's sale); an empty note beats a stale one. Never generic marketing.`,
     1500,
   );

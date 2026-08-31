@@ -1,0 +1,63 @@
+import { Router } from "express";
+import { loadMemory, saveMemory } from "../memoryStore";
+import { createSession, requireSession } from "../sessionStore";
+import type { StyleProfile, WardrobePlan } from "../types";
+
+export const memoryRouter = Router();
+
+// Save the current session's profile + plan under a claim code (or update
+// an existing code). Purchased keys come from the client, which owns
+// check-off state.
+memoryRouter.post("/save", (req, res, next) => {
+  try {
+    const { sessionId, purchasedKeys, existingCode } = req.body as {
+      sessionId?: string;
+      purchasedKeys?: string[];
+      existingCode?: string;
+    };
+    if (!sessionId) return res.status(400).json({ error: "sessionId is required" });
+    let session;
+    try {
+      session = requireSession(sessionId);
+    } catch {
+      return res.status(404).json({ error: "This session has expired — the plan on your screen can still be copied" });
+    }
+    if (!session.wardrobePlan) return res.status(409).json({ error: "Nothing to save yet — finish a plan first" });
+    const record = saveMemory({
+      styleProfile: session.styleProfile ?? null,
+      wardrobePlan: session.wardrobePlan,
+      purchasedKeys: Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
+      existingCode: typeof existingCode === "string" ? existingCode : undefined,
+    });
+    res.json({ code: record.code });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Restore a saved plan into a brand-new session so everything works again
+// on this device — including Kyla's plan chat.
+memoryRouter.post("/restore", (req, res, next) => {
+  try {
+    const { code } = req.body as { code?: string };
+    if (!code?.trim()) return res.status(400).json({ error: "code is required" });
+    const record = loadMemory(code);
+    if (!record || !record.wardrobePlan) {
+      return res.status(404).json({ error: "No saved plan under that code — check the dashes and try again" });
+    }
+    const session = createSession();
+    session.styleProfile = (record.styleProfile ?? undefined) as StyleProfile | undefined;
+    session.wardrobePlan = record.wardrobePlan as WardrobePlan;
+    session.interviewComplete = true;
+    session.planStatus = "done";
+    res.json({
+      sessionId: session.id,
+      profile: record.styleProfile,
+      plan: record.wardrobePlan,
+      purchasedKeys: record.purchasedKeys ?? [],
+      code: record.code,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
