@@ -94,8 +94,11 @@ async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrie
     return { scoutName: def.scoutName, categories: def.categories, recommendations: [] };
   }
 
-  const userMessage = `MAN'S STYLE PROFILE:
-${JSON.stringify(profile, null, 2)}
+  // Everything stable per scout — persona, climate brief, candidate store
+  // profiles — lives in the system prompt under one cache breakpoint, so
+  // the API processes it once and reuses it across turns AND across
+  // different users' runs. Only the man's profile varies per request.
+  const systemText = `${buildSystemPrompt(def)}
 
 HOUSTON CLIMATE CONTEXT:
 ${climateBrief}
@@ -118,10 +121,13 @@ ${JSON.stringify(
     2,
   )}`;
 
+  const userMessage = `MAN'S STYLE PROFILE:
+${JSON.stringify(profile, null, 2)}`;
+
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: FAST_AGENT_MODEL,
-    max_tokens: 2048,
-    system: buildSystemPrompt(def),
+    max_tokens: 3000,
+    system: [{ type: "text" as const, text: systemText, cache_control: { type: "ephemeral" as const } }],
     messages: [{ role: "user", content: userMessage }],
     tools: [RECOMMEND_TOOL],
     tool_choice: { type: "tool", name: "submit_recommendations" },

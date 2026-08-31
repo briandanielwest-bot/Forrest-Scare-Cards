@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
+import { INDUSTRY_DRESS_CODES } from "../data/houstonKnowledge";
 import type { SessionState, StyleProfile } from "../types";
 
 /**
@@ -56,7 +57,10 @@ RULES
 - THE INTERVIEW ONLY ENDS WHEN YOU ACTUALLY CALL submit_style_profile — in that same response. Never tell him the profile is submitted, locked in, queued, or "in motion" unless the tool call is in this very message: words alone do nothing, and the app will leave him stranded at a chat box. If you've decided you have enough, the correct move is always: short closing text + submit_style_profile call, together, now. (offer_quick_replies is never a substitute for this.) Missing brands/sizes is fine, leave those fields as empty arrays/strings/undefined — but don't skip the follow-up depth on style itself just to wrap up faster.
 - When you call submit_style_profile, also send a short, hyped closing text line that names the real scale of what's coming — dollar amounts, a timeline, real Houston stores — not just "let's build your plan."
 - Never call submit_style_profile before you have at minimum: budgetTotalUsd, budgetCadence, lifestyle, at least two dressCodes, at least one styleArchetype, fitPreferences, colorPreferences, and timeline.
-- All monetary amounts are USD.`;
+- All monetary amounts are USD.
+
+${INDUSTRY_DRESS_CODES}
+Use the decoder above the moment he names his work — react like a local expert who already knows what an energy desk or the Med Center means for a closet, and let it sharpen your follow-ups (a Med Center guy gets asked about his civilian wardrobe, not his office wear).`;
 
 const OFFER_QUICK_REPLIES_TOOL: Anthropic.Tool = {
   name: "offer_quick_replies",
@@ -138,7 +142,9 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
     // Chat turns live or die on latency — the fast model keeps Kyla snappy.
     model: FAST_AGENT_MODEL,
     max_tokens: 4096,
-    system: SYSTEM_PROMPT,
+    // Cacheable: this long, stable system prompt is re-sent every chat
+    // turn — caching it cuts per-turn latency and input cost.
+    system: [{ type: "text" as const, text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" as const } }],
     messages: session.interviewHistory,
     tools: [SUBMIT_PROFILE_TOOL, OFFER_QUICK_REPLIES_TOOL],
     tool_choice: { type: "auto" },

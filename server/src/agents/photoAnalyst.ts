@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
+import { FACE_BODY_PLAYBOOK } from "../data/houstonKnowledge";
 import type { PhotoAssessment, StyleProfile, UploadedImage } from "../types";
 
 /**
@@ -29,6 +30,10 @@ Cover:
 - Recommended silhouettes/cuts that would work well for his frame.
 
 If the photos are too few, too dark, too distant, or don't show his face or enough of his body to say something concrete, say so honestly in the relevant fields ("face not clearly visible in these photos") rather than inventing detail.
+
+${FACE_BODY_PLAYBOOK}
+
+Observe first, then apply the playbook mappings above to fill faceGuidance and fitGuidance — your job is accurate observation plus correct application, not re-deriving menswear theory.
 
 Call submit_assessment exactly once with your full analysis.`;
 
@@ -104,7 +109,7 @@ export async function analyzePhotos(
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: FAST_AGENT_MODEL,
     max_tokens: 4096,
-    system: SYSTEM_PROMPT,
+    system: [{ type: "text" as const, text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" as const } }],
     messages: [{ role: "user", content }],
     tools: [SUBMIT_ASSESSMENT_TOOL],
     tool_choice: { type: "tool", name: "submit_assessment" },
