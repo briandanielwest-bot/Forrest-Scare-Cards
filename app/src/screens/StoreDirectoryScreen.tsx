@@ -156,9 +156,17 @@ export function StoreDirectoryScreen() {
                   </Text>
                 </Pressable>
               ) : null}
+              {/* One social slot so the row still fits a phone: their
+                  Instagram first, their Facebook page if that's all they
+                  have, and only then a generic photo search. A store with a
+                  real page should never be represented by a Google search. */}
               {item.instagram ? (
                 <Pressable onPress={() => Linking.openURL(`https://instagram.com/${item.instagram}`)} hitSlop={8}>
                   <Text style={styles.website}>@{item.instagram}</Text>
+                </Pressable>
+              ) : item.facebook ? (
+                <Pressable onPress={() => Linking.openURL(item.facebook!)} hitSlop={8}>
+                  <Text style={styles.website}>Facebook</Text>
                 </Pressable>
               ) : (
                 <Pressable onPress={() => Linking.openURL(photosUrl(item))} hitSlop={8}>
