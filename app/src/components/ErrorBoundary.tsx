@@ -39,7 +39,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <ScrollView contentContainerStyle={styles.content}>
             <Text style={styles.title}>Something went wrong</Text>
             <Text style={styles.body}>
-              The app hit an unexpected error building or showing your plan. This isn't your fault — tap below to
+              The app hit an unexpected error building or showing your plan. This isn't your fault. Tap below to
               start over.
             </Text>
             <Text style={styles.errorText}>{this.state.error.message}</Text>

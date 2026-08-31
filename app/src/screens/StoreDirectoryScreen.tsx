@@ -46,7 +46,7 @@ function AskCampbell() {
       const { reply } = await askCampbell(q);
       setAnswer(reply);
     } catch {
-      setAnswer("Campbell's line is busy — try again in a minute.");
+      setAnswer("Campbell's line is busy, try again in a minute.");
     } finally {
       setAsking(false);
     }
@@ -58,7 +58,7 @@ function AskCampbell() {
         <TeamAvatar look={campbellLook} size={34} />
         <View>
           <Text style={styles.campbellTitle}>Ask Campbell</Text>
-          <Text style={styles.campbellSub}>Houston dress codes, seasons, events — he's the concierge.</Text>
+          <Text style={styles.campbellSub}>Houston dress codes, seasons, events. He's the concierge.</Text>
         </View>
       </View>
       <View style={styles.campbellRow}>
@@ -151,7 +151,7 @@ export function StoreDirectoryScreen() {
         style={styles.search}
         value={query}
         onChangeText={setQuery}
-        placeholder="Search stores or brands — 'Alden', 'custom', 'Heights'…"
+        placeholder="Search stores or brands: Alden, custom, Heights…"
         placeholderTextColor={colors.muted}
       />
       <SectionList
@@ -226,9 +226,9 @@ export function StoreDirectoryScreen() {
         )}
         ListFooterComponent={
           <Text style={styles.disclaimer}>
-            Directory researched via live web search and re-verified monthly by an AI researcher — brands, prices, and
-            "Right now" notes come from that research and can change without notice. Photos link to each store's own
-            public galleries. Confirm current stock, pricing, and hours with the store before you drive.
+            We research this directory by live web search and re-check it every month. Brands, prices, and "Right
+            now" notes come from that research and can go stale without warning. Photos link to each store's own
+            public galleries. Call and confirm stock, pricing, and hours before you drive across town.
           </Text>
         }
       />

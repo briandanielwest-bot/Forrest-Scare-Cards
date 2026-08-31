@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { getStoresByCategory, STORE_CATEGORY_LABELS, type HoustonStore, type StoreCategory } from "../data/houstonStores";
@@ -39,7 +40,7 @@ const SCOUT_DEFINITIONS: ScoutDefinition[] = [
     scoutName: "Biggio (Director of Tailoring)",
     categories: ["bespoke-tailoring", "alterations"],
     focus:
-      "custom and made-to-measure tailoring — suits and shirts built or fitted specifically to this man — plus dedicated alterations shops for making off-the-rack pieces fit",
+      "custom and made-to-measure tailoring, suits and shirts built or fitted specifically to this man, plus dedicated alterations shops for making off-the-rack pieces fit",
   },
   {
     scoutName: "Drexler (Director of Designer Floors)",
@@ -50,7 +51,7 @@ const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   {
     scoutName: "Olajuwon (Director of Footwear)",
     categories: ["western-boots-leather", "footwear"],
-    focus: "dress and casual footwear, plus boots and western wear for the man who genuinely wants that category — not a default push toward it",
+    focus: "dress and casual footwear, plus boots and western wear for the man who genuinely wants that category, not a default push toward it",
   },
   {
     scoutName: "Wagner (Director of Accessories)",
@@ -89,7 +90,7 @@ const RECOMMEND_TOOL: Anthropic.Tool = {
 
 function buildSystemPrompt(def: ScoutDefinition): string {
   const plainName = def.scoutName.split(" (")[0];
-  return `You are ${plainName}, a Houston menswear buying director inside the Bayou & Blazer app — a seasoned category expert in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty — each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier — and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. If his profile includes a homeBase (where in the Houston area he lives/works), weigh each store's neighborhood against it — Houston distances are real, and a store he'll actually get to beats a marginally better one 45 minutes away; a genuinely superior fit can still earn the drive, just say so in the reason. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. Each reason must name the SPECIFIC thing he'd buy there and why THAT store earns it — lean on each store's knownFor (its signature items) and catersTo (its real clientele): "his paper-pattern dress shirts, because a fit file means every reorder fits" beats "good for shirts". If a store's catersTo clearly isn't him, that's a reason to rank it down even when the category matches. A "rightNow" note on a store is current, live-researched intel — weigh it (a running sale can promote a store; a disruption can demote it). Each store's brands, pricePoints, and insiderTake are researched facts: use them to be specific and to price-match him honestly ("their MTM starts at $1,295" beats "they do custom"), and never claim a brand or price that isn't in that data. Those facts must make your reason SHORTER and sharper, never longer — the 25-word cap is absolute, and a named brand should replace a vague phrase rather than extend it. Recommend your TOP 3 (4 only when a fourth genuinely earns it) — the planner needs your best calls, not coverage. Each reason MAX 25 words: the item he'd buy + the store fact that wins it, nothing else. Call submit_recommendations exactly once.`;
+  return `You are ${plainName}, a Houston menswear buying director inside the Bayou & Blazer app, a seasoned category expert in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty, each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier, and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. If his profile includes a homeBase (where in the Houston area he lives/works), weigh each store's neighborhood against it, Houston distances are real, and a store he'll actually get to beats a marginally better one 45 minutes away; a genuinely superior fit can still earn the drive, just say so in the reason. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. Each reason must name the SPECIFIC thing he'd buy there and why THAT store earns it, lean on each store's knownFor (its signature items) and catersTo (its real clientele): "his paper-pattern dress shirts, because a fit file means every reorder fits" beats "good for shirts". If a store's catersTo clearly isn't him, that's a reason to rank it down even when the category matches. A "rightNow" note on a store is current, live-researched intel, weigh it (a running sale can promote a store; a disruption can demote it). Each store's brands, pricePoints, and insiderTake are researched facts: use them to be specific and to price-match him honestly ("their MTM starts at $1,295" beats "they do custom"), and never claim a brand or price that isn't in that data. Those facts must make your reason SHORTER and sharper, never longer, the 25-word cap is absolute, and a named brand should replace a vague phrase rather than extend it. Recommend your TOP 3 (4 only when a fourth genuinely earns it), the planner needs your best calls, not coverage. Each reason MAX 25 words: the item he'd buy + the store fact that wins it, nothing else. Call submit_recommendations exactly once.`;
 }
 
 async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrief: string, extraContext?: string): Promise<ScoutReport> {
@@ -157,7 +158,7 @@ ${JSON.stringify(profile, null, 2)}${extraContext ? `\n\n${extraContext}` : ""}`
   const recommendations: StoreRecommendation[] = rawRecs
     .map((r) => {
       const store = candidates.find((c) => c.id === r.storeId);
-      return store ? { store, reason: r.reason } : undefined;
+      return store ? { store, reason: sanitizeVoice(r.reason) } : undefined;
     })
     .filter((r): r is StoreRecommendation => Boolean(r));
 
@@ -182,7 +183,7 @@ export async function rerunAccessoriesWithFace(
   try {
     return await runScout(def, profile, climateBrief, `PHOTO TEAM'S FACE READ (weigh for eyewear and accessory picks):\n${faceContext}`);
   } catch (err) {
-    console.warn(`[scouts] face re-run failed (${(err as Error).message?.slice(0, 60)}) — keeping original picks`);
+    console.warn(`[scouts] face re-run failed (${(err as Error).message?.slice(0, 60)}), keeping original picks`);
     return null;
   }
 }

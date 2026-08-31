@@ -40,7 +40,7 @@ function unquote(text: string): string {
 function moneyRange(low: number | undefined | null, high: number | undefined | null): string {
   const lo = Number(low) || 0;
   const hi = Number(high) || 0;
-  return lo === 0 && hi === 0 ? "$0 today — buy later" : `${money(lo)} – ${money(hi)}`;
+  return lo === 0 && hi === 0 ? "$0 today, buy later" : `${money(lo)} – ${money(hi)}`;
 }
 
 // `?? []` doesn't guard against a field that EXISTS but isn't an array
@@ -98,7 +98,7 @@ function OutfitMatrix({ sessionId }: { sessionId: string | null }) {
       const r = await fetchOutfits(sessionId);
       setOutfits(r.outfits);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't build the outfits — try again?");
+      setError(e instanceof Error ? e.message : "Couldn't build the outfits, try again?");
     } finally {
       setLoading(false);
     }
@@ -153,8 +153,8 @@ function AskKyla({ sessionId, purchasedKeys }: { sessionId: string | null; purch
     } catch (e) {
       setError(
         e instanceof Error && /session/i.test(e.message)
-          ? "Kyla's memory of this session has expired (the server restarted) — she can chat again on your next plan."
-          : "Kyla didn't get that — try again?",
+          ? "Kyla's memory of this session expired when the server restarted. She can chat again on your next plan."
+          : "Kyla didn't get that, try again?",
       );
     } finally {
       setAsking(false);
@@ -168,7 +168,7 @@ function AskKyla({ sessionId, purchasedKeys }: { sessionId: string | null; purch
         <KylaPortrait size={34} />
         <Text style={styles.askTitle}>Questions? Ask Kyla</Text>
       </View>
-      <Text style={styles.askHint}>Swaps, sizing, "why this store" — she knows every pick in this plan.</Text>
+      <Text style={styles.askHint}>Swaps, sizing, "why this store". She knows every pick in this plan.</Text>
       {exchanges.map((ex, i) => (
         <View key={i} style={styles.askExchange}>
           <Text style={styles.askQ}>You: {ex.q}</Text>
@@ -220,7 +220,7 @@ export function PlanScreen({ navigation }: Props) {
       const { code } = await saveMemory(sessionId, purchasedKeys, memoryCode ?? undefined);
       setMemoryCode(code);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "Couldn't save — try again?");
+      setSaveError(e instanceof Error ? e.message : "Couldn't save, try again?");
     } finally {
       setSaving(false);
     }
@@ -265,7 +265,7 @@ export function PlanScreen({ navigation }: Props) {
   if (!wardrobePlan) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={typography.body}>No plan yet — head back and finish the interview first.</Text>
+        <Text style={typography.body}>No plan yet, head back and finish the interview first.</Text>
       </SafeAreaView>
     );
   }
@@ -283,14 +283,14 @@ export function PlanScreen({ navigation }: Props) {
 
         {/* Read order matches how he'll actually use it: WHEN to buy,
             then WHERE (with what), then the full detail per item. The
-            plan leads — save and copy sit under the thing they act on. */}
+            plan leads, save and copy sit under the thing they act on. */}
         <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
 
         <StoreRunList runs={buildStoreRuns(plan, storeById)} />
 
         <Pressable style={styles.copyButton} onPress={handleCopyPlan}>
           <Text style={styles.copyButtonText}>
-            {copied ? "✓ Copied — paste it anywhere" : "📋 Copy plan to hand to the store"}
+            {copied ? "✓ Copied, paste it anywhere" : "📋 Copy plan to hand to the store"}
           </Text>
         </Pressable>
 
@@ -303,7 +303,7 @@ export function PlanScreen({ navigation }: Props) {
           </Pressable>
         ) : (
           <Pressable style={styles.saveButton} onPress={handleSavePlan} disabled={saving}>
-            <Text style={styles.saveButtonText}>{saving ? "Saving…" : "🔑 Save my plan — get a claim code"}</Text>
+            <Text style={styles.saveButtonText}>{saving ? "Saving…" : "🔑 Save my plan, get a claim code"}</Text>
           </Pressable>
         )}
         {saveError ? <Text style={styles.askError}>{saveError}</Text> : null}
@@ -316,7 +316,7 @@ export function PlanScreen({ navigation }: Props) {
           <Text style={styles.calloutText}>{cleanText(plan.climateNotes)}</Text>
         </View>
 
-        <Text style={styles.sectionHeader}>Every item — tap to check off as you buy</Text>
+        <Text style={styles.sectionHeader}>Every item. Tap to check one off as you buy it</Text>
 
         {asArray<WardrobePlan["phases"][number]>(plan.phases).map((phase, i) => (
           <View key={phase.name ?? i} style={styles.phaseCard}>
@@ -398,11 +398,11 @@ function buildPlanText(plan: WardrobePlan, storeById: (id: string) => HoustonSto
   const lines: string[] = [plan.guideTitle ?? "Your Houston Wardrobe Plan", ""];
   lines.push(`TOTAL BUDGET: ${money(plan.budgetSummary?.totalBudgetUsd)}`, "");
   for (const phase of asArray<WardrobePlan["phases"][number]>(plan.phases)) {
-    lines.push(`== ${(phase.timingLabel ?? "").toUpperCase()} — ${phase.name ?? "Phase"} ==`);
+    lines.push(`== ${(phase.timingLabel ?? "").toUpperCase()}: ${phase.name ?? "Phase"} ==`);
     for (const item of asArray<WardrobeItem>(phase.items)) {
       const label = `${item.quantity > 1 ? `${item.quantity}x ` : ""}${item.itemName ?? item.category}`;
       const stores = asArray<string>(item.recommendedStoreIds).map(storeName).join(" / ");
-      lines.push(`• ${label} (${moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)}) — ${stores}`);
+      lines.push(`• ${label} (${moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)}) at ${stores}`);
       if (item.sayThis) lines.push(`  Say: "${unquote(cleanText(item.sayThis))}"`);
       for (const spec of asArray<string>(item.keySpecs)) lines.push(`  - ${cleanText(spec)}`);
       if (item.tip) lines.push(`  Tip: ${cleanText(item.tip)}`);
@@ -416,7 +416,7 @@ function buildPlanText(plan: WardrobePlan, storeById: (id: string) => HoustonSto
     for (const run of runs) {
       const s = run.store;
       const bits = [s?.neighborhood, s?.contact].filter(Boolean).join(" · ");
-      lines.push(`${s?.name ?? run.storeId}${bits ? ` — ${bits}` : ""}`);
+      lines.push(`${s?.name ?? run.storeId}${bits ? `, ${bits}` : ""}`);
     }
   }
   return lines.join("\n");
@@ -470,7 +470,7 @@ function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (i
       <Text style={styles.timelineHeader}>Your buying timeline</Text>
       {firstStoreId ? (
         <Text style={styles.timelineStart}>
-          ▶ First move: {storeName(firstStoreId)} — {(firstPhase.timingLabel || "this week").toLowerCase()}
+          ▶ First move: {storeName(firstStoreId)}, {(firstPhase.timingLabel || "this week").toLowerCase()}
         </Text>
       ) : null}
       {phases.map((phase, i) => {
@@ -492,7 +492,7 @@ function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (i
             {phase.name ? <Text style={styles.timelinePhaseName}>{phase.name}</Text> : null}
             {Array.from(byStore.entries()).map(([storeId, items]) => (
               <Text key={storeId} style={styles.timelineStoreLine}>
-                <Text style={styles.timelineStoreName}>{storeName(storeId)}</Text> — {items.join(", ")}
+                <Text style={styles.timelineStoreName}>{storeName(storeId)}</Text>: {items.join(", ")}
               </Text>
             ))}
           </View>
@@ -512,7 +512,7 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
     <View style={styles.runCard}>
       <Text style={styles.runHeader}>Your store run list</Text>
       <Text style={styles.runSubheader}>
-        Every item above, regrouped by store — this is your errand list. Show it at the counter.
+        Every item above, regrouped by store. This is your errand list. Show it at the counter.
       </Text>
       {runs.map((run) => {
         const low = run.items.reduce((sum, it) => sum + it.low, 0);
@@ -541,14 +541,14 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
-                •  {it.label} — {moneyRange(it.low, it.high)}
+                •  {it.label}, {moneyRange(it.low, it.high)}
                 {it.phaseName ? `  (${it.phaseName})` : ""}
               </Text>
             ))}
             <View style={styles.runLinkRow}>
               {run.store?.website ? (
                 <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8} style={styles.runLinkShrink}>
-                  {/* Domain only — full store URLs overflowed the card and
+                  {/* Domain only. Full store URLs overflowed the card and
                       pushed the Map link out of reach (seen live). */}
                   <Text style={styles.runStoreLink} numberOfLines={1}>
                     {run.store.website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]} →

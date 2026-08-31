@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
@@ -23,7 +24,7 @@ RULES
 - 8-14 outfits, each: a punchy name (max 5 words, your voice), the occasion it wins (max 6 words), and the 3-5 pieces that make it.
 - Cover his real life: his work dress codes first, then client/event looks, then off-duty. No fantasy occasions he didn't mention.
 - Every wearable piece appears in at least one outfit; his most-worn categories anchor several.
-- No commentary outside the tool call — submit_outfits once with the full matrix.`;
+- No commentary outside the tool call, submit_outfits once with the full matrix.`;
 
 const SUBMIT_OUTFITS_TOOL: Anthropic.Tool = {
   name: "submit_outfits",
@@ -80,8 +81,8 @@ export async function buildOutfitMatrix(session: SessionState): Promise<Outfit[]
   const outfits: Outfit[] = raw
     .filter((o) => o && typeof o === "object")
     .map((o) => ({
-      name: String(o.name ?? "Look"),
-      occasion: String(o.occasion ?? ""),
+      name: sanitizeVoice(String(o.name ?? "Look")),
+      occasion: sanitizeVoice(String(o.occasion ?? "")),
       pieces: coerceArray<string>(o.pieces).filter((p): p is string => typeof p === "string"),
     }))
     .filter((o) => o.pieces.length > 0);

@@ -94,7 +94,7 @@ export function PhotoUploadScreen({ navigation }: Props) {
       await analyzePhotos(sessionId, shrunk);
       navigation.navigate("GeneratingPlan");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Watt couldn't process those — try again?");
+      setError(e instanceof Error ? e.message : "Watt couldn't process those, try again?");
     } finally {
       setBusy(false);
     }
@@ -105,9 +105,9 @@ export function PhotoUploadScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Show Watt what you've got</Text>
         <Text style={styles.subtitle}>
-          Upload as many photos as you want — a clear face shot, full-body shots, current outfits, whatever you have.
+          Upload as many photos as you want. A clear face shot, full-body shots, current outfits, whatever you have.
           Watt reads your face shape, body type, fit, and coloring, and every one of those sharpens what the plan
-          tells you to buy — down to collar styles and lapel widths that suit your face.
+          tells you to buy, down to collar styles and lapel widths that suit your face.
         </Text>
 
         <Pressable style={styles.pickButton} onPress={handlePick}>
@@ -135,7 +135,7 @@ export function PhotoUploadScreen({ navigation }: Props) {
           {busy ? <ActivityIndicator color={colors.cream} /> : <Text style={styles.primaryButtonText}>Analyze my photos →</Text>}
         </Pressable>
         <Pressable onPress={() => navigation.navigate("GeneratingPlan")}>
-          <Text style={styles.skip}>Skip — build my plan without photos</Text>
+          <Text style={styles.skip}>Skip photos, build my plan</Text>
         </Pressable>
       </View>
     </SafeAreaView>
