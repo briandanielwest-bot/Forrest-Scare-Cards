@@ -11,6 +11,7 @@ import { planRouter } from "./routes/plan";
 import { storesRouter } from "./routes/stores";
 import { sessionRouter } from "./routes/session";
 import { almanacRouter } from "./routes/almanac";
+import { memoryRouter } from "./routes/memory";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
@@ -44,6 +45,8 @@ app.use("/api/plan", planRouter);
 app.use("/api/stores", storesRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/almanac", agentRouteLimiter, almanacRouter);
+// No Claude calls in memory save/restore — cheap disk reads/writes.
+app.use("/api/memory", memoryRouter);
 
 app.use((req, res) => {
   res.status(404).json({ error: `No route for ${req.method} ${req.path}` });

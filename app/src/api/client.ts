@@ -141,6 +141,45 @@ export function fetchStores() {
   return request<{ stores: HoustonStore[]; categoryLabels: Record<StoreCategory, string> }>("/api/stores");
 }
 
+// Claim-code memory: save the finished plan under a code; restore it later
+// on any device (fresh session included, so Kyla's plan chat works again).
+export function saveMemory(sessionId: string, purchasedKeys: string[], existingCode?: string) {
+  return request<{ code: string }>("/api/memory/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, purchasedKeys, existingCode }),
+  });
+}
+
+export function restoreMemory(code: string) {
+  return request<{
+    sessionId: string;
+    profile?: StyleProfile;
+    plan: WardrobePlan;
+    purchasedKeys: string[];
+    code: string;
+  }>("/api/memory/restore", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+}
+
+export interface Outfit {
+  name: string;
+  occasion: string;
+  pieces: string[];
+}
+
+// On-demand outfit matrix: "these 11 pieces make 14 outfits."
+export function fetchOutfits(sessionId: string) {
+  return request<{ outfits: Outfit[] }>("/api/plan/outfits", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId }),
+  });
+}
+
 // Post-plan Q&A with Kyla — she answers questions about the delivered plan
 // ("can I swap the oxfords for loafers?") with the plan and profile in hand.
 export function askKylaAboutPlan(sessionId: string, question: string) {

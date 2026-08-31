@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { fetchStores, startInterview } from "../api/client";
+import { fetchStores, restoreMemory, startInterview } from "../api/client";
 import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
@@ -16,10 +16,44 @@ import { TEAM } from "../data/team";
 type InterviewOpener = Awaited<ReturnType<typeof startInterview>>;
 
 export function WelcomeScreen({ navigation }: Props) {
-  const { stores, setSessionId, setStores, setCategoryLabels, setChatMessages, setStyleProfile, setInterviewDone } =
-    useAppContext();
+  const {
+    stores,
+    setSessionId,
+    setStores,
+    setCategoryLabels,
+    setChatMessages,
+    setStyleProfile,
+    setInterviewDone,
+    setWardrobePlan,
+    setPurchasedKeys,
+    setMemoryCode,
+  } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [codeDraft, setCodeDraft] = useState("");
+  const [restoring, setRestoring] = useState(false);
+
+  async function handleRestore() {
+    const code = codeDraft.trim();
+    if (!code || restoring) return;
+    setError(null);
+    setRestoring(true);
+    try {
+      const restored = await restoreMemory(code);
+      setSessionId(restored.sessionId);
+      setStyleProfile(restored.profile ?? null);
+      setWardrobePlan(restored.plan);
+      setPurchasedKeys(restored.purchasedKeys ?? []);
+      setMemoryCode(restored.code);
+      setInterviewDone(true);
+      navigation.navigate("Plan");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't find that code.");
+    } finally {
+      setRestoring(false);
+    }
+  }
   // Kyla's opening message takes a real model call (~4-5s). Kicking it off
   // while he's still reading this screen makes "Meet Kyla" open instantly.
   const prefetchRef = React.useRef<Promise<InterviewOpener | null> | null>(null);
@@ -150,6 +184,28 @@ export function WelcomeScreen({ navigation }: Props) {
         <Pressable onPress={() => navigation.navigate("StoreDirectory")}>
           <Text style={styles.link}>Browse the Houston store directory</Text>
         </Pressable>
+
+        {showCodeInput ? (
+          <View style={styles.codeRow}>
+            <TextInput
+              style={styles.codeInput}
+              value={codeDraft}
+              onChangeText={setCodeDraft}
+              placeholder="BB-XXXX-XXXX"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              autoCapitalize="characters"
+              editable={!restoring}
+              onSubmitEditing={handleRestore}
+            />
+            <Pressable style={styles.codeButton} onPress={handleRestore} disabled={restoring || !codeDraft.trim()}>
+              {restoring ? <ActivityIndicator color={colors.bayouDark} size="small" /> : <Text style={styles.codeButtonText}>Restore</Text>}
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable onPress={() => setShowCodeInput(true)}>
+            <Text style={styles.link}>Have a claim code? Restore your plan</Text>
+          </Pressable>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -255,5 +311,26 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.85 },
   primaryButtonText: { color: colors.bayouDark, fontWeight: "800", fontSize: 17 },
   link: { color: colors.cream, textAlign: "center", marginTop: spacing.md, textDecorationLine: "underline" },
+  codeRow: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.md, alignItems: "center" },
+  codeInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    color: colors.cream,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+  codeButton: {
+    backgroundColor: colors.gold,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minWidth: 84,
+    alignItems: "center",
+  },
+  codeButtonText: { color: colors.bayouDark, fontWeight: "800" },
   error: { color: "#FFD9CE", textAlign: "center", marginBottom: spacing.sm },
 });
