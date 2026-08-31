@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createSession, requireSession } from "../sessionStore";
 import { continueInterview, startInterview } from "../agents/interviewer";
+import { prewarmScouts } from "../agents/orchestrator";
 
 export const interviewRouter = Router();
 
@@ -30,6 +31,9 @@ interviewRouter.post("/message", async (req, res, next) => {
     if (result.profile) {
       session.styleProfile = result.profile;
       session.interviewComplete = true;
+      // Fire-and-forget: the buying team starts working the moment the
+      // profile is final, while he's still on the photo screen.
+      prewarmScouts(session);
     }
 
     res.json({
