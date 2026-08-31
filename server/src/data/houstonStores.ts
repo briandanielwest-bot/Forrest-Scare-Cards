@@ -51,6 +51,16 @@ export interface HoustonStore {
   seasonalNote?: string;
   /** From the monthly refresh: date this store was last re-verified. */
   lastVerified?: string;
+  /** From deep research: brands/labels this store actually carries. */
+  brands?: string[];
+  /** From deep research: real price points, "<item>: <price>". */
+  pricePoints?: string[];
+  /** From deep research: the insider detail worth knowing before you walk in. */
+  insiderTake?: string;
+  /** Official Instagram handle (no @) — the store's own public profile. */
+  instagram?: string;
+  /** Official Facebook page URL. */
+  facebook?: string;
 }
 
 export const HOUSTON_STORES: HoustonStore[] = [
@@ -780,6 +790,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
 ];
 
 import { STORE_FRESHNESS } from "./storeFreshness";
+import { STORE_INTEL } from "./storeIntel";
+import { STORE_SOCIAL } from "./storeSocial";
 
 // The monthly refresh job (scripts/refresh-data.ts) re-verifies each store
 // with live web search. Its overlay is applied here: a store flagged
@@ -787,8 +799,21 @@ import { STORE_FRESHNESS } from "./storeFreshness";
 // surviving store carries its current seasonal note + verification date.
 function withFreshness(store: HoustonStore): HoustonStore {
   const f = STORE_FRESHNESS[store.id];
-  if (!f) return store;
-  return { ...store, seasonalNote: f.note || undefined, lastVerified: f.checkedAt };
+  const intel = STORE_INTEL[store.id];
+  const social = STORE_SOCIAL[store.id];
+  const enriched: HoustonStore = {
+    ...store,
+    ...(intel
+      ? {
+          brands: intel.brands.length > 0 ? intel.brands : undefined,
+          pricePoints: intel.pricePoints.length > 0 ? intel.pricePoints : undefined,
+          insiderTake: intel.insiderTake || undefined,
+        }
+      : {}),
+    ...(social ? { instagram: social.instagram, facebook: social.facebook } : {}),
+  };
+  if (!f) return enriched;
+  return { ...enriched, seasonalNote: f.note || undefined, lastVerified: f.checkedAt };
 }
 
 function isOperating(store: HoustonStore): boolean {

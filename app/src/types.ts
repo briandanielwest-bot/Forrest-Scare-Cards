@@ -103,6 +103,11 @@ export interface HoustonStore {
   catersTo?: string;
   seasonalNote?: string;
   lastVerified?: string;
+  brands?: string[];
+  pricePoints?: string[];
+  insiderTake?: string;
+  instagram?: string;
+  facebook?: string;
 }
 
 export interface ChatMessage {
