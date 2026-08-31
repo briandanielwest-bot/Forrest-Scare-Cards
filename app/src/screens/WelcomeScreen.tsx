@@ -98,6 +98,16 @@ export function WelcomeScreen({ navigation }: Props) {
           />
         </View>
 
+        <Pressable style={styles.staplesCard} onPress={() => navigation.navigate("Staples")}>
+          <Text style={styles.staplesKicker}>FREE SAMPLE — NO INTERVIEW REQUIRED</Text>
+          <Text style={styles.staplesTitle}>Kyla's Starter Staples</Text>
+          <Text style={styles.staplesText}>
+            Four Houston industries. Three career levels. The two pieces she'd make you buy first — with the store,
+            the price, and exactly why. Tap in, steal freely.
+          </Text>
+          <Text style={styles.staplesLink}>Browse the staples →</Text>
+        </Pressable>
+
         <View style={styles.teamCard}>
           <Text style={styles.teamTitle}>Meet the team</Text>
           <View style={styles.teamRow}>
@@ -180,6 +190,16 @@ const styles = StyleSheet.create({
   },
   stepBadgeText: { color: colors.cream, fontWeight: "700", fontSize: 12 },
   stepText: { ...typography.body, flex: 1 },
+  staplesCard: {
+    backgroundColor: colors.gold,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.xs,
+  },
+  staplesKicker: { color: colors.bayouDark, fontSize: 11, fontWeight: "800", letterSpacing: 1 },
+  staplesTitle: { color: colors.bayouDark, fontSize: 20, fontWeight: "800" },
+  staplesText: { color: colors.bayouDark, fontSize: 14, lineHeight: 20 },
+  staplesLink: { color: colors.bayouDark, fontWeight: "800", textDecorationLine: "underline", marginTop: 2 },
   teamCard: {
     backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: radii.lg,
