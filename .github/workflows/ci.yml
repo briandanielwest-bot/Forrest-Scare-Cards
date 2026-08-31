@@ -34,3 +34,8 @@ jobs:
       - name: Voice check
         working-directory: server
         run: npm run voice:check
+      # Every case here is a malformed planner envelope seen in a live run;
+      # a regression means users pay a full regenerate for it again.
+      - name: Plan shape check
+        working-directory: server
+        run: npm run plan:check

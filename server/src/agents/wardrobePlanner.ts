@@ -392,7 +392,7 @@ async function repairVoice(plan: WardrobePlan): Promise<WardrobePlan> {
 // *string* inside the tool input (seen live: phases arrived stringified,
 // crashing the client's phases.map). Parse those back, then validate hard —
 // a malformed plan must become a retryable error, never a stored plan.
-function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePlan {
+export function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePlan {
   const plan = { ...(raw as Record<string, unknown>) };
 
   const parseIfString = (v: unknown): unknown => {
@@ -427,14 +427,36 @@ function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePl
     }
   }
 
+  // Seen live: the tool input came back with the phases array parked under
+  // a junk top-level key (once, literally "$PARAMETER_NAME") while `phases`
+  // itself was undefined. The plan was fully written and correct; only the
+  // envelope was wrong. Regenerating cost the user another minute for
+  // content we were already holding, so recover it instead. Any value that
+  // looks like a phases array (objects carrying an items array) is the plan.
+  if (!Array.isArray(plan.phases) || plan.phases.length === 0) {
+    const looksLikePhases = (v: unknown): boolean =>
+      Array.isArray(v) &&
+      v.length > 0 &&
+      v.every((p) => p && typeof p === "object" && Array.isArray((p as { items?: unknown }).items));
+    const rescued = Object.entries(plan).find(([key, v]) => key !== "phases" && looksLikePhases(parseIfString(v)));
+    if (rescued) {
+      console.warn(`[planner] recovered phases from misplaced key "${rescued[0]}" instead of regenerating`);
+      plan.phases = parseIfString(rescued[1]);
+      delete plan[rescued[0]];
+    }
+  }
+
   if (!Array.isArray(plan.phases) || plan.phases.length === 0) {
     // A regenerate costs a full minute of the user's wait, so say enough
     // about the bad shape to fix the cause rather than keep paying for it.
     const shape = Array.isArray(plan.phases)
       ? "empty array"
       : `${typeof plan.phases}${plan.phases === undefined ? " (absent)" : ""}`;
+    const describe = (v: unknown): string =>
+      Array.isArray(v) ? `array(${v.length})` : v === null ? "null" : typeof v === "object" ? `object{${Object.keys(v as object).slice(0, 8).join(",")}}` : `${typeof v}`;
     console.error(
-      `[planner] malformed phases: got ${shape}; top-level keys were [${Object.keys(plan).join(", ")}]` +
+      `[planner] malformed phases: got ${shape}; top-level shape: ` +
+        Object.entries(plan).map(([k, v]) => `${k}=${describe(v)}`).join(", ") +
         (typeof plan.phases === "string" ? `; first 200 chars: ${(plan.phases as string).slice(0, 200)}` : ""),
     );
     throw new Error("Wardrobe planner returned malformed phases, retry plan generation");
