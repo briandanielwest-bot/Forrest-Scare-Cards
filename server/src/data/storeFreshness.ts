@@ -15,45 +15,45 @@ export const STORE_FRESHNESS: Record<string, StoreFreshness> = {
     "checkedAt": "2026-08-31"
   },
   "norton-ditto": {
-    "status": "open",
-    "note": "Vicuña wool Custom Show in-store featuring rare wool sport coats/suits at their West Alabama at Kirby location.",
-    "confidence": "high",
+    "status": "unclear",
+    "note": "",
+    "confidence": "low",
     "checkedAt": "2026-08-31"
   },
   "hamilton-shirts": {
     "status": "open",
     "note": "",
-    "confidence": "low",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "q-clothier": {
     "status": "open",
-    "note": "Located at West Ave (2800 Kirby Dr, Ste B124); shares space with sister boutique Rye 51 for casual menswear.",
+    "note": "Located at 2800 Kirby Dr, Ste B124; open daily with weekday hours 10am-6pm, Sat 11am-7pm, Sun 12pm-5pm.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "kuffs-houston": {
-    "status": "open",
-    "note": "",
-    "confidence": "high",
-    "checkedAt": "2026-08-31"
-  },
-  "lucho": {
     "status": "unclear",
     "note": "",
     "confidence": "low",
+    "checkedAt": "2026-08-31"
+  },
+  "lucho": {
+    "status": "open",
+    "note": "",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "bill-walker-clothier": {
     "status": "open",
-    "note": "Located at 1737 Post Oak Blvd, Houston; known for in-house tailoring and custom suits/tuxedos.",
+    "note": "Located at 1737 Post Oak Blvd, Houston (Post Oak Plaza); active listing with regular hours and 2025 new-arrivals updates",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "blu-fine-menswear": {
-    "status": "unclear",
-    "note": "",
-    "confidence": "low",
+    "status": "open",
+    "note": "Private by-appointment studio at 2500 E T C Jester Blvd, Ste 205, Houston; call ahead to book a consultation.",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "indochino-galleria": {
@@ -64,97 +64,97 @@ export const STORE_FRESHNESS: Record<string, StoreFreshness> = {
   },
   "bzach-clothier": {
     "status": "open",
-    "note": "Two Houston storefronts (3733 Westheimer Rd & 6811 SW Freeway) plus appointment booking; walk-ins also welcome.",
+    "note": "Two Houston locations: 3733 Westheimer Rd Unit #3 and 6811 Southwest Fwy; custom & off-the-rack suits, book by appointment.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "festari-for-men": {
     "status": "open",
-    "note": "",
+    "note": "Located at 1800 Post Oak Blvd Ste 6160 near the Galleria; family-owned custom/bespoke suit and tuxedo shop since 1993.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "m-penner": {
-    "status": "open",
+    "status": "unclear",
     "note": "",
     "confidence": "low",
     "checkedAt": "2026-08-31"
   },
   "neiman-marcus-galleria": {
     "status": "open",
-    "note": "Offers in-store shopping by appointment and curbside pickup (dial 713-265-7783 on arrival).",
+    "note": "",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "saks-galleria": {
     "status": "open",
-    "note": "Store features 51fifteen restaurant on-site for refreshments and light bites.",
+    "note": "Two-story Galleria flagship features Fifth Avenue Club, Virtual Appointments, and dining at 51fifteen",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "nordstrom-galleria": {
     "status": "open",
-    "note": "",
-    "confidence": "low",
+    "note": "Offers same-day delivery ($15 within 10 miles) and curbside pickup; open daily incl. Sun 12-7pm.",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "zegna-houston": {
     "status": "open",
-    "note": "Zegna Boutique at Houston Galleria; Mon-Sat 11-7, Sun 12-6; boutique delivery & returns available.",
+    "note": "",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "brioni-river-oaks": {
     "status": "open",
-    "note": "Brioni hosted an in-store trunk show at its River Oaks District location (4444 Westheimer Rd, Suite C115) in May 2025.",
+    "note": "Brioni opened its first Houston store in River Oaks District in 2024, next to Van Cleef & Arpels, offering bespoke tailoring and ready-to-wear.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "brunello-cucinelli-river-oaks": {
     "status": "open",
-    "note": "Undergoing $1.8M expansion to 4,750+ sq ft at 4444 Westheimer Rd, Suite F155, starting April 2026 (completion Oct 2026).",
+    "note": "Brunello Cucinelli plans a $1.8M expansion to 4,750+ sq ft at River Oaks District, construction expected April-Oct 2026.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "hermes-river-oaks": {
     "status": "open",
-    "note": "Store had a temporary closure May 22–29 (reopened May 30); located at 4444 Westheimer Rd, Ste A-160, River Oaks District.",
+    "note": "Standalone two-story boutique at River Oaks District; open Mon-Sat 10am-6pm, closed Sundays.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "louis-vuitton-mens-galleria": {
     "status": "open",
-    "note": "Located at 5015 Westheimer (Galleria 1), Suite A2414; offers on-site hot stamping and personalization services.",
+    "note": "Offers on-site hot-stamping personalization service and a full fragrance counter; appointments can be booked online.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "the-black-tux-galleria": {
     "status": "open",
-    "note": "Located inside Nordstrom, 1st Floor Men's Clothing dept at Galleria; book appointments for suit/tux fittings.",
+    "note": "Located at 5085 Westheimer Rd, The Galleria Level 2; open Mon–Sat 11:00AM–7:00PM.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "als-formal-wear": {
-    "status": "closed",
-    "note": "All Al's Formal Wear locations abruptly shut down permanently in August 2023, leaving customers without tuxedos or refunds.",
+    "status": "open",
+    "note": "Multiple Houston-area locations open; site currently running a free/discounted prom tuxedo rental promo.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "dxl-big-tall": {
     "status": "open",
-    "note": "Store offers curbside pickup; official listing shows active hours (Mon-Sat 10am-7pm, Sun 12-6pm)",
+    "note": "Curbside pickup available at this Westheimer location",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "sid-mashburn": {
     "status": "open",
-    "note": "Store doing light renovations; doors temporarily closed through Mon, July 28 at 10am (alterations/pickup via Sid Shop Manager).",
+    "note": "Store recently closed briefly for light renovations at the Westheimer/River Oaks Blvd location.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "suitsupply-river-oaks-district": {
     "status": "open",
-    "note": "Store is actually at West Ave shopping center (2601 Westheimer #220), not inside River Oaks District mall, though both sit in Houston's Upper Kirby/River Oaks area.",
+    "note": "",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
@@ -166,61 +166,61 @@ export const STORE_FRESHNESS: Record<string, StoreFreshness> = {
   },
   "premium-goods": {
     "status": "open",
-    "note": "",
+    "note": "Flash sale: $25 hats now until Sunday; recently launched Adidas Campus '00 collab (Jan 2026).",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "buck-mason": {
     "status": "open",
-    "note": "Located at 906 Westheimer Rd in Montrose Collective; open Mon-Sat 11am-7pm, Sun 11am-6pm.",
+    "note": "Located at 906 Westheimer Rd, Montrose Collective; open Mon–Sat 11am–7pm, Sun 11am–6pm.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "marine-layer-rice-village": {
-    "status": "open",
-    "note": "",
-    "confidence": "high",
-    "checkedAt": "2026-08-31"
-  },
-  "manready-mercantile": {
-    "status": "open",
-    "note": "",
-    "confidence": "high",
-    "checkedAt": "2026-08-31"
-  },
-  "lucchese": {
     "status": "unclear",
     "note": "",
     "confidence": "low",
     "checkedAt": "2026-08-31"
   },
+  "manready-mercantile": {
+    "status": "open",
+    "note": "Open at 321 W 19th St; appeared at Houston Ballet Nutcracker Market 2025; site runs an online clearance sale (all discounted sales final).",
+    "confidence": "high",
+    "checkedAt": "2026-08-31"
+  },
+  "lucchese": {
+    "status": "open",
+    "note": "Highland Village store hours: Mon-Sat 10am-7pm, Sun 12pm-6pm; offers custom boot design room.",
+    "confidence": "high",
+    "checkedAt": "2026-08-31"
+  },
   "cavenders": {
     "status": "open",
-    "note": "New Copperfield store (6757 Hwy 6 N) just opened; new Katy Mills-area location opening May 1, 2026",
+    "note": "New Houston-area location opened July 2025 in Copperfield (6757 Hwy 6 N), a 23,500 sq ft former Party City space.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "tecovas-rice-village": {
     "status": "open",
-    "note": "",
+    "note": "Tecovas is running a site-wide Cyber Week sale (Nov 26–Dec 2, 2025) with markdowns on boots and accessories.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "republic-boot-co": {
     "status": "open",
-    "note": "Also operates a second location, 'Republic Wine Castle,' in Johnson City, TX alongside the Houston Heights shop.",
+    "note": "Recently bought its Heights flagship building (E. 11th & Studewood) and opened a 2nd location, 'Republic Wine Castle,' in Johnson City, TX.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "the-hat-store": {
-    "status": "unclear",
-    "note": "",
-    "confidence": "low",
+    "status": "open",
+    "note": "5587 Richmond Ave; hours Tue–Fri 10–6, Sat 10–5, closed Sun–Mon; offers custom hat shaping, cleaning, boots & belts.",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "pinto-ranch": {
     "status": "open",
-    "note": "Store briefly closed abruptly in June 2024 but reopened under new management; still active in 2025 (sponsored 2025 NFR event).",
+    "note": "Also has a second Houston-area location at Bush Intercontinental Airport (IAH), Terminal C.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
@@ -232,37 +232,37 @@ export const STORE_FRESHNESS: Record<string, StoreFreshness> = {
   },
   "johnston-murphy-galleria": {
     "status": "open",
-    "note": "Located Level 1 near Galleria Financial Center, 5061 Westheimer Rd; hours vary Mon–Sun (e.g., Sun 12–7PM).",
+    "note": "Extra 20% off select styles online with code EXTRA20 at johnstonmurphy.com",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "qc-tailors": {
     "status": "open",
-    "note": "Located at 3801 Kirby Dr Suite 100 in Upper Kirby; has operated on Kirby Dr since 1998.",
+    "note": "3801 Kirby Dr, Suite 100, Upper Kirby; serving Houston since 1998, walk-ins welcome for alterations & custom tailoring.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "warby-parker-rice-village": {
     "status": "open",
-    "note": "Currently offering 15% off when you buy 2+ prescription eyewear pairs (optical/optical, optical/sun, or sun/sun).",
+    "note": "Open daily; hours Mon-Sat 10am-7pm, Sun 12pm-6pm at 2518 University Blvd, Rice Village.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "eye-elegance": {
     "status": "open",
-    "note": "Two Houston locations (Post Oak Blvd & Montrose/Westheimer Rd); ran an End of Season Sale Sep 15–Oct 11, 2025 at Montrose Collective store",
+    "note": "Eye Elegance is an optical boutique (not menswear), with two locations: 1703 Post Oak Blvd (Galleria) and 3939 Montrose Blvd.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "kuhl-linscomb": {
-    "status": "unclear",
-    "note": "",
-    "confidence": "low",
+    "status": "open",
+    "note": "Kuhl-Linscomb is running its annual Winter Sale with up to 20% off select items, including furniture",
+    "confidence": "high",
     "checkedAt": "2026-08-31"
   },
   "zadok-jewelers": {
     "status": "open",
-    "note": "Expanded in 2021 to a 28,000 sq ft flagship on Post Oak Blvd; family-run since 1976",
+    "note": "Holiday Trunk Show Series running through December 2025 featuring jewelry/watch brands like Vhernier, Pasquale Bruni, Ondyn, Nouvel Héritage.",
     "confidence": "high",
     "checkedAt": "2026-08-31"
   }
