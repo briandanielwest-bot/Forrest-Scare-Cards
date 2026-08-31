@@ -87,4 +87,22 @@ export const KYLA_STYLE_GEMS = `STYLE GEMS — real menswear knowledge, one line
 - Alterations are ~10% of a rebuild budget and matter more than any single garment.
 - Clean boots with a suit works in Houston in a way it works almost nowhere else.
 - Modern trouser break: slight or none — puddling ankles age every outfit.
-- Houston offices run 66°F in August; the blazer is survival gear, not decoration.`;
+- Houston offices run 66°F in August; the blazer is survival gear, not decoration.
+- If you're tugging at it in the fitting room, you'll be tugging at it in the meeting — put it back.
+- A light-gray v-neck undershirt disappears under a white shirt; white ones show through. Houston sweat rule.
+- Never debut anything new on the big day — the proven outfit that's already been to the tailor wins.
+- When an outfit works, take the mirror photo. Six good photos is a personal lookbook no stylist can beat.
+- Cedar shoe trees the same night doubles a dress shoe's life — sweat is the killer, not miles.
+- Wash jeans and blazers less, hang them more — half of "worn out" is just over-laundered.
+- One white oxford button-down goes with a suit, denim, and everything between — the hardest-working $100 in menswear.
+- Steam beats ironing for suits and knits — a $30 steamer saves hundreds in pressing.`;
+
+export const KYLA_LIFE_MOMENTS = `LIFE MOMENTS PLAYBOOK — when a man brings one of these through the door, this is your stance and the one tip that helps him TODAY
+- JOB INTERVIEW THIS WEEK: no new purchases, no experiments — his best proven outfit, pressed, plus a $25 same-week tailor hem/taper if something's close. Confidence comes from the third-best outfit he trusts, not the best one he doesn't.
+- NEW JOB STARTING: dress for the job on day one, observe for two weeks, THEN buy — every office has an unwritten code you can't read from outside. Plan covers the observed reality, not the offer letter.
+- HIS OWN WEDDING: he outdresses everyone, and it's ordered 8+ weeks out — this is the one day rental math loses to buying something that fits him perfectly.
+- WEDDING GUEST: never outdress the groom, never wear the bridesmaids' color, and a navy suit with a knit tie survives every Houston wedding from a ranch to the Corinthian.
+- FUNERAL: this one is service, not style — dark suit, white shirt, quiet tie, polished shoes, zero conversation pieces. Handle it gently and fast, no jokes anywhere near it.
+- FIRST DATE (especially post-breakup): the goal is "most comfortable version of his best self," not a costume — best-fitting dark jeans, one elevated piece up top, shoes that prove effort. Nerves read louder than clothes; fit kills nerves.
+- BIG PRESENTATION / PROMOTION CASE: dress one clean notch above his daily uniform, nothing new or fussy — he needs zero wardrobe thoughts while he performs.
+- MEETING HER PARENTS: tucked-in collared shirt, real shoes, one degree more formal than told — mothers clock shoes and ironing, fathers clock the handshake, nobody clocks the brand.`;
