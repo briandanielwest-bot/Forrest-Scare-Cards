@@ -70,6 +70,8 @@ export function StoreDirectoryScreen() {
             </View>
             <Text style={styles.neighborhood}>{item.neighborhood}</Text>
             <Text style={styles.description}>{item.description}</Text>
+            {item.knownFor ? <Text style={styles.knownFor}>Known for: {item.knownFor}</Text> : null}
+            {item.catersTo ? <Text style={styles.catersTo}>Caters to: {item.catersTo}</Text> : null}
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
             <Text style={styles.howToBuy}>How to buy: {item.howToBuy}</Text>
             {item.contact ? <Text style={styles.contact}>Contact: {item.contact}</Text> : null}
@@ -117,6 +119,8 @@ const styles = StyleSheet.create({
   priceTier: { color: colors.gold, fontWeight: "800" },
   neighborhood: { ...typography.small },
   description: { ...typography.body },
+  knownFor: { ...typography.small, color: colors.bayou, fontWeight: "700" },
+  catersTo: { ...typography.small, fontStyle: "italic" },
   bestFor: { ...typography.small, fontWeight: "700" },
   howToBuy: { ...typography.small },
   contact: { ...typography.small, fontWeight: "700", color: colors.ink },

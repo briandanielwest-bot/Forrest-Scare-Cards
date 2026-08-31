@@ -42,6 +42,10 @@ export interface HoustonStore {
   website: string;
   /** Phone or booking contact, when found via live search. */
   contact?: string;
+  /** Signature items / what the store is genuinely known for. */
+  knownFor: string;
+  /** Who actually shops there — the store's real clientele. */
+  catersTo: string;
   verified: false;
 }
 
@@ -59,6 +63,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "National made-to-measure clothier with Houston-based representatives who build a personal fit file, then bring fabric books and fittings to your calendar instead of the other way around.",
     website: "https://www.tomjames.com/locations/houston",
+    knownFor: "A personal fit file plus fabric books brought to your office — suits, shirts, and reorders without a store visit.",
+    catersTo: "Busy professionals and executives who would rather never set foot in a shop.",
     verified: false,
   },
   {
@@ -74,6 +80,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Family-owned Houston menswear retailer dating to 1908 (originally Barringer-Norton). One of the city's longest-running sources for fine off-the-rack and custom clothing.",
     website: "https://nortonditto.com/",
     contact: "(713) 688-9800",
+    knownFor: "Old-Houston tailored clothing — fine suits, sport coats, and trousers with complimentary in-house tailoring, since 1908.",
+    catersTo: "Established professionals who want a traditional, relationship-driven menswear house.",
     verified: false,
   },
   {
@@ -89,6 +97,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Houston's oldest family-owned business (founded 1883), now run by the fourth generation. Makes ready-to-wear, made-to-measure, and fully bespoke shirts the traditional way — no laser cutters.",
     website: "https://hamiltonshirts.com/",
     contact: "(713) 264-8800 — call to book a shirt fitting",
+    knownFor: "Dress shirts cut from a hand-drawn paper pattern kept on file — ready-to-wear through fully bespoke, made in Houston since 1883.",
+    catersTo: "Men who've learned off-the-rack shirts never quite fit — from a first custom shirt to lifelong reorders.",
     verified: false,
   },
   {
@@ -104,6 +114,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Custom suit and shirt maker with over 60 years of combined tailoring experience behind it, known locally for a faster-than-average made-to-measure turnaround.",
     website: "https://qclothier.com/pages/houston",
     contact: "(713) 523-8333 — call to schedule a fitting",
+    knownFor: "Made-to-measure suits and shirts with one of the faster turnarounds in town and a personal-stylist experience.",
+    catersTo: "Professionals who want custom without the long wait — from first suit to full wardrobe.",
     verified: false,
   },
   {
@@ -118,6 +130,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston custom clothier with 20+ years of experience running a come-to-you model for suits, shirts, and tuxedos.",
     website: "https://www.kuffshouston.com/",
+    knownFor: "Come-to-you custom suits, shirts, and tuxedos, measured at your home or office.",
+    catersTo: "Time-pressed professionals and wedding parties.",
     verified: false,
   },
   {
@@ -132,6 +146,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description: "Family-run Houston custom tailor and luxury menswear shop operating continuously since 1989.",
     website: "https://lucho.com/",
     contact: "(832) 495-8558 — call or book online",
+    knownFor: "Family-run custom tailoring known for very fast custom-suit turnaround, plus luxury menswear in the shop.",
+    catersTo: "Men who need real custom clothing on a real deadline.",
     verified: false,
   },
   {
@@ -146,6 +162,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston made-to-measure clothier covering tailored suits, shirts, tuxedos, and casual luxury clothing including denim.",
     website: "https://billwalkerclothier.com/",
+    knownFor: "Made-to-measure tailored clothing plus casual luxury — one clothier covering suits through premium denim.",
+    catersTo: "Professionals outfitting both the office and the weekend through one trusted fitter.",
     verified: false,
   },
   {
@@ -160,6 +178,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Family-owned Houston custom clothier — three generations of tailoring experience — building custom suits, tuxedos, and wedding suits from a library of 4,000+ fabrics.",
     website: "https://www.houstonsuitguy.com/",
+    knownFor: "A 4,000+ fabric library and three generations of tailors — custom suits and wedding tuxedos.",
+    catersTo: "Grooms, wedding parties, and men who want maximum fabric choice.",
     verified: false,
   },
   {
@@ -174,6 +194,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Made-to-measure suiting showroom on the Galleria's first floor — suits starting around $399, measured in person by a stylist and cut to your dimensions. Not bespoke, but real custom fit at a fraction of traditional pricing.",
     website: "https://www.indochino.com/showroom/houston",
+    knownFor: "Made-to-measure suits at off-the-rack prices — measured in person by a stylist, built to your dimensions in ~3 weeks.",
+    catersTo: "First-time custom buyers and budget-conscious professionals.",
     verified: false,
   },
   {
@@ -188,6 +210,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston bespoke tailoring house blending old-school hand craftsmanship with modern precision for custom suits, tuxedos, and shirts.",
     website: "https://bzachclothier.com/",
+    knownFor: "Old-school hand-cut bespoke construction — the full multi-fitting process, not just made-to-measure.",
+    catersTo: "Purists who want true bespoke craftsmanship.",
     verified: false,
   },
   {
@@ -203,6 +227,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Family-owned luxury menswear store on Post Oak Blvd since 1993, working in fabrics from Zegna, Loro Piana, and Scabal across off-the-rack, made-to-measure, and bespoke suits plus tuxedos.",
     website: "https://festariformen.com/",
     contact: "(713) 626-1234 — appointments via festariformen.com/appointment",
+    knownFor: "Luxury suiting in Zegna, Loro Piana, and Scabal cloths — off-the-rack through bespoke, plus tuxedos.",
+    catersTo: "Executives and gala-goers shopping the Post Oak corridor.",
     verified: false,
   },
 
@@ -220,6 +246,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Houston's most storied high-end menswear retailer, running since the early 1900s. Carries designer suits, sportswear, and dress furnishings, with a strong made-to-measure program.",
     website: "https://www.mpenner.com/",
     contact: "(713) 527-8200",
+    knownFor: "Houston's storied independent luxury shop — curated designer tailoring and sportswear with real stylists and made-to-measure.",
+    catersTo: "Men who want a relationship with one great shop instead of a mall.",
     verified: false,
   },
   {
@@ -234,6 +262,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Full-line Neiman Marcus flagship inside the Galleria complex, carrying men's designer clothing, shoes, and accessories from top international labels.",
     website: "https://www.neimanmarcus.com/stores/houston/tx/houston+-+galleria",
+    knownFor: "Top international designer collections across clothing, shoes, and accessories, with free personal shoppers.",
+    catersTo: "Designer-label shoppers who want the full houses under one roof.",
     verified: false,
   },
   {
@@ -248,6 +278,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Full-line luxury department store with a strong men's designer offering inside the Galleria mall complex.",
     website: "https://www.saksfifthavenue.com/locations/houston/",
+    knownFor: "A broad designer menswear floor with deep seasonal markdowns.",
+    catersTo: "Label-conscious shoppers who also love a sale rack.",
     verified: false,
   },
   {
@@ -262,6 +294,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "The most forgiving on-ramp of the Galleria luxury stores — contemporary and designer menswear side by side, with alterations included on many purchases.",
     website: "https://www.nordstrom.com/store-details/united-states/tx/houston/nordstrom-houston-galleria",
+    knownFor: "The wear-to-work through designer range with free alterations and famously easy returns.",
+    catersTo: "Men still dialing in their fit — the lowest-risk place in Houston to experiment.",
     verified: false,
   },
   {
@@ -276,6 +310,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Italian fashion house boutique with two Houston locations, carrying luxury suiting, outerwear, and accessories from one of menswear's most respected names.",
     website: "https://www.zegna.com/us-en/store-locator/store-detail/united-states/houston/5015-westheimer-rd-ste-a3166.424/",
+    knownFor: "Benchmark Italian suiting and refined casualwear, with in-store made-to-measure.",
+    catersTo: "Executives investing in top-tier Italian tailoring.",
     verified: false,
   },
   {
@@ -290,6 +326,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Storied Italian luxury house known for exquisite ready-to-wear and bespoke men's tailoring, with a boutique in the River Oaks District.",
     website: "https://www.brioni.com/",
+    knownFor: "Hand-tailored Italian luxury — among the finest ready-to-wear suits made anywhere, plus bespoke service.",
+    catersTo: "The very top of the budget range — C-suite and special-occasion dressing.",
     verified: false,
   },
 
@@ -305,6 +343,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Italian luxury house boutique in the River Oaks District specializing in refined, understated tailoring and cashmere for the modern gentleman.",
     website: "https://www.riveroaksdistrict.com/brunello-cucinelli",
+    knownFor: "Quiet-luxury cashmere, unstructured tailoring, and refined casual — logo-free elegance.",
+    catersTo: "Understated luxury buyers who want quality whispered, not shouted.",
     verified: false,
   },
   {
@@ -320,6 +360,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Two-story Hermès flagship in the River Oaks District spanning all sixteen of the house's métiers — men's ready-to-wear, ties, belts, small leather goods, and footwear included. In Houston since 1988.",
     website: "https://www.hermes.com/us/en/find-store/united-states/houston/hermes-houston-5HWTEY0C/",
     contact: "(713) 623-2177",
+    knownFor: "Ties, belts, and small leather goods that outlast and outclass everything else — all sixteen métiers on two floors.",
+    catersTo: "Accessory-first luxury buyers and collectors.",
     verified: false,
   },
   {
@@ -334,6 +376,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Dedicated Louis Vuitton men's boutique inside the Galleria carrying ready-to-wear, leather goods, shoes, watches, and accessories, with in-store personalization.",
     website: "https://us.louisvuitton.com/eng-us/point-of-sale/usa/louis-vuitton-houston-mens",
+    knownFor: "Leather goods, sneakers, and ready-to-wear from fashion's biggest house, with hot-stamp personalization.",
+    catersTo: "Fashion-forward shoppers and statement-piece buyers.",
     verified: false,
   },
 
@@ -350,6 +394,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Modern formalwear company with a Galleria-area showroom — rent or buy tuxedos and suits online after trying on your exact size in person.",
     website: "https://theblacktux.com/pages/showroom/houston-galleria",
+    knownFor: "Modern-cut tuxedo and suit rental or purchase, with try-before-you-order showroom fittings.",
+    catersTo: "Grooms and gala-goers — especially outfitting a wedding party across cities.",
     verified: false,
   },
   {
@@ -364,6 +410,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston-headquartered formalwear chain renting and selling tuxedos across multiple Texas locations — a long-running local name for prom, wedding, and black-tie rentals.",
     website: "https://www.alsformalwears.com/",
+    knownFor: "Walk-in tuxedo rental at the budget end, with locations all over greater Houston.",
+    catersTo: "Prom, quinceañera, and wedding parties keeping costs down.",
     verified: false,
   },
 
@@ -380,6 +428,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Dedicated big & tall menswear retailer with a Houston storefront carrying sizes up to 8X and waist 72, spanning everyday, business, and dress categories.",
     website: "https://stores.dxl.com/us/tx/houston/5393-westheimer-road",
+    knownFor: "A genuine big & tall range — up to 8X and a 72-inch waist — across casual through dress.",
+    catersTo: "Big & tall men tired of settling for whatever fits at standard stores.",
     verified: false,
   },
 
@@ -397,6 +447,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Atlanta-born menswear shop beloved by style editors nationwide, with its Houston store at River Oaks Blvd and Westheimer. Own-label tailored and casual clothing, a curated shoe wall, made-to-measure, and an in-house tailor.",
     website: "https://shopmashburn.com/blogs/sid-mashburn-locations/houston-tx",
     contact: "(713) 936-9502",
+    knownFor: "The 'effortless but correct' wardrobe in one store — own-label tailoring, five-pocket pants, knits, and a curated shoe wall, with famously hands-on staff.",
+    catersTo: "Men who want one tasteful store to dress them head to toe.",
     verified: false,
   },
   {
@@ -411,6 +463,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "European-owned suiting shop with a sharper, more fashion-forward cut than the traditional Houston houses. Good middle rung between department-store suits and full custom.",
     website: "https://suitsupply.com/en-us/stores/houston",
+    knownFor: "Sharp, slim European tailoring in Italian fabrics at mid prices, with same-visit in-house alterations.",
+    catersTo: "Young professionals and modern dressers stepping up from mall suits.",
     verified: false,
   },
   {
@@ -425,6 +479,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Contemporary menswear boutique carrying designer casualwear and denim (brands like Diesel and John Varvatos), sister shop to Q Clothier.",
     website: "https://rye51.com/pages/houston",
+    knownFor: "Contemporary designer casualwear and denim, one door from Q Clothier's custom side.",
+    catersTo: "The off-duty wardrobe of a custom-suit customer.",
     verified: false,
   },
   {
@@ -439,6 +495,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston sneaker and streetwear boutique running since 2004, carrying everything from classic silhouettes to limited-edition releases alongside curated streetwear.",
     website: "https://premiumgoods.com/",
+    knownFor: "Houston sneaker culture since 2004 — classic silhouettes through limited releases, plus curated streetwear.",
+    catersTo: "Sneakerheads and casual-first dressers.",
     verified: false,
   },
   {
@@ -453,6 +511,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Los Angeles menswear brand's Houston store in Montrose Collective — premium t-shirts, denim, sweats, and cashmere with a clean, masculine, no-logo aesthetic.",
     website: "https://www.buckmason.com/",
+    knownFor: "Elevated no-logo basics — premium tees, denim, sweats, and cashmere with a clean masculine cut.",
+    catersTo: "Minimalists building a quality casual foundation.",
     verified: false,
   },
   {
@@ -467,6 +527,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "San Francisco brand's Rice Village shop specializing in extremely soft re-spun cotton tees, casual button-downs, and light layers — well matched to Houston's climate.",
     website: "https://www.marinelayer.com/",
+    knownFor: "Absurdly soft re-spun cotton tees, button-downs, and light layers built for heat.",
+    catersTo: "Comfort-first weekend dressers in the Houston climate.",
     verified: false,
   },
   {
@@ -481,6 +543,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Heights neighborhood general-goods shop for men — clothing, shoes, accessories, grooming, and home goods, mixing new pieces with vintage finds from the owners' travels.",
     website: "https://manready.com/",
+    knownFor: "A Heights general store for men — clothing, grooming, leather goods, candles, and vintage finds.",
+    catersTo: "Gift shoppers and guys furnishing a masculine everyday kit.",
     verified: false,
   },
 
@@ -497,6 +561,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Iconic American bootmaker founded in 1883, with a Houston boutique carrying exotic and classic leather boots plus belts and small leather goods.",
     website: "https://www.lucchese.com/",
+    knownFor: "Handmade boots since 1883 — classic and exotic leathers, with custom programs for exact fit.",
+    catersTo: "The buy-once-cry-once boot buyer.",
     verified: false,
   },
   {
@@ -511,6 +577,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "The accessible end of Houston Western wear: boots and denim from Ariat, Justin, Lucchese, and more, without bespoke pricing. Multiple locations across greater Houston.",
     website: "https://www.cavenders.com/",
+    knownFor: "Wide-range western basics — Ariat, Justin, Lucchese and more — at real-world prices.",
+    catersTo: "Practical western wear and rodeo-season outfitting.",
     verified: false,
   },
   {
@@ -526,6 +594,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Austin-born direct-to-consumer bootmaker's Rice Village store — handmade western boots, jeans, and leather goods at a sharply lower price than heritage bootmakers, with real in-store fitting.",
     website: "https://www.tecovas.com/stores/houston-tx-rice-village",
     contact: "(832) 481-7020",
+    knownFor: "Handmade western boots at direct-to-consumer prices, with a friendly first-boot fitting experience.",
+    catersTo: "First-time boot buyers and modern western-wear fans.",
     verified: false,
   },
   {
@@ -541,6 +611,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "One of the last true on-site custom bootmakers in Houston — third-generation craftsmen in the Heights building roughly ten pairs a week by hand on century-old equipment, with work guaranteed for life.",
     website: "https://republicboothouston.com/",
     contact: "(832) 767-6586",
+    knownFor: "Fully custom cowboy boots built by hand in Houston by third-generation makers — guaranteed for life.",
+    catersTo: "Serious boot people who want one-of-one, made for their foot.",
     verified: false,
   },
   {
@@ -556,6 +628,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Houston institution dating to 1915 and the city's last true custom hat shop — western hats, fedoras, and dress hats shaped and fitted in-house, plus custom belts and buckles.",
     website: "https://www.thehatstore.com/",
     contact: "(713) 780-2480",
+    knownFor: "Custom hats shaped to your head on the spot — western and dress — since 1915.",
+    catersTo: "Anyone serious about a hat that genuinely fits.",
     verified: false,
   },
   {
@@ -570,6 +644,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Upscale Western apparel retailer known for handmade boots and a curated selection of high-end western wear, hats, and jewelry.",
     website: "https://pintoranch.com/",
+    knownFor: "High-end western fashion — handmade boots, custom hat shaping, and dress-western for Texas-formal events.",
+    catersTo: "Rodeo galas and the dressed-up end of western wear.",
     verified: false,
   },
 
@@ -586,6 +662,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Classic American shoemaker's Houston storefront — oxfords, derbies, and loafers built to be resoled rather than replaced.",
     website: "https://www.allenedmonds.com/stores/tx/houston/77098/lamar-river-oaks-39116",
+    knownFor: "Recraftable Goodyear-welted dress shoes — resoled for a decade-plus of service.",
+    catersTo: "Professionals buying shoes as a long-term investment.",
     verified: false,
   },
 
@@ -602,6 +680,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "165-year-old American shoemaker's Galleria store carrying dress shoes, casual leather sneakers, and business-casual hybrids plus belts and small leather goods.",
     website: "https://www.johnstonmurphy.com/",
     contact: "(713) 961-0025",
+    knownFor: "Versatile business and business-casual shoes, including dress-sneaker hybrids.",
+    catersTo: "Everyday office footwear a step below premium prices.",
     verified: false,
   },
 
@@ -619,6 +699,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Upper Kirby's tailor since 1998 — a dedicated alterations and dress-work shop, the place plans in this app send you to make off-the-rack pieces fit like they were made for you.",
     website: "https://qctailors.com/",
     contact: "(713) 520-6090",
+    knownFor: "Alterations and dress work — shirt darts, trouser tapers, jacket surgery — in Upper Kirby since 1998.",
+    catersTo: "Anyone making off-the-rack clothes fit like they were made for them.",
     verified: false,
   },
 
@@ -636,6 +718,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Warby Parker's Rice Village store — in-house-designed prescription glasses and sunglasses at accessible prices, with expert frame-styling help and on-site eye exams.",
     website: "https://stores.warbyparker.com/tx/houston/2518-university-blvd",
     contact: "(832) 301-9886",
+    knownFor: "In-house designed frames from about $95, on-site eye exams, and staff who style frames to your face shape.",
+    catersTo: "Value-smart glasses wearers.",
     verified: false,
   },
   {
@@ -651,6 +735,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
       "Houston luxury optical boutique (Post Oak and Montrose locations) carrying hand-picked international designer frames — Cartier, Matsuda, and hard-to-find special editions — with premium lenses and fitting.",
     website: "https://eyeelegance.com/",
     contact: "(713) 322-5541",
+    knownFor: "Rare international designer frames — Cartier, Matsuda, special editions — fitted by real opticians.",
+    catersTo: "Statement-eyewear buyers and luxury frame collectors.",
     verified: false,
   },
 
@@ -667,6 +753,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Upscale Houston lifestyle store spanning five buildings and 100,000+ square feet — best known for home goods and gifts, but a reliable source for men's grooming and small accessories.",
     website: "https://www.kuhl-linscomb.com/",
+    knownFor: "A sprawling five-building lifestyle store — men's grooming, small leather goods, and gift-worthy accessories.",
+    catersTo: "Finishing-touch and gift shopping.",
     verified: false,
   },
   {
@@ -681,6 +769,8 @@ export const HOUSTON_STORES: HoustonStore[] = [
     description:
       "Houston luxury watch and jewelry retailer carrying brands like Cartier, Grand Seiko, Tudor, and Ulysse Nardin, including pre-owned Swiss watches.",
     website: "https://zadok.com/",
+    knownFor: "New and certified pre-owned Swiss watches — Cartier, Grand Seiko, Tudor — from a family-run Houston institution.",
+    catersTo: "The first real watch through collector-grade pieces.",
     verified: false,
   },
 ];

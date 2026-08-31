@@ -88,6 +88,8 @@ export interface HoustonStore {
   description: string;
   website: string;
   contact?: string;
+  knownFor?: string;
+  catersTo?: string;
 }
 
 export interface ChatMessage {
