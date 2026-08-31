@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { loadMemory, saveMemory } from "../memoryStore";
-import { createSession, requireSession } from "../sessionStore";
+import { loadMemoryRecord, saveMemoryRecord } from "../memoryStore";
+import { createSession, requireSession, saveSession } from "../sessionStore";
 import type { StyleProfile, WardrobePlan } from "../types";
 import { track } from "../analytics";
 
@@ -9,7 +9,7 @@ export const memoryRouter = Router();
 // Save the current session's profile + plan under a claim code (or update
 // an existing code). Purchased keys come from the client, which owns
 // check-off state.
-memoryRouter.post("/save", (req, res, next) => {
+memoryRouter.post("/save", async (req, res, next) => {
   try {
     const { sessionId, purchasedKeys, existingCode } = req.body as {
       sessionId?: string;
@@ -19,12 +19,12 @@ memoryRouter.post("/save", (req, res, next) => {
     if (!sessionId) return res.status(400).json({ error: "sessionId is required" });
     let session;
     try {
-      session = requireSession(sessionId);
+      session = await requireSession(sessionId);
     } catch {
       return res.status(404).json({ error: "This session has expired — the plan on your screen can still be copied" });
     }
     if (!session.wardrobePlan) return res.status(409).json({ error: "Nothing to save yet — finish a plan first" });
-    const record = saveMemory({
+    const record = await saveMemoryRecord({
       styleProfile: session.styleProfile ?? null,
       wardrobePlan: session.wardrobePlan,
       purchasedKeys: Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
@@ -42,11 +42,11 @@ memoryRouter.post("/save", (req, res, next) => {
 
 // Restore a saved plan into a brand-new session so everything works again
 // on this device — including Kyla's plan chat.
-memoryRouter.post("/restore", (req, res, next) => {
+memoryRouter.post("/restore", async (req, res, next) => {
   try {
     const { code } = req.body as { code?: string };
     if (!code?.trim()) return res.status(400).json({ error: "code is required" });
-    const record = loadMemory(code);
+    const record = await loadMemoryRecord(code);
     if (!record || !record.wardrobePlan) {
       return res.status(404).json({ error: "No saved plan under that code — check the dashes and try again" });
     }
@@ -60,6 +60,7 @@ memoryRouter.post("/restore", (req, res, next) => {
     session.photoAssessment = record.photoAssessment;
     session.planQAHistory = record.planQAHistory;
     session.outfits = record.outfits;
+    saveSession(session);
     track("plan_restored");
     res.json({
       sessionId: session.id,

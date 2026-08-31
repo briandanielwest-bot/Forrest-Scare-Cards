@@ -3,8 +3,8 @@ import { requireSession } from "../sessionStore";
 
 export const sessionRouter = Router();
 
-sessionRouter.get("/:id", (req, res) => {
-  const session = requireSession(req.params.id);
+sessionRouter.get("/:id", async (req, res) => {
+  const session = await requireSession(req.params.id);
   res.json({
     id: session.id,
     interviewComplete: session.interviewComplete,

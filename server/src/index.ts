@@ -13,6 +13,7 @@ import { sessionRouter } from "./routes/session";
 import { almanacRouter } from "./routes/almanac";
 import { memoryRouter } from "./routes/memory";
 import { readStats } from "./analytics";
+import { initDb, pruneOldSessions } from "./db";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
@@ -76,6 +77,11 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Bayou & Blazer server listening on http://localhost:${PORT}`);
+  // Storage comes up after the port so a database hiccup can never stop
+  // the app from serving — it just falls back to memory and disk.
+  await initDb();
+  void pruneOldSessions();
+  setInterval(() => void pruneOldSessions(), 6 * 60 * 60 * 1000);
 });

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { requireSession } from "../sessionStore";
+import { requireSession, saveSession } from "../sessionStore";
 import { analyzePhotos } from "../agents/photoAnalyst";
 import type { UploadedImage } from "../types";
 
@@ -20,7 +20,7 @@ const upload = multer({
 
 export const photoRouter = Router();
 
-photoRouter.post("/analyze", upload.array("photos", 12), (req, res, next) => {
+photoRouter.post("/analyze", upload.array("photos", 12), async (req, res, next) => {
   try {
     const { sessionId } = req.body as { sessionId?: string };
     const files = req.files as Express.Multer.File[] | undefined;
@@ -32,7 +32,7 @@ photoRouter.post("/analyze", upload.array("photos", 12), (req, res, next) => {
       return res.status(400).json({ error: "At least one photo is required" });
     }
 
-    const session = requireSession(sessionId);
+    const session = await requireSession(sessionId);
 
     const totalBytes = files.reduce((sum, f) => sum + f.size, 0);
     console.log(`[photo] ${files.length} file(s), ${(totalBytes / 1024).toFixed(0)} KB total — analyzing in background`);
@@ -53,6 +53,7 @@ photoRouter.post("/analyze", upload.array("photos", 12), (req, res, next) => {
       .then((assessment) => {
         session.photoAssessment = assessment;
         session.photoStatus = "done";
+        saveSession(session);
         console.log(`[photo] analysis done in ${((Date.now() - startedAt) / 1000).toFixed(1)}s`);
       })
       .catch((err) => {

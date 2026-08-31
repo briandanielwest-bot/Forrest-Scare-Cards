@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSession, requireSession } from "../sessionStore";
+import { createSession, requireSession, saveSession } from "../sessionStore";
 import { continueInterview, continueInterviewStreaming, startInterview } from "../agents/interviewer";
 import { prewarmScouts } from "../agents/orchestrator";
 import { track } from "../analytics";
@@ -11,6 +11,7 @@ interviewRouter.post("/start", async (_req, res, next) => {
     const session = createSession();
     track("interview_started");
     const result = await startInterview(session);
+    saveSession(session);
     res.json({ sessionId: session.id, reply: result.reply, done: result.done, quickReplies: result.quickReplies });
   } catch (err) {
     next(err);
@@ -27,7 +28,7 @@ interviewRouter.post("/message/stream", async (req, res) => {
   }
   let session;
   try {
-    session = requireSession(sessionId);
+    session = await requireSession(sessionId);
   } catch {
     return res.status(404).json({ error: "Session not found" });
   }
@@ -50,6 +51,7 @@ interviewRouter.post("/message/stream", async (req, res) => {
       track("interview_completed", { budget: result.profile.budgetTotalUsd });
       prewarmScouts(session);
     }
+    saveSession(session);
     send({
       final: {
         reply: result.reply,
@@ -72,7 +74,7 @@ interviewRouter.post("/message", async (req, res, next) => {
       return res.status(400).json({ error: "sessionId and message are required" });
     }
 
-    const session = requireSession(sessionId);
+    const session = await requireSession(sessionId);
     if (session.interviewComplete) {
       return res.status(409).json({ error: "Interview already complete for this session" });
     }
@@ -86,6 +88,7 @@ interviewRouter.post("/message", async (req, res, next) => {
       // profile is final, while he's still on the photo screen.
       prewarmScouts(session);
     }
+    saveSession(session);
 
     res.json({
       reply: result.reply,
