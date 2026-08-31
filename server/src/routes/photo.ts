@@ -34,6 +34,9 @@ photoRouter.post("/analyze", upload.array("photos", 12), async (req, res, next) 
 
     const session = requireSession(sessionId);
 
+    const totalBytes = files.reduce((sum, f) => sum + f.size, 0);
+    console.log(`[photo] ${files.length} file(s), ${(totalBytes / 1024).toFixed(0)} KB total`);
+
     const images: UploadedImage[] = files.map((f) => ({
       mediaType: f.mimetype as UploadedImage["mediaType"],
       base64Data: f.buffer.toString("base64"),
