@@ -122,8 +122,6 @@ export function WelcomeScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        <AskCampbell />
-
         <View style={styles.card}>
           <Text style={styles.cardTitle}>What you walk out with</Text>
           <Bullet text="A rebuild in phases, priced in real dollars against your budget, down to the alterations line." />
@@ -148,15 +146,22 @@ export function WelcomeScreen({ navigation }: Props) {
           />
         </View>
 
-        <Pressable style={styles.staplesCard} onPress={() => navigation.navigate("Staples")}>
-          <Text style={styles.staplesKicker}>FREE. NO INTERVIEW NEEDED.</Text>
-          <Text style={styles.staplesTitle}>Kyla's Starter Staples</Text>
-          <Text style={styles.staplesText}>
-            Pick your industry and where you are in your career. Kyla names the two pieces she'd have you buy first,
-            where to get them, and what they run. Nothing to fill out.
-          </Text>
-          <Text style={styles.staplesLink}>Browse the staples →</Text>
-        </Pressable>
+        <View style={styles.freeSection}>
+          <Text style={styles.freeSectionTitle}>Free, right now</Text>
+          <Text style={styles.freeSectionSub}>No interview, no sign-up. Take what's useful and go.</Text>
+
+          <Pressable style={styles.staplesCard} onPress={() => navigation.navigate("Staples")}>
+            <Text style={styles.staplesKicker}>KYLA'S PICKS</Text>
+            <Text style={styles.staplesTitle}>Starter Staples</Text>
+            <Text style={styles.staplesText}>
+              Pick your industry and where you are in your career. Kyla names the two pieces she'd have you buy
+              first, where to get them, and what they run. Nothing to fill out.
+            </Text>
+            <Text style={styles.staplesLink}>Browse the staples →</Text>
+          </Pressable>
+
+          <AskCampbell />
+        </View>
 
         <View style={styles.teamCard}>
           <Text style={styles.teamTitle}>Meet the team</Text>
@@ -267,6 +272,9 @@ const styles = StyleSheet.create({
   },
   stepBadgeText: { color: colors.cream, fontWeight: "700", fontSize: 12 },
   stepText: { ...typography.body, flex: 1 },
+  freeSection: { gap: spacing.sm, marginBottom: spacing.sm },
+  freeSectionTitle: { ...typography.title, fontSize: 20, color: colors.cream },
+  freeSectionSub: { ...typography.small, color: colors.cream, opacity: 0.75, marginTop: -4, marginBottom: 2 },
   staplesCard: {
     backgroundColor: colors.gold,
     borderRadius: radii.lg,
