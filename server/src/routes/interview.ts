@@ -2,12 +2,14 @@ import { Router } from "express";
 import { createSession, requireSession } from "../sessionStore";
 import { continueInterview, continueInterviewStreaming, startInterview } from "../agents/interviewer";
 import { prewarmScouts } from "../agents/orchestrator";
+import { track } from "../analytics";
 
 export const interviewRouter = Router();
 
 interviewRouter.post("/start", async (_req, res, next) => {
   try {
     const session = createSession();
+    track("interview_started");
     const result = await startInterview(session);
     res.json({ sessionId: session.id, reply: result.reply, done: result.done, quickReplies: result.quickReplies });
   } catch (err) {
@@ -45,6 +47,7 @@ interviewRouter.post("/message/stream", async (req, res) => {
     if (result.profile) {
       session.styleProfile = result.profile;
       session.interviewComplete = true;
+      track("interview_completed", { budget: result.profile.budgetTotalUsd });
       prewarmScouts(session);
     }
     send({
@@ -78,6 +81,7 @@ interviewRouter.post("/message", async (req, res, next) => {
     if (result.profile) {
       session.styleProfile = result.profile;
       session.interviewComplete = true;
+      track("interview_completed", { budget: result.profile.budgetTotalUsd });
       // Fire-and-forget: the buying team starts working the moment the
       // profile is final, while he's still on the photo screen.
       prewarmScouts(session);

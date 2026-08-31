@@ -33,6 +33,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();
   const [error, setError] = useState<string | null>(null);
   const [memberIndex, setMemberIndex] = useState(0);
+  const [draftedPhases, setDraftedPhases] = useState<string[]>([]);
   const startedAtRef = useRef(Date.now());
 
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -57,6 +58,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
       try {
         const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
+        if (result.draftedPhases?.length) setDraftedPhases(result.draftedPhases);
 
         if (result.status === "done" && result.plan) {
           setWardrobePlan(result.plan);
@@ -120,10 +122,21 @@ export function GeneratingPlanScreen({ navigation }: Props) {
               <Text style={styles.memberDuty}>{member.duty}</Text>
             </View>
 
-            <Text style={styles.valueLine}>
-              Usually about a minute. The wait is real work: eight experts reading your profile against 40+ vetted
-              Houston stores, matching every piece to your budget, your build, and this city's calendar.
-            </Text>
+            {draftedPhases.length > 0 ? (
+              <View style={styles.draftBox}>
+                <Text style={styles.draftLabel}>MOON'S DRAFT, LIVE</Text>
+                {draftedPhases.map((name, i) => (
+                  <Text key={i} style={styles.draftLine}>
+                    ✓ {name}
+                  </Text>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.valueLine}>
+                Usually about a minute. The wait is real work: eight experts reading your profile against 40+ vetted
+                Houston stores, matching every piece to your budget, your build, and this city's calendar.
+              </Text>
+            )}
           </>
         )}
       </View>
@@ -151,6 +164,9 @@ const styles = StyleSheet.create({
   memberTitle: { color: colors.gold, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 },
   memberDuty: { ...typography.body, color: colors.cream, opacity: 0.9, textAlign: "center", marginTop: spacing.xs },
   valueLine: { ...typography.small, color: colors.cream, opacity: 0.65, textAlign: "center", paddingHorizontal: spacing.md },
+  draftBox: { alignSelf: "stretch", backgroundColor: "rgba(255,255,255,0.06)", borderRadius: radii.md, padding: spacing.md, gap: 4 },
+  draftLabel: { color: colors.gold, fontSize: 10, fontWeight: "800", letterSpacing: 1.2, marginBottom: 2 },
+  draftLine: { ...typography.small, color: colors.cream, opacity: 0.9 },
   error: { color: "#FFD9CE", textAlign: "center", fontSize: 16 },
   retry: { color: colors.gold, textAlign: "center", marginTop: spacing.md, fontWeight: "700" },
 });

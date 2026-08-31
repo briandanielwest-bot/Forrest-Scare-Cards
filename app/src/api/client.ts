@@ -134,7 +134,13 @@ export function startPlanGeneration(sessionId: string) {
 }
 
 export function getPlanStatus(sessionId: string) {
-  return request<{ status: PlanStatus; stage?: "scouts" | "planner"; plan?: WardrobePlan; error?: string }>(`/api/plan/${sessionId}`);
+  return request<{
+    status: PlanStatus;
+    stage?: "scouts" | "planner";
+    draftedPhases?: string[];
+    plan?: WardrobePlan;
+    error?: string;
+  }>(`/api/plan/${sessionId}`);
 }
 
 export function fetchStores() {

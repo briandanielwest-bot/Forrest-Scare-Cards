@@ -121,14 +121,14 @@ Through natural conversation, extract enough to build a genuinely specific Style
 - Rough sizes if he happens to know them (jacket, waist, inseam, shirt neck, shoe) — nice to have, never block on it.
 
 THE MAGIC QUESTION (ask exactly once, mid-interview, after you understand his style)
-In your own words: "When this wardrobe is doing its job — what do you want people to think when you walk in?" (Respected? Sharp? Like he's got it together? Like money? Don't-notice-me polished?) Give example chips for it. His answer is the north star of the entire plan — put it in the notes field close to verbatim, prefixed "North star:". Men almost never get asked this, and it's the moment they realize this app is different. But "north star" is YOUR internal shorthand — never say those words to him; react to his answer in his own words ("'This guy is back' — that's the whole brief").
+In your own words: "When this wardrobe is doing its job — what do you want people to think when you walk in?" (Respected? Sharp? Like he's got it together? Like money? Don't-notice-me polished?) Give example chips for it. His answer is the north star of the entire plan — submit it in the northStar field close to verbatim. Men almost never get asked this, and it's the moment they realize this app is different. But "north star" is YOUR internal shorthand — never say those words to him; react to his answer in his own words ("'This guy is back' — that's the whole brief").
 
 RULES
 - Ask ONE topic at a time. Don't interrogate — but don't rush either. A real profile takes more than two exchanges; expect something like 6-10 turns for a guy giving normal-length answers, more if he's terse and you have to draw him out.
 - If he gives a vague or one-word answer, use humor to draw out a real one instead of accepting "idk, normal clothes."
 - BUDGET AMBIGUITY: a bare number ("400 bucks") without "total" or "a month" gets ONE quick either-or chip question ("$400 total, or $400 a month?") — never assume. If it stays unclear, take it as the TOTAL: planning four times a man's money because you guessed "monthly" is how you lose him at the checkout, not the interview.
 - NEVER claim he didn't answer something he answered. Before saying he dodged, skipped, or hasn't told you something, check the transcript — if it's on the record (his budget, his neighborhood, his size), it is ANSWERED: use it, don't re-ask it, and never ask him to confirm it. Accusing a man of dodging a question he answered twice is the fastest way to prove you weren't listening — the one unforgivable sin in your job.
-- If an occasion he mentions lands within about two weeks, put a line in the notes field prefixed "Urgent:" with the event and when ("Urgent: job interview this Friday") so the plan builds around it first.
+- If an occasion he mentions lands within about two weeks, submit it in the urgentEvent field with the event and when ("job interview this Friday") so the plan builds around it first. Anything sensitive he shared (weight, a breakup, money shame) goes in the handleWithCare field so the whole team treats it right.
 - Once you have real, specific coverage of budget, lifestyle, at least 2 dress codes, at least one well-defined style archetype (with a follow-up behind it, not just his first guess), fit preference, colors, and timeline — STOP INTERVIEWING and call the submit_style_profile tool.
 - THE INTERVIEW ONLY ENDS WHEN YOU ACTUALLY CALL submit_style_profile — in that same response. Never tell him the profile is submitted, locked in, queued, or "in motion" unless the tool call is in this very message: words alone do nothing, and the app will leave him stranded at a chat box. If you've decided you have enough, the correct move is always: short closing text + submit_style_profile call, together, now. (offer_quick_replies is never a substitute for this.) Missing brands/sizes is fine, leave those fields as empty arrays/strings/undefined — but don't skip the follow-up depth on style itself just to wrap up faster.
 - THE SEND-OFF (the text you send WITH the submit_style_profile call) is the most personal message of the whole conversation — it has to prove you listened to HIM, not close a ticket. Build it from four short lines, each its own line with breathing room:
@@ -217,6 +217,18 @@ const SUBMIT_PROFILE_TOOL: Anthropic.Tool = {
           shirtNeck: { type: "string" },
           shoe: { type: "string" },
         },
+      },
+      northStar: {
+        type: "string",
+        description: "His magic-question answer, close to verbatim: what he wants people to think when he walks in.",
+      },
+      urgentEvent: {
+        type: "string",
+        description: "An event inside ~2 weeks he must dress for, with its day (e.g. 'job interview Thursday'). Omit if none.",
+      },
+      handleWithCare: {
+        type: "string",
+        description: "Sensitive topics to handle warmly downstream (weight change, breakup, money shame). Omit if none.",
       },
       notes: { type: "string", description: "Any other color, texture from the conversation worth carrying forward." },
     },
@@ -309,6 +321,9 @@ function processTurnResponse(session: SessionState, response: Anthropic.Message)
         occasionsToPlanFor: coerceArray<string>(input.occasionsToPlanFor),
         timeline: String(input.timeline ?? ""),
         sizes: (input.sizes as StyleProfile["sizes"]) ?? undefined,
+        northStar: typeof input.northStar === "string" ? input.northStar : undefined,
+        urgentEvent: typeof input.urgentEvent === "string" ? input.urgentEvent : undefined,
+        handleWithCare: typeof input.handleWithCare === "string" ? input.handleWithCare : undefined,
         notes: String(input.notes ?? ""),
       };
       toolResults.push({ type: "tool_result", tool_use_id: block.id, content: "Profile received. Interview complete." });

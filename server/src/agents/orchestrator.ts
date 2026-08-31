@@ -1,6 +1,6 @@
 import type { SessionState, WardrobePlan } from "../types";
 import { getHoustonClimateStyleBrief } from "./styleWeather";
-import { runAllScouts, type ScoutReport } from "./storeScout";
+import { rerunAccessoriesWithFace, runAllScouts, type ScoutReport } from "./storeScout";
 import { buildWardrobePlan } from "./wardrobePlanner";
 
 // Scouts only need the finished profile, which is final the moment the
@@ -62,14 +62,32 @@ export async function generateWardrobePlan(session: SessionState): Promise<Wardr
     (async () => (prewarmed ? await prewarmed : null) ?? runAllScouts(session.styleProfile!, climateBrief))(),
     waitForPhotoAnalysis(session),
   ]);
+
+  // Courtesy pass: pre-warmed directors never saw the photo read. When a
+  // face read exists, give the accessories director one look at it.
+  const face = session.photoAssessment?.faceShape
+    ? `Face shape: ${session.photoAssessment.faceShape}. ${session.photoAssessment.faceGuidance ?? ""}`
+    : null;
+  if (prewarmed && face) {
+    const updated = await rerunAccessoriesWithFace(session.styleProfile, climateBrief, face);
+    if (updated) {
+      const idx = scoutReports.findIndex((r) => r.categories.some((c) => updated.categories.includes(c)));
+      if (idx >= 0) scoutReports[idx] = updated;
+      console.log("[orchestrator] accessories director re-ran with the face read");
+    }
+  }
   const tScouts = Date.now();
   console.log(`[orchestrator] scouts + photo wait: ${((tScouts - t0) / 1000).toFixed(1)}s`);
 
   session.planStage = "planner";
+  session.draftedPhases = [];
   const plan = await buildWardrobePlan({
     profile: session.styleProfile,
     photoAssessment: session.photoAssessment,
     scoutReports,
+    onPhaseName: (name) => {
+      session.draftedPhases = [...(session.draftedPhases ?? []), name];
+    },
   });
   console.log(`[orchestrator] planner: ${((Date.now() - tScouts) / 1000).toFixed(1)}s`);
 

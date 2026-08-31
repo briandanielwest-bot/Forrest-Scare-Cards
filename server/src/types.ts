@@ -15,6 +15,10 @@ export interface StyleProfile {
   brandAffinities: string[];
   occasionsToPlanFor: string[];
   timeline: string;
+  /** Typed client brief — un-droppable handoffs from the interview. */
+  northStar?: string;
+  urgentEvent?: string;
+  handleWithCare?: string;
   sizes?: {
     jacket?: string;
     waist?: string;
@@ -101,6 +105,8 @@ export interface SessionState {
   planStatus: PlanStatus;
   /** Which pipeline stage generation is in, for honest progress UI. */
   planStage?: "scouts" | "planner";
+  /** Phase names Moon has drafted so far — the live ticker. */
+  draftedPhases?: string[];
   planError?: string;
   /** Rolling post-plan Q&A history with Kyla (seeded with plan context). */
   planQAHistory?: Anthropic.MessageParam[];

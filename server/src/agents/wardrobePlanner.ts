@@ -4,6 +4,7 @@ import { AGENT_MODEL } from "../config";
 import type { ScoutReport } from "./storeScout";
 import { PRICE_AND_TIMING_REALITY } from "../data/houstonKnowledge";
 import { getHoustonClimateStyleBrief } from "./styleWeather";
+import { getAllStores } from "../data/houstonStores";
 import type { PhotoAssessment, StyleProfile, WardrobePlan } from "../types";
 
 /**
@@ -17,6 +18,7 @@ import type { PhotoAssessment, StyleProfile, WardrobePlan } from "../types";
 
 const SYSTEM_PROMPT = `You are Moon, the wardrobe planning agent inside the Bayou & Blazer men's style app — the quarterback of the operation. You are handed a man's style profile, an optional photo-based style assessment, a Houston climate/culture brief, and a set of Houston store recommendations already vetted by your buying directors — each a category expert (tailoring, designer floors, footwear, accessories). Your job is to turn all of that into ONE coherent, phased, budgeted wardrobe plan — the full game plan, called from the pocket.
 
+If the profile carries a handleWithCare field, the whole plan treats those topics warmly and factually — no jokes anywhere near them.
 VOICE: confident, energetic, a little funny, genuinely useful — a quarterback walking his guy through the game plan, not a corporate stylist deck. Light football/game-plan framing is welcome where it lands naturally (phases as quarters, the plan as a playbook, the final word as a locker-room send-off), but never at the cost of clarity, and don't force a sports metaphor into every sentence. Keep it real: name specific pieces, specific stores, specific dollar ranges.
 
 RULES
@@ -38,8 +40,8 @@ RULES
 - CONCISION IS A FEATURE — he reads this on a phone, standing in stores. Hard caps: introNarrative MAX 90 words (his situation, the promise, how the plan works — no filler); climateNotes MAX 70 words; each phase goal MAX 40 words; each item description MAX 30 words; generalBuyingTips at most 6 tips of MAX 20 words each. When a sentence isn't specific to HIM or actionable, cut it.
 - DENSITY TEST — every sentence must carry at least one of: a decision made for him, a number (price, weeks, count, temperature), or an instruction he can act on. Vibe adjectives ("elevated", "timeless", "versatile", "effortless") are banned unless tied to a concrete reason in the same sentence. Never restate his profile back to him ("as a business casual professional…") — he knows who he is; tell him what to DO about it.
 - The final word of the plan belongs to KYLA, the stylist who interviewed him — write finalPepTalk in HER voice, not yours: 3-4 sentences MAX (under 55 words), warm, bossy, funny, personal — her sharpest callback from his profile, one concrete first move, and a confident send-off ("Go. And send me the fitting-room mirror pic."). No football framing in this one field — it's her sign-off, and it's the last thing he reads.
-- If the profile notes carry a "North star:" line — what he wants people to think when he walks in — it outranks everything stylistic: open the intro narrative from what HE wants people to think, let it settle close calls between items, and echo it in the final sign-off. NEVER print the words "north star" anywhere in the plan — use his actual words instead; the concept is internal machinery, not customer-facing language.
-- If the notes carry an "Urgent:" line (an event inside ~2 weeks), Phase 1 exists to win that event: only same-week-attainable pieces (in-stock + fast alterations, never made-to-measure lead times), and say plainly in that phase's goal what he should wear to the event itself — even if it's mostly clothes he already owns, dialed in by a tailor.
+- If the profile carries a northStar field (or the notes carry a "North star:" line) — what he wants people to think when he walks in — it outranks everything stylistic: open the intro narrative from what HE wants people to think, let it settle close calls between items, and echo it in the final sign-off. NEVER print the words "north star" anywhere in the plan — use his actual words instead; the concept is internal machinery, not customer-facing language.
+- If the profile carries an urgentEvent field (or the notes carry an "Urgent:" line) — an event inside ~2 weeks — Phase 1 exists to win that event: only same-week-attainable pieces (in-stock + fast alterations, never made-to-measure lead times), and say plainly in that phase's goal what he should wear to the event itself — even if it's mostly clothes he already owns, dialed in by a tailor.
 - Call submit_wardrobe_plan exactly once with the complete plan.
 
 ${PRICE_AND_TIMING_REALITY}
@@ -164,8 +166,39 @@ export async function buildWardrobePlan(args: {
   profile: StyleProfile;
   photoAssessment?: PhotoAssessment;
   scoutReports: ScoutReport[];
+  /** Called with each phase name the moment Moon writes it — powers the live drafting ticker. */
+  onPhaseName?: (name: string) => void;
 }): Promise<WardrobePlan> {
-  const { profile, photoAssessment, scoutReports } = args;
+  const { profile, photoAssessment, scoutReports, onPhaseName } = args;
+
+  // Watches the tool call's JSON as it streams and surfaces phase names as
+  // they appear. Phases are the only objects in the schema with a bare
+  // "name" key (items use itemName, budget rows use phaseName), so a
+  // simple scan is reliable — and purely cosmetic: the real plan still
+  // comes from the finished, validated message.
+  let draftBuffer = "";
+  const seenNames = new Set<string>();
+  const nameRegex = /"name"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  const watchDelta = (partialJson: string) => {
+    if (!onPhaseName) return;
+    draftBuffer += partialJson;
+    nameRegex.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = nameRegex.exec(draftBuffer)) !== null) {
+      const name = m[1].replace(/\\"/g, '"');
+      if (name && !seenNames.has(name)) {
+        seenNames.add(name);
+        onPhaseName(name);
+      }
+    }
+  };
+  const attachWatcher = (stream: { on: (ev: "streamEvent", cb: (e: Anthropic.MessageStreamEvent) => void) => unknown }) => {
+    stream.on("streamEvent", (event) => {
+      if (event.type === "content_block_delta" && event.delta.type === "input_json_delta") {
+        watchDelta(event.delta.partial_json);
+      }
+    });
+  };
 
   // The planner gets each vetted store's full profile — what it actually
   // carries, how buying there works, and its contact — so item-to-store
@@ -247,11 +280,13 @@ Build the complete wardrobe plan now.`;
       betas: ["fast-mode-2026-02-01"],
       // speed/betas aren't typed on this SDK version's stream params yet.
     } as never);
+    attachWatcher(fastStream as unknown as { on: (ev: "streamEvent", cb: (e: Anthropic.MessageStreamEvent) => void) => unknown });
     response = (await fastStream.finalMessage()) as Anthropic.Message;
     console.log("[planner] fast mode");
   } catch (err) {
     console.warn(`[planner] fast mode unavailable (${(err as Error).message?.slice(0, 80)}) — standard lane`);
     const stream = anthropic.messages.stream(baseParams);
+    attachWatcher(stream);
     response = await stream.finalMessage();
   }
 
@@ -272,14 +307,14 @@ Build the complete wardrobe plan now.`;
     throw new Error("Wardrobe planner did not return a plan");
   }
 
-  return normalizeWardrobePlan(toolUse.input);
+  return normalizeWardrobePlan(toolUse.input, profile);
 }
 
 // The model occasionally emits a nested array/object field as a JSON
 // *string* inside the tool input (seen live: phases arrived stringified,
 // crashing the client's phases.map). Parse those back, then validate hard —
 // a malformed plan must become a retryable error, never a stored plan.
-function normalizeWardrobePlan(raw: unknown): WardrobePlan {
+function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePlan {
   const plan = { ...(raw as Record<string, unknown>) };
 
   const parseIfString = (v: unknown): unknown => {
@@ -336,6 +371,43 @@ function normalizeWardrobePlan(raw: unknown): WardrobePlan {
     if (phaseSum > total + 1) {
       throw new Error(
         `Wardrobe planner budget error: phases sum to $${phaseSum} against a $${total} total — retry plan generation`,
+      );
+    }
+  }
+
+  // THE INSPECTOR — deterministic checks, no model calls. Anything caught
+  // here becomes an automatic regenerate via generatePlanWithRetry instead
+  // of a defect a customer sees.
+  const allPhases = plan.phases as { name?: string; items?: Record<string, unknown>[] }[];
+  const validIds = new Set(getAllStores().map((st) => st.id));
+  const banned = (profile?.colorsToAvoid ?? [])
+    .map((c) => String(c).trim().toLowerCase())
+    .filter((c) => c.length > 2);
+  for (const phase of allPhases) {
+    for (const item of phase.items ?? []) {
+      const ids = (item.recommendedStoreIds as string[]) ?? [];
+      const unknownIds = ids.filter((id) => !validIds.has(id));
+      if (unknownIds.length > 0) {
+        throw new Error(`Plan referenced unknown store id(s) ${unknownIds.join(", ")} — retry plan generation`);
+      }
+      const nameText = String(item.itemName ?? "").toLowerCase();
+      for (const color of banned) {
+        if (new RegExp("\\b" + color + "\\b").test(nameText)) {
+          throw new Error(
+            'Plan put a banned color ("' + color + '") in item "' + item.itemName + '" — retry plan generation',
+          );
+        }
+      }
+    }
+  }
+  // One-time budgets can't quietly grow: a plan totaling well beyond the
+  // stated number is the "$400 became $1,600" failure, mechanically caught.
+  if (profile && profile.budgetCadence === "one-time" && Number(profile.budgetTotalUsd) > 0) {
+    const stated = Number(profile.budgetTotalUsd);
+    const planTotal = Number((plan.budgetSummary as { totalBudgetUsd?: unknown })?.totalBudgetUsd) || 0;
+    if (planTotal > stated * 1.1 + 25) {
+      throw new Error(
+        `Plan total $${planTotal} exceeds his stated one-time budget $${stated} — retry plan generation`,
       );
     }
   }
