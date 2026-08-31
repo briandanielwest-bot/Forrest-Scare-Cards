@@ -428,9 +428,25 @@ function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePl
   }
 
   if (!Array.isArray(plan.phases) || plan.phases.length === 0) {
+    // A regenerate costs a full minute of the user's wait, so say enough
+    // about the bad shape to fix the cause rather than keep paying for it.
+    const shape = Array.isArray(plan.phases)
+      ? "empty array"
+      : `${typeof plan.phases}${plan.phases === undefined ? " (absent)" : ""}`;
+    console.error(
+      `[planner] malformed phases: got ${shape}; top-level keys were [${Object.keys(plan).join(", ")}]` +
+        (typeof plan.phases === "string" ? `; first 200 chars: ${(plan.phases as string).slice(0, 200)}` : ""),
+    );
     throw new Error("Wardrobe planner returned malformed phases, retry plan generation");
   }
-  if ((plan.phases as unknown[]).some((p) => !p || typeof p !== "object" || !Array.isArray((p as any).items))) {
+  const badPhase = (plan.phases as unknown[]).findIndex(
+    (p) => !p || typeof p !== "object" || !Array.isArray((p as { items?: unknown }).items),
+  );
+  if (badPhase >= 0) {
+    const p = (plan.phases as Record<string, unknown>[])[badPhase];
+    console.error(
+      `[planner] phase ${badPhase} has no items array: items was ${typeof p?.items}; phase keys [${Object.keys(p ?? {}).join(", ")}]`,
+    );
     throw new Error("Wardrobe planner returned a phase without a valid items array, retry plan generation");
   }
 
