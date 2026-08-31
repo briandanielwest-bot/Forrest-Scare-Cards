@@ -22,7 +22,7 @@ export const HOUSTON_CALENDAR = `HOUSTON YEAR IN DRESS — month by month
 The buying rhythm: hot-weather foundation first (worn 7+ months), winter/gala capsule in Oct, rodeo-season western ahead of February, and conference tailoring (CERAWeek/OTC) ordered 6+ weeks ahead.`;
 
 export const SHOPPING_DISTRICTS = `HOUSTON SHOPPING GEOGRAPHY — cluster errands, respect the drive
-- River Oaks District (Westheimer at Willowick): Suitsupply, Hermès, Brioni, Brunello Cucinelli — with Sid Mashburn minutes away at River Oaks Blvd/Westheimer. The luxury walking cluster.
+- River Oaks District (Westheimer at Willowick): Hermès, Brioni, Brunello Cucinelli — with Sid Mashburn and Suitsupply (West Ave, Westheimer at Kirby) minutes away. The luxury walking cluster.
 - Galleria / Post Oak: Nordstrom, Neiman Marcus, Saks, Zegna, Louis Vuitton Men's, Indochino, Johnston & Murphy, The Black Tux inside or beside the mall; Festari, Pinto Ranch, Eye Elegance, Zadok on Post Oak; Hamilton Shirts and The Hat Store on Richmond. The densest one-trip zone in the city.
 - Upper Kirby / West Alabama: Q Clothier + Rye 51 (same stop), QC Tailors, Lucho, Norton Ditto, Kuhl-Linscomb. The custom-and-alterations corridor.
 - Rice Village: Tecovas, Warby Parker, Marine Layer. Casual + boots + eyewear in one walkable stop.

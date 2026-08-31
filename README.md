@@ -98,6 +98,25 @@ Either way, once it's live, set `CORS_ORIGIN` to your actual app's origin instea
 
 To upgrade this to live data, swap `getAllStores()` in that file for a call to a real source (Google Places API, Yelp Fusion API, etc.) — nothing else in the codebase needs to change, since every agent consumes stores through that one function.
 
+### Monthly self-refresh ("Ryan", the front office)
+
+The dataset re-verifies itself: `server/scripts/refresh-data.ts` uses the
+Claude API's server-side web search tool to check every store (open/closed +
+one current, shopper-useful note) and rebuild a rolling ~90-day Houston
+season brief, then writes both as generated TypeScript data files
+(`storeFreshness.ts`, `seasonBrief.ts`). A store flagged closed with high
+confidence disappears from every agent and the directory automatically; the
+current notes surface as "Right now:" lines in the directory and as
+`rightNow` intel to the scouts and planner. On its first run it caught a
+store in this very dataset that had closed permanently.
+
+`.github/workflows/refresh-data.yml` runs it on the 1st of each month and
+commits the result (Render redeploys from main automatically). Setup: add an
+`ANTHROPIC_API_KEY` repository secret (Settings → Secrets and variables →
+Actions), plus `ANTHROPIC_WORKSPACE_ID` if your key needs one. Run on demand
+with `cd server && npm run refresh:data`, or from the Actions tab
+(workflow_dispatch).
+
 ## Extending it
 
 - **More/better store data** — see above.

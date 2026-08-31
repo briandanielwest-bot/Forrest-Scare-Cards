@@ -1,0 +1,46 @@
+name: Monthly data refresh
+
+# "Ryan" — re-verifies every store and rebuilds the Houston season brief
+# with live web search, then commits the regenerated data files. Render
+# redeploys from main automatically, so the app's knowledge stays fresh
+# with zero runtime cost or latency.
+#
+# Requires repo secret ANTHROPIC_API_KEY (Settings -> Secrets and
+# variables -> Actions).
+
+on:
+  schedule:
+    - cron: "0 11 1 * *" # 1st of each month, 11:00 UTC (~6am Houston)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install server deps
+        working-directory: server
+        run: npm ci
+      - name: Run refresh
+        working-directory: server
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
+        run: npm run refresh:data
+      - name: Typecheck with fresh data
+        working-directory: server
+        run: npm run typecheck
+      - name: Commit refreshed data
+        run: |
+          git config user.name "bayou-blazer-refresh"
+          git config user.email "actions@users.noreply.github.com"
+          git add server/src/data/storeFreshness.ts server/src/data/seasonBrief.ts
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "Monthly data refresh: store freshness + season brief"
+          git push

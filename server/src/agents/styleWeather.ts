@@ -17,6 +17,7 @@ import { FAST_AGENT_MODEL } from "../config";
  */
 
 import { HOUSTON_CALENDAR, SHOPPING_DISTRICTS } from "../data/houstonKnowledge";
+import { SEASON_BRIEF, SEASON_BRIEF_DATE } from "../data/seasonBrief";
 
 export function getHoustonClimateStyleBrief(): string {
   return `HOUSTON CLIMATE & STYLE ALMANAC
@@ -42,7 +43,14 @@ SEASONAL PLANNING CUES
 
 ${HOUSTON_CALENDAR}
 
-${SHOPPING_DISTRICTS}`;
+${SHOPPING_DISTRICTS}${
+    SEASON_BRIEF
+      ? `
+
+RIGHT NOW IN HOUSTON (live-researched ${SEASON_BRIEF_DATE} — treat as current ground truth over the general calendar above):
+${SEASON_BRIEF}`
+      : ""
+  }`;
 }
 
 const ALMANAC_SYSTEM_PROMPT = `You are Campbell, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
