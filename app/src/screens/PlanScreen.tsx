@@ -223,7 +223,36 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
       {asArray<string>(item.recommendedStoreIds).length > 0 && (
         <Text style={styles.itemStores}>Where: {asArray<string>(item.recommendedStoreIds).map(storeName).join(", ")}</Text>
       )}
-      {item.buyingNotes ? (
+      {item.sayThis ? (
+        <View style={styles.scriptBox}>
+          <Text style={styles.scriptLabel}>WHAT TO SAY IN-STORE</Text>
+          <Text style={styles.sayThis}>“{cleanText(item.sayThis)}”</Text>
+          {asArray<string>(item.keySpecs).map((spec, i) => (
+            <Text key={i} style={styles.scriptText}>
+              •  {cleanText(spec)}
+            </Text>
+          ))}
+          {item.decline ? (
+            <Text style={styles.scriptText}>
+              <Text style={styles.scriptTag}>Skip: </Text>
+              {cleanText(item.decline)}
+            </Text>
+          ) : null}
+          {item.whyThisStore ? (
+            <Text style={styles.scriptText}>
+              <Text style={styles.scriptTag}>Why here: </Text>
+              {cleanText(item.whyThisStore)}
+            </Text>
+          ) : null}
+          {item.logistics ? (
+            <Text style={styles.scriptText}>
+              <Text style={styles.scriptTag}>Logistics: </Text>
+              {cleanText(item.logistics)}
+            </Text>
+          ) : null}
+        </View>
+      ) : item.buyingNotes ? (
+        // Older saved plans carry the script as one paragraph.
         <View style={styles.scriptBox}>
           <Text style={styles.scriptLabel}>WHAT TO SAY IN-STORE</Text>
           <Text style={styles.scriptText}>{cleanText(item.buyingNotes)}</Text>
@@ -268,7 +297,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   scriptLabel: { ...typography.small, color: colors.bayou, fontWeight: "800", letterSpacing: 0.5 },
-  scriptText: { ...typography.small },
+  sayThis: { ...typography.body, fontSize: 14, fontWeight: "600", color: colors.bayouDark, fontStyle: "italic" },
+  scriptTag: { fontWeight: "800", color: colors.bayou },
+  scriptText: { ...typography.small, lineHeight: 17 },
   runCard: { backgroundColor: colors.blazerNavy, borderRadius: radii.lg, padding: spacing.md, gap: spacing.sm },
   runHeader: { color: colors.cream, fontSize: 20, fontWeight: "800" },
   runSubheader: { color: colors.cream, opacity: 0.8, fontSize: 13, lineHeight: 18, marginBottom: spacing.xs },

@@ -51,7 +51,14 @@ export interface WardrobeItem {
   estimatedBudgetHighUsd: number;
   priority: StorePriority;
   recommendedStoreIds: string[];
-  buyingNotes: string;
+  /** Structured in-store script (current plans). */
+  sayThis?: string;
+  keySpecs?: string[];
+  decline?: string;
+  whyThisStore?: string;
+  logistics?: string;
+  /** Legacy single-blob script from older stored plans. */
+  buyingNotes?: string;
 }
 
 export interface WardrobePhase {
