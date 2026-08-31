@@ -19,6 +19,7 @@ import * as fs from "fs";
 import * as path from "path";
 import Anthropic from "@anthropic-ai/sdk";
 import { HOUSTON_STORES } from "../src/data/houstonStores";
+import { STORE_SOCIAL as EXISTING } from "../src/data/storeSocial";
 
 const anthropic = new Anthropic();
 const MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
@@ -106,15 +107,37 @@ Answer ONLY this JSON:
 }
 
 async function main() {
-  console.log(`[social] finding profiles for ${HOUSTON_STORES.length} stores…`);
-  const social: Record<string, StoreSocial> = {};
-  const results = await pool(HOUSTON_STORES, 4, async (store) => {
+  // Resume by default. The first full run burned the account's credits at
+  // store 16 of 43, and without this a retry would pay all over again for
+  // the ones already found. Pass --force to re-check everything.
+  const force = process.argv.includes("--force");
+  const social: Record<string, StoreSocial> = force ? {} : { ...EXISTING };
+  const todo = force ? [...HOUSTON_STORES] : HOUSTON_STORES.filter((st) => !social[st.id]);
+  console.log(
+    `[social] finding profiles for ${todo.length} store(s)` +
+      (force ? " (--force: re-checking all)" : `, ${Object.keys(social).length} already on file`),
+  );
+  if (todo.length === 0) {
+    console.log("[social] nothing to do. Pass --force to re-check every store.");
+    return;
+  }
+  let outOfCredit = false;
+  const results = await pool(todo, 4, async (store) => {
+    if (outOfCredit) return [store.id, {} as StoreSocial] as const;
     try {
       const s = await findSocial(store);
       console.log(`  ${store.id}: ${s.instagram ? "@" + s.instagram : "no IG"}${s.facebook ? " + FB" : ""}`);
       return [store.id, s] as const;
     } catch (err) {
-      console.warn(`  ${store.id}: FAILED (${(err as Error).message.slice(0, 60)})`);
+      const msg = (err as Error).message ?? "";
+      if (/credit balance is too low/i.test(msg)) {
+        // Every remaining store will fail the same way, and the partial
+        // results are still worth writing out.
+        if (!outOfCredit) console.error("  [social] STOPPING: the account is out of API credits. Partial results will be saved.");
+        outOfCredit = true;
+      } else {
+        console.warn(`  ${store.id}: FAILED (${msg.slice(0, 90)})`);
+      }
       return [store.id, {} as StoreSocial] as const;
     }
   });
