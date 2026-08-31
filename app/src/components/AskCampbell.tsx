@@ -31,8 +31,11 @@ export function AskCampbell() {
     try {
       const { reply } = await askCampbell(q);
       setAnswer(reply);
-    } catch {
-      setAnswer("Campbell's line is busy, try again in a minute.");
+    } catch (e) {
+      // The server sends a real reason (out of credits, session gone, rate
+      // limited). Swallowing it and blaming a busy line sent people
+      // looking for a problem that wasn't there.
+      setAnswer(e instanceof Error && e.message ? e.message : "Campbell's line is busy, try again in a minute.");
     } finally {
       setAsking(false);
     }
