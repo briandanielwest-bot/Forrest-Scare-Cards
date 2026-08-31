@@ -69,7 +69,7 @@ Website: ${store.website}
 
 Answer ONLY this JSON:
 {"status": "open" | "closed" | "unclear", "note": "<one current, shopper-useful fact if any — prioritize insider-grade intel: a sale running, a trunk show or MTM event, a service policy worth knowing (free alterations, same-day tailoring, appointment perks), a move or new location; max 180 chars; empty string if nothing notable>", "confidence": "high" | "low"}
-"closed" ONLY with clear evidence (permanently closed listing, dead business). If searches are ambiguous, use "unclear" with confidence "low". The note must be CURRENT (from search results), never generic marketing.`,
+"closed" ONLY with clear evidence (permanently closed listing, dead business). If searches are ambiguous, use "unclear" with confidence "low". The note must be CURRENT as of today's date — reject anything dated in the past (a "holiday" event months ago, last winter's sale); an empty note beats a stale one. Never generic marketing.`,
     1500,
   );
   const raw = extractJson(text) as Partial<Freshness>;
@@ -115,7 +115,11 @@ Answer ONLY this JSON:
     3000,
   );
   const raw = extractJson(text) as { brief?: string };
-  return (raw.brief ?? "").slice(0, 900);
+  const brief = (raw.brief ?? "").slice(0, 900);
+  // A failed search sometimes narrates its failure INTO the brief field —
+  // never store an apology as pricing intel.
+  if (/unavailable|unable to|please retry|rate limit|could not/i.test(brief)) return "";
+  return brief;
 }
 
 async function pool<T, R>(items: T[], size: number, fn: (t: T) => Promise<R>): Promise<R[]> {
