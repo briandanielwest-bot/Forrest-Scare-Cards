@@ -1,9 +1,9 @@
 name: CI
 
-# Typechecks both halves of the app on every push and PR to main —
-# replaces the stock "NodeJS with Webpack" template (this repo doesn't
-# use webpack), so the badge is green AND catches real mistakes before
-# Vercel/Render pick up the merge.
+# Typechecks both halves of the app on every push and PR to main, and
+# runs the house-voice check. Replaces the stock "NodeJS with Webpack"
+# template (this repo doesn't use webpack), so the badge is green AND
+# catches real mistakes before Vercel/Render pick up the merge.
 
 on:
   push:
@@ -29,3 +29,8 @@ jobs:
         run: |
           npm ci
           npx tsc --noEmit
+      # Guards the house voice: the tell detector still matching, and no
+      # em-dashes creeping back into shipped copy or the agents' prompts.
+      - name: Voice check
+        working-directory: server
+        run: npm run voice:check
