@@ -10,6 +10,15 @@ function formatWebsite(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
+function telUrl(contact: string): string | null {
+  const digits = contact.replace(/[^\d]/g, "");
+  return digits.length >= 10 ? `tel:+1${digits.slice(-10)}` : null;
+}
+
+function mapsUrl(store: { name: string; neighborhood: string }): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.name} ${store.neighborhood} Houston TX`)}`;
+}
+
 export function StoreDirectoryScreen() {
   const { stores, setStores, categoryLabels, setCategoryLabels } = useAppContext();
   const [loading, setLoading] = useState(stores.length === 0);
@@ -92,12 +101,25 @@ export function StoreDirectoryScreen() {
             {item.catersTo ? <Text style={styles.catersTo}>Caters to: {item.catersTo}</Text> : null}
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
             <Text style={styles.howToBuy}>How to buy: {item.howToBuy}</Text>
-            {item.contact ? <Text style={styles.contact}>Contact: {item.contact}</Text> : null}
-            {item.website ? (
-              <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8}>
-                <Text style={styles.website}>{formatWebsite(item.website)} →</Text>
-              </Pressable>
+            {item.contact ? (
+              telUrl(item.contact) ? (
+                <Pressable onPress={() => Linking.openURL(telUrl(item.contact!)!)} hitSlop={6}>
+                  <Text style={styles.contactLink}>📞 {item.contact}</Text>
+                </Pressable>
+              ) : (
+                <Text style={styles.contact}>Contact: {item.contact}</Text>
+              )
             ) : null}
+            <View style={styles.linkRow}>
+              {item.website ? (
+                <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8}>
+                  <Text style={styles.website}>{formatWebsite(item.website)} →</Text>
+                </Pressable>
+              ) : null}
+              <Pressable onPress={() => Linking.openURL(mapsUrl(item))} hitSlop={8}>
+                <Text style={styles.website}>📍 Map</Text>
+              </Pressable>
+            </View>
           </View>
         )}
         ListFooterComponent={
@@ -163,6 +185,8 @@ const styles = StyleSheet.create({
   bestFor: { ...typography.small, fontWeight: "700" },
   howToBuy: { ...typography.small },
   contact: { ...typography.small, fontWeight: "700", color: colors.ink },
+  contactLink: { ...typography.small, fontWeight: "700", color: colors.bayou },
+  linkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 2 },
   website: { ...typography.small, color: colors.bayou, fontWeight: "700", marginTop: 2 },
   disclaimer: { ...typography.small, textAlign: "center", marginTop: spacing.lg, marginBottom: spacing.xl },
 });
