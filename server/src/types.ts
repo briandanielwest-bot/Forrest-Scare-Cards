@@ -94,6 +94,8 @@ export interface SessionState {
   photoStatus: PhotoStatus;
   wardrobePlan?: WardrobePlan;
   planStatus: PlanStatus;
+  /** Which pipeline stage generation is in, for honest progress UI. */
+  planStage?: "scouts" | "planner";
   planError?: string;
 }
 

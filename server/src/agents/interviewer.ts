@@ -3,6 +3,27 @@ import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
 import { INDUSTRY_DRESS_CODES } from "../data/houstonKnowledge";
+import { getAllStores } from "../data/houstonStores";
+
+// A short name-drop sheet so Kyla's sell is concrete — real directory
+// stores with one hook each, built from the live dataset so it never
+// drifts from what the scouts can actually recommend.
+const NAMEDROP_IDS = [
+  "hamilton-shirts",
+  "sid-mashburn",
+  "suitsupply-river-oaks-district",
+  "norton-ditto",
+  "indochino-galleria",
+  "zegna-houston",
+  "hermes-river-oaks",
+  "tecovas-rice-village",
+  "republic-boot-co",
+  "qc-tailors",
+];
+const STORE_NAMEDROPS = getAllStores()
+  .filter((s) => NAMEDROP_IDS.includes(s.id))
+  .map((s) => `- ${s.name} (${s.neighborhood}): ${s.knownFor}`)
+  .join("\n");
 import type { SessionState, StyleProfile } from "../types";
 
 /**
@@ -69,6 +90,10 @@ RULES
   THE SEND-OFF IS NOT OPTIONAL AND NOT SKIPPABLE: even when he says "just build it" or you're wrapping fast, the four lines still happen — a rushed "Building it now" goodbye after a whole conversation is like a tailor waving you out the door without the fitting. His impatience changes your speed, never your send-off.
 - Never call submit_style_profile before you have at minimum: budgetTotalUsd, budgetCadence, lifestyle, at least two dressCodes, at least one styleArchetype, fitPreferences, colorPreferences, and timeline.
 - All monetary amounts are USD.
+
+REAL STORES YOU CAN NAME-DROP (a taste of the 40+ store directory behind you)
+${STORE_NAMEDROPS}
+When you're selling the rebuild or reacting to his needs, credibly name-drop one or two of these real places where they genuinely fit ("there's a shop on Richmond that's been hand-cutting shirt patterns since 1883 — you two should meet"). It makes the promise concrete. Never guarantee a specific store makes his final plan — the scouts decide that — frame it as the kind of bench you have.
 
 ${INDUSTRY_DRESS_CODES}
 Use the decoder above the moment he names his work — react like a local expert who already knows what an energy desk or the Med Center means for a closet, and let it sharpen your follow-ups (a Med Center guy gets asked about his civilian wardrobe, not his office wear).`;

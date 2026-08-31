@@ -31,6 +31,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
   const { sessionId, setWardrobePlan } = useAppContext();
   const [error, setError] = useState<string | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
+  const [stage, setStage] = useState<"scouts" | "planner" | undefined>(undefined);
   const startedAtRef = useRef(Date.now());
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
       try {
         const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
+        setStage(result.stage);
 
         if (result.status === "done" && result.plan) {
           setWardrobePlan(result.plan);
@@ -97,6 +99,13 @@ export function GeneratingPlanScreen({ navigation }: Props) {
         ) : (
           <>
             <ActivityIndicator size="large" color={colors.gold} />
+            <Text style={styles.stage}>
+              {stage === "planner"
+                ? "MOON IS WRITING YOUR PLAN — THE LONG PART"
+                : stage === "scouts"
+                  ? "SCOUTS ARE ON THE FLOOR"
+                  : "WARMING UP"}
+            </Text>
             <Text style={styles.status}>{STATUS_LINES[statusIndex]}</Text>
           </>
         )}
@@ -108,6 +117,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bayou, justifyContent: "center" },
   content: { alignItems: "center", gap: spacing.lg, padding: spacing.lg },
+  stage: { color: colors.gold, fontSize: 12, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
   status: { ...typography.body, color: colors.cream, textAlign: "center" },
   error: { color: "#FFD9CE", textAlign: "center", fontSize: 16 },
   retry: { color: colors.gold, textAlign: "center", marginTop: spacing.md, fontWeight: "700" },
