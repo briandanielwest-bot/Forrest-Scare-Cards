@@ -1,3 +1,5 @@
+import { PRICE_BRIEF, PRICE_BRIEF_DATE } from "./priceBrief";
+
 /**
  * Houston expertise packs — deep domain knowledge encoded as DATA so
  * agents apply it instead of deriving it (faster + more consistent), and
@@ -70,7 +72,13 @@ LEAD TIMES (order backward from the deadline):
 - Custom shirts: first order a few weeks (pattern-making); reorders faster.
 - Custom boots or hats: weeks to months — order well before rodeo season.
 - In-house alterations at Suitsupply/Nordstrom: often same-visit to ~1 week; independents ~3-10 business days.
-WHEN TO BUY: January and July-August markdowns for tailoring and next-season pieces (Nordstrom's Anniversary Sale typically mid-July into August); overcoats and formalwear in October before gala season; western ahead of February; conference suiting 6+ weeks before CERAWeek/OTC.`;
+WHEN TO BUY: January and July-August markdowns for tailoring and next-season pieces (Nordstrom's Anniversary Sale typically mid-July into August); overcoats and formalwear in October before gala season; western ahead of February; conference suiting 6+ weeks before CERAWeek/OTC.${
+  PRICE_BRIEF
+    ? `
+LIVE PRICE NOTES (researched ${PRICE_BRIEF_DATE} — current ground truth over the generic ballparks above):
+${PRICE_BRIEF}`
+    : ""
+}`;
 
 export const KYLA_STYLE_GEMS = `STYLE GEMS — real menswear knowledge, one line each
 - High-twist wool shrugs off wrinkles — the car-to-meeting fabric.

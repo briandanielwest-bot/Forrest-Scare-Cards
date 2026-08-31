@@ -247,9 +247,19 @@ function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (i
   const phases = asArray<WardrobePlan["phases"][number]>(plan.phases);
   const amounts = asArray<{ phaseName: string; amountUsd: number }>(plan.budgetSummary?.perPhaseUsd);
   if (phases.length === 0) return null;
+  // His literal first move: the first store of the first phase.
+  const firstPhase = phases[0];
+  const firstItem = asArray<WardrobeItem>(firstPhase?.items)[0];
+  const firstStoreId = asArray<string>(firstItem?.recommendedStoreIds)[0];
+
   return (
     <View style={styles.timelineCard}>
       <Text style={styles.timelineHeader}>Your buying timeline</Text>
+      {firstStoreId ? (
+        <Text style={styles.timelineStart}>
+          ▶ First move: {storeName(firstStoreId)} — {(firstPhase.timingLabel || "this week").toLowerCase()}
+        </Text>
+      ) : null}
       {phases.map((phase, i) => {
         const amount = amounts.find((a) => a.phaseName === phase.name)?.amountUsd ?? amounts[i]?.amountUsd;
         // One line per store this phase visits: "Store — item, item".
@@ -266,6 +276,7 @@ function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (i
               <Text style={styles.timelineWhen}>{phase.timingLabel || `Phase ${i + 1}`}</Text>
               <Text style={styles.timelineAmount}>{amount != null ? money(amount) : ""}</Text>
             </View>
+            {phase.name ? <Text style={styles.timelinePhaseName}>{phase.name}</Text> : null}
             {Array.from(byStore.entries()).map(([storeId, items]) => (
               <Text key={storeId} style={styles.timelineStoreLine}>
                 <Text style={styles.timelineStoreName}>{storeName(storeId)}</Text> — {items.join(", ")}
@@ -453,6 +464,17 @@ const styles = StyleSheet.create({
   timelineHeader: { ...typography.title, fontSize: 18, color: colors.bayouDark },
   timelineRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
   timelinePhase: { gap: 2 },
+  timelineStart: {
+    ...typography.small,
+    color: colors.bayouDark,
+    fontWeight: "800",
+    backgroundColor: "#F4E9C9",
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+    overflow: "hidden",
+  },
+  timelinePhaseName: { ...typography.body, fontSize: 14, fontWeight: "700", color: colors.ink },
   timelineWhen: { ...typography.small, color: colors.bayou, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.5, flexShrink: 1 },
   timelineStoreLine: { ...typography.small, lineHeight: 18, color: colors.ink },
   timelineStoreName: { fontWeight: "800", color: colors.bayouDark },
