@@ -11,6 +11,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
 import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
+import { AskCampbell } from "../components/AskCampbell";
 import { TEAM } from "../data/team";
 
 type InterviewOpener = Awaited<ReturnType<typeof startInterview>>;
@@ -121,6 +122,8 @@ export function WelcomeScreen({ navigation }: Props) {
           </Text>
         </View>
 
+        <AskCampbell />
+
         <View style={styles.card}>
           <Text style={styles.cardTitle}>What you walk out with</Text>
           <Bullet text="A rebuild in phases, priced in real dollars against your budget, down to the alterations line." />
@@ -167,8 +170,8 @@ export function WelcomeScreen({ navigation }: Props) {
             ))}
           </View>
           <Text style={styles.teamDisclaimer}>
-            Kyla and the team are AI stylists. Their names are a fan homage to Houston sports legends, and this app
-            is not affiliated with or endorsed by the people they honor.
+            Kyla and the team are characters, not real people. Their names are a fan homage to Houston sports
+            legends, and this app is not affiliated with or endorsed by the people they honor.
           </Text>
         </View>
       </ScrollView>

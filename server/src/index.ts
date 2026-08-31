@@ -80,10 +80,10 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
       );
       return res.status(503).json({
         error:
-          "Kyla's team is offline — the app's AI credits ran out. If this is your app, top up at console.anthropic.com (Plans & Billing) and it comes right back.",
+          "Kyla's team is offline: the app's usage credits ran out. If this is your app, top up at console.anthropic.com (Plans & Billing) and it comes right back.",
       });
     }
-    return res.status(502).json({ error: "Upstream AI request failed" });
+    return res.status(502).json({ error: "Kyla's team is offline for a moment. Try that again?" });
   }
 
   console.error("Unhandled error:", err);
