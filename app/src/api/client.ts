@@ -182,11 +182,11 @@ export function fetchOutfits(sessionId: string) {
 
 // Post-plan Q&A with Kyla — she answers questions about the delivered plan
 // ("can I swap the oxfords for loafers?") with the plan and profile in hand.
-export function askKylaAboutPlan(sessionId: string, question: string) {
+export function askKylaAboutPlan(sessionId: string, question: string, purchasedKeys: string[] = []) {
   return request<{ reply: string }>("/api/plan/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId, question }),
+    body: JSON.stringify({ sessionId, question, purchasedKeys }),
   });
 }
 

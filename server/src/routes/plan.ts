@@ -70,7 +70,11 @@ planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
 // like every other Claude-calling route.
 planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
   try {
-    const { sessionId, question } = req.body as { sessionId?: string; question?: string };
+    const { sessionId, question, purchasedKeys } = req.body as {
+      sessionId?: string;
+      question?: string;
+      purchasedKeys?: string[];
+    };
     if (!sessionId || !question?.trim()) {
       return res.status(400).json({ error: "sessionId and question are required" });
     }
@@ -83,7 +87,11 @@ planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
     if (!session.wardrobePlan) {
       return res.status(409).json({ error: "No plan yet for this session" });
     }
-    const reply = await askAboutPlan(session, question.trim().slice(0, 1000));
+    const reply = await askAboutPlan(
+      session,
+      question.trim().slice(0, 1000),
+      Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
+    );
     res.json({ reply });
   } catch (err) {
     next(err);

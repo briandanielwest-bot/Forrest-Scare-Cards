@@ -29,7 +29,23 @@ const STORE_SHEET = getAllStores()
   .map((s) => `${s.name} (${s.neighborhood}; ${s.priceTier}): ${s.knownFor}`)
   .join("\n");
 
-export async function askAboutPlan(session: SessionState, question: string): Promise<string> {
+// Maps the client's check-off keys (p{phase}i{item}) back to item names so
+// Kyla knows what he's already bought when he asks "what's next?".
+function purchasedItemNames(session: SessionState, purchasedKeys: string[]): string[] {
+  const names: string[] = [];
+  (session.wardrobePlan?.phases ?? []).forEach((phase, pi) => {
+    (phase.items ?? []).forEach((item, ii) => {
+      if (purchasedKeys.includes(`p${pi}i${ii}`)) names.push(item.itemName ?? item.category);
+    });
+  });
+  return names;
+}
+
+export async function askAboutPlan(
+  session: SessionState,
+  question: string,
+  purchasedKeys: string[] = [],
+): Promise<string> {
   if (!session.wardrobePlan) throw new Error("No plan exists for this session yet");
 
   if (!session.planQAHistory) {
@@ -45,7 +61,16 @@ export async function askAboutPlan(session: SessionState, question: string): Pro
       { role: "assistant", content: "Got it — I've got his plan and the full directory in front of me. Ask away." },
     ];
   }
-  session.planQAHistory.push({ role: "user", content: question });
+  // Live state travels with each question, not the seed — purchases and
+  // the outfit matrix can both change after the chat starts.
+  const bought = purchasedItemNames(session, purchasedKeys);
+  const stateBits: string[] = [];
+  if (bought.length > 0) stateBits.push(`Already bought and checked off: ${bought.join("; ")}.`);
+  if (session.outfits?.length) {
+    stateBits.push(`His outfit matrix exists: ${session.outfits.map((o) => o.name).join(", ")}.`);
+  }
+  const content = stateBits.length > 0 ? `(${stateBits.join(" ")})\n\n${question}` : question;
+  session.planQAHistory.push({ role: "user", content });
 
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: FAST_AGENT_MODEL,
