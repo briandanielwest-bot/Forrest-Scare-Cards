@@ -57,6 +57,10 @@ export interface HoustonStore {
   pricePoints?: string[];
   /** From deep research: the insider detail worth knowing before you walk in. */
   insiderTake?: string;
+  /** Official Instagram handle (no @) — the store's own public profile. */
+  instagram?: string;
+  /** Official Facebook page URL. */
+  facebook?: string;
 }
 
 export const HOUSTON_STORES: HoustonStore[] = [
@@ -787,6 +791,7 @@ export const HOUSTON_STORES: HoustonStore[] = [
 
 import { STORE_FRESHNESS } from "./storeFreshness";
 import { STORE_INTEL } from "./storeIntel";
+import { STORE_SOCIAL } from "./storeSocial";
 
 // The monthly refresh job (scripts/refresh-data.ts) re-verifies each store
 // with live web search. Its overlay is applied here: a store flagged
@@ -795,14 +800,18 @@ import { STORE_INTEL } from "./storeIntel";
 function withFreshness(store: HoustonStore): HoustonStore {
   const f = STORE_FRESHNESS[store.id];
   const intel = STORE_INTEL[store.id];
-  const enriched: HoustonStore = intel
-    ? {
-        ...store,
-        brands: intel.brands.length > 0 ? intel.brands : undefined,
-        pricePoints: intel.pricePoints.length > 0 ? intel.pricePoints : undefined,
-        insiderTake: intel.insiderTake || undefined,
-      }
-    : store;
+  const social = STORE_SOCIAL[store.id];
+  const enriched: HoustonStore = {
+    ...store,
+    ...(intel
+      ? {
+          brands: intel.brands.length > 0 ? intel.brands : undefined,
+          pricePoints: intel.pricePoints.length > 0 ? intel.pricePoints : undefined,
+          insiderTake: intel.insiderTake || undefined,
+        }
+      : {}),
+    ...(social ? { instagram: social.instagram, facebook: social.facebook } : {}),
+  };
   if (!f) return enriched;
   return { ...enriched, seasonalNote: f.note || undefined, lastVerified: f.checkedAt };
 }

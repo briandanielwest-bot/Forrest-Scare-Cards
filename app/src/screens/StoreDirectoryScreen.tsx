@@ -209,9 +209,15 @@ export function StoreDirectoryScreen() {
                   </Text>
                 </Pressable>
               ) : null}
-              <Pressable onPress={() => Linking.openURL(photosUrl(item))} hitSlop={8}>
-                <Text style={styles.website}>📷 Photos</Text>
-              </Pressable>
+              {item.instagram ? (
+                <Pressable onPress={() => Linking.openURL(`https://instagram.com/${item.instagram}`)} hitSlop={8}>
+                  <Text style={styles.website}>@{item.instagram}</Text>
+                </Pressable>
+              ) : (
+                <Pressable onPress={() => Linking.openURL(photosUrl(item))} hitSlop={8}>
+                  <Text style={styles.website}>📷 Photos</Text>
+                </Pressable>
+              )}
               <Pressable onPress={() => Linking.openURL(mapsUrl(item))} hitSlop={8}>
                 <Text style={styles.website}>📍 Map</Text>
               </Pressable>

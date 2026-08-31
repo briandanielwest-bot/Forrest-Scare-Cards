@@ -106,6 +106,8 @@ export interface HoustonStore {
   brands?: string[];
   pricePoints?: string[];
   insiderTake?: string;
+  instagram?: string;
+  facebook?: string;
 }
 
 export interface ChatMessage {
