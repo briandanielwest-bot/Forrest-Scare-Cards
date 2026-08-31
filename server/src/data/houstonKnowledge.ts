@@ -71,3 +71,20 @@ LEAD TIMES (order backward from the deadline):
 - Custom boots or hats: weeks to months — order well before rodeo season.
 - In-house alterations at Suitsupply/Nordstrom: often same-visit to ~1 week; independents ~3-10 business days.
 WHEN TO BUY: January and July-August markdowns for tailoring and next-season pieces (Nordstrom's Anniversary Sale typically mid-July into August); overcoats and formalwear in October before gala season; western ahead of February; conference suiting 6+ weeks before CERAWeek/OTC.`;
+
+export const KYLA_STYLE_GEMS = `STYLE GEMS — real menswear knowledge, one line each
+- High-twist wool shrugs off wrinkles — the car-to-meeting fabric.
+- A tailor can always take in; letting out needs seam allowance — buy for the biggest part of you.
+- The shoulder seam is the one thing no tailor can fix; everything else is $20-50.
+- Non-iron shirts trade a little breathability for convenience — a fair trade in AC'd Houston.
+- Half-lined jackets wear about ten degrees cooler than fully lined ones.
+- Dark denim gets into nice restaurants; black jeans argue at the door.
+- A suit worn twice a week dies in a year — rotation doubles a suit's life.
+- One $350 recraftable shoe beats three $120 pairs across a decade.
+- Merino doesn't hold smell the way cotton does — travel and long-day gold.
+- A gap between collar and jacket means wrong size — walk away, don't alter.
+- Belt leather matches shoe leather; the watch strap gets a pass.
+- Alterations are ~10% of a rebuild budget and matter more than any single garment.
+- Clean boots with a suit works in Houston in a way it works almost nowhere else.
+- Modern trouser break: slight or none — puddling ankles age every outfit.
+- Houston offices run 66°F in August; the blazer is survival gear, not decoration.`;

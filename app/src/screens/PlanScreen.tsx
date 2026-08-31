@@ -207,7 +207,18 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
               </Text>
             </View>
             {run.store?.neighborhood ? <Text style={styles.runStoreMeta}>{run.store.neighborhood}</Text> : null}
-            {run.store?.contact ? <Text style={styles.runStoreContact}>{run.store.contact}</Text> : null}
+            {run.store?.contact ? (
+              (() => {
+                const digits = run.store!.contact!.replace(/[^\d]/g, "");
+                return digits.length >= 10 ? (
+                  <Pressable onPress={() => Linking.openURL(`tel:+1${digits.slice(-10)}`)} hitSlop={6}>
+                    <Text style={styles.runStoreContact}>📞 {run.store!.contact}</Text>
+                  </Pressable>
+                ) : (
+                  <Text style={styles.runStoreContact}>{run.store!.contact}</Text>
+                );
+              })()
+            ) : null}
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
@@ -215,13 +226,27 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
                 {it.phaseName ? `  (${it.phaseName})` : ""}
               </Text>
             ))}
-            {run.store?.website ? (
-              <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8}>
-                <Text style={styles.runStoreLink}>
-                  {run.store.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} →
-                </Text>
-              </Pressable>
-            ) : null}
+            <View style={styles.runLinkRow}>
+              {run.store?.website ? (
+                <Pressable onPress={() => Linking.openURL(run.store!.website)} hitSlop={8}>
+                  <Text style={styles.runStoreLink}>
+                    {run.store.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} →
+                  </Text>
+                </Pressable>
+              ) : null}
+              {run.store ? (
+                <Pressable
+                  onPress={() =>
+                    Linking.openURL(
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${run.store!.name} ${run.store!.neighborhood} Houston TX`)}`,
+                    )
+                  }
+                  hitSlop={8}
+                >
+                  <Text style={styles.runStoreLink}>📍 Map</Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
         );
       })}
@@ -348,6 +373,7 @@ const styles = StyleSheet.create({
   runStoreContact: { color: colors.gold, fontSize: 13, fontWeight: "700" },
   runItem: { color: colors.cream, fontSize: 13, lineHeight: 19 },
   runStoreLink: { color: colors.gold, fontSize: 12, fontWeight: "700", textDecorationLine: "underline", marginTop: 2 },
+  runLinkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   tipsCard: { backgroundColor: colors.paper, borderRadius: radii.md, padding: spacing.md, borderWidth: 1, borderColor: colors.border, gap: spacing.xs },
   tipText: { ...typography.body },
   pepCard: { backgroundColor: colors.gold, borderRadius: radii.md, padding: spacing.md },

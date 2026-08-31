@@ -192,22 +192,42 @@ Build the complete wardrobe plan now.`;
   // live truncation at the old 16000 non-streaming cap shipped a plan with
   // no phases. Streaming lets max_tokens sit far above any real plan size
   // without risking SDK HTTP timeouts.
-  const stream = anthropic.messages.stream({
+  const baseParams = {
     model: AGENT_MODEL,
     max_tokens: 64000,
     // Stable across every run — cacheable across users on the same model.
     system: [{ type: "text" as const, text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" as const } }],
-    messages: [{ role: "user", content: userMessage }],
+    messages: [{ role: "user", content: userMessage }] as Anthropic.MessageParam[],
     tools: [SUBMIT_PLAN_TOOL],
-    tool_choice: { type: "tool", name: "submit_wardrobe_plan" },
+    tool_choice: { type: "tool" as const, name: "submit_wardrobe_plan" },
     // Left at default (high) effort deliberately: dropping to "medium" was
     // tried and reverted after a live test produced budget phases that
     // summed to $3,560 against a stated $2,500 total — high effort has
-    // consistently gotten this arithmetic right. The fire-and-forget +
-    // polling change is what actually fixes host request timeouts; this
-    // agent doesn't need to also be fast.
-  });
-  const response = await stream.finalMessage();
+    // consistently gotten this arithmetic right.
+  };
+
+  // The planner is the run's dominant wall-clock cost (~2 min of pure
+  // output generation), so it opts into fast mode: the same Opus model at
+  // up to 2.5x output speed (research preview, premium-priced, Claude API
+  // only). Any failure — the beta being unavailable, a fast-mode-specific
+  // rate limit, a non-Opus model override — falls back to the standard
+  // lane, so quality and reliability never depend on it. Note the two
+  // lanes keep separate prompt caches.
+  let response: Anthropic.Message;
+  try {
+    const fastStream = anthropic.beta.messages.stream({
+      ...baseParams,
+      speed: "fast",
+      betas: ["fast-mode-2026-02-01"],
+      // speed/betas aren't typed on this SDK version's stream params yet.
+    } as never);
+    response = (await fastStream.finalMessage()) as Anthropic.Message;
+    console.log("[planner] fast mode");
+  } catch (err) {
+    console.warn(`[planner] fast mode unavailable (${(err as Error).message?.slice(0, 80)}) — standard lane`);
+    const stream = anthropic.messages.stream(baseParams);
+    response = await stream.finalMessage();
+  }
 
   // A "max_tokens" stop reason means the tool call's JSON was cut off
   // mid-generation — the API still hands back a best-effort parse of
