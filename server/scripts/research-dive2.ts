@@ -45,9 +45,46 @@ async function runWithSearch(system: string, user: string, maxTokens: number): P
 }
 
 function extractJson<T>(text: string): T {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error(`no JSON object in: ${text.slice(0, 200)}`);
-  return JSON.parse(match[0]) as T;
+  // The researcher sometimes narrates before its JSON ("Let me extract
+  // that…"), and prose can contain braces — so scan for the LAST balanced
+  // object in the text rather than trusting the first brace.
+  const starts: number[] = [];
+  for (let i = 0; i < text.length; i++) if (text[i] === "{") starts.push(i);
+  for (const start of starts) {
+    let depth = 0;
+    let inStr = false;
+    let esc = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (esc) { esc = false; continue; }
+      if (ch === "\\") { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === "{") depth++;
+      else if (ch === "}") {
+        depth--;
+        if (depth === 0) {
+          try {
+            return JSON.parse(text.slice(start, i + 1)) as T;
+          } catch {
+            break; // Malformed from this start; try the next one.
+          }
+        }
+      }
+    }
+  }
+  throw new Error(`no parsable JSON object in: ${text.slice(0, 160)}`);
+}
+
+// Web searches occasionally time out; one retry costs little and saves an
+// entire research angle from being lost.
+async function withRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.warn(`  ${label}: retrying after ${(err as Error).message.slice(0, 50)}`);
+    return await fn();
+  }
 }
 
 async function pool<T, R>(items: T[], size: number, fn: (t: T) => Promise<R>): Promise<R[]> {
@@ -137,7 +174,7 @@ async function main() {
   console.log(`[dive2] ${DEEP_ANGLES.length} angles, excluding ${knownNames.length + priorNames.length} known names…`);
   const found = await pool(DEEP_ANGLES, 3, async (angle) => {
     try {
-      const candidates = await discover(angle, [...knownNames, ...priorNames]);
+      const candidates = await withRetry(angle.id, () => discover(angle, [...knownNames, ...priorNames]));
       console.log(`  ${angle.id}: ${candidates.length} candidate(s)`);
       return { angle: angle.id, candidates };
     } catch (err) {

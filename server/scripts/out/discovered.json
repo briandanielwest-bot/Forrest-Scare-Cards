@@ -1,0 +1,146 @@
+[
+  {
+    "name": "Larry's Original Custom Tailors",
+    "neighborhood": "Hillcroft/Westpark, Houston",
+    "whatItIs": "Custom-made men's suits and shirts plus precision alterations, serving Houston men since 1975.",
+    "whyNotable": "Fully bespoke suits cut from scratch with 3,000+ fabric swatches, run by a beloved old-school tailor.",
+    "website": "https://www.myhoustontailor.com/custom-mens-clothing",
+    "evidence": "Own site plus positive independent reviews",
+    "angle": "alterations"
+  },
+  {
+    "name": "Nick Lopez Tailoring",
+    "neighborhood": "Sage Rd, Galleria area",
+    "whatItIs": "Boutique tailor making custom men's suits with old-world, hand-stitched construction.",
+    "whyNotable": "Over 35 years crafting 100% hand-stitched canvas coats, cited on Houston's top bespoke-clothing lists.",
+    "website": "",
+    "evidence": "Expertise.com and Yelp bespoke-clothing rankings",
+    "angle": "alterations"
+  },
+  {
+    "name": "Saad's Tailors",
+    "neighborhood": "Houston (citywide service)",
+    "whatItIs": "Tailoring shop offering Italian ready-made suits and shirts alongside men's custom apparel and alterations.",
+    "whyNotable": "45 years of local reputation for superior fabrics and design, ranked among Houston's top suit-alteration shops.",
+    "website": "",
+    "evidence": "Expertise.com profile and Yelp Suit Alterations top-10",
+    "angle": "alterations"
+  },
+  {
+    "name": "Memorial Tailors",
+    "neighborhood": "Memorial area, Houston",
+    "whatItIs": "Tailor shop specializing in suit alterations and tailoring for Houston men.",
+    "whyNotable": "Repeatedly called out by name in Yelp reviews as the shop people 'unhesitatingly recommend' for suit work.",
+    "website": "",
+    "evidence": "Multiple Yelp 'Best Suit Alterations Houston' listings",
+    "angle": "alterations"
+  },
+  {
+    "name": "Star Tailor & Alterations",
+    "neighborhood": "Near The Heights, Houston",
+    "whatItIs": "Alterations shop known for precise suit and trouser fitting work for local men.",
+    "whyNotable": "Called an 'unsung hero of tailoring' by reviewers, with a tailor (Nguyen) singled out by name for suit fittings.",
+    "website": "",
+    "evidence": "Yelp Suit Alterations and Heights-area tailor rankings",
+    "angle": "alterations"
+  },
+  {
+    "name": "Bay Area Custom Clothing",
+    "neighborhood": "Houston (mobile, comes to you)",
+    "whatItIs": "Mobile custom clothier bringing fine Italian and English suit, sport coat, and shirt fabrics to clients' doors.",
+    "whyNotable": "Skips the shop entirely — a 30-year operator who fits and delivers custom suits at your home or office.",
+    "website": "",
+    "evidence": "Fash.com Houston tailors roundup",
+    "angle": "alterations"
+  },
+  {
+    "name": "Knot Standard Houston",
+    "neighborhood": "3733 Westheimer Rd, Highland Village area",
+    "whatItIs": "Custom and made-to-measure suit retailer with a genuine Houston showroom for local fittings.",
+    "whyNotable": "Praised for hitting a rare balance of price, quality, and service for custom suiting in Houston.",
+    "website": "https://www.knotstandard.com/",
+    "evidence": "Houston Hits 2026 custom-suits roundup",
+    "angle": "alterations"
+  },
+  {
+    "name": "Ahmed's Custom Clothiers",
+    "neighborhood": "Houston, TX",
+    "whatItIs": "Custom tailor making made-to-order men's suits and shirts, including monogrammed embroidery.",
+    "whyNotable": "Near-perfect 4.9 rating with clients praising flawless wedding suits and years-long customer loyalty.",
+    "website": "",
+    "evidence": "MyBestHouston 'Best Custom Suits' feature",
+    "angle": "alterations"
+  },
+  {
+    "name": "Kick Game",
+    "neighborhood": "Rice Village/Montrose area, Houston",
+    "whatItIs": "Sneaker consignment and resale boutique selling rare, secondhand designer and collaboration sneakers to collectors.",
+    "whyNotable": "Long-running Houston consignment spot specifically for hard-to-find designer and luxury-collab sneakers, not fast-fashion resale.",
+    "website": "",
+    "evidence": "Known local sneaker-consignment retailer; store listings/prior press",
+    "angle": "luxury-resale"
+  },
+  {
+    "name": "Round Two",
+    "neighborhood": "The Heights/Rice Village, Houston",
+    "whatItIs": "Multi-city consignment chain buying and reselling authenticated secondhand designer streetwear, sneakers, and accessories.",
+    "whyNotable": "One of few Houston shops built around authenticated resale of luxury streetwear and designer sneakers rather than general thrift.",
+    "website": "https://www.roundtwo.com",
+    "evidence": "Chain's own store-locator/website",
+    "angle": "luxury-resale"
+  },
+  {
+    "name": "Buffalo Exchange (Montrose)",
+    "neighborhood": "Montrose, Houston",
+    "whatItIs": "Buy-sell-trade secondhand clothing store carrying a rotating mix of men's designer and brand-name pieces.",
+    "whyNotable": "Established Montrose thrift destination where designer menswear occasionally surfaces at deep discounts.",
+    "website": "https://www.buffaloexchange.com",
+    "evidence": "Chain's own store-locator/website",
+    "angle": "luxury-resale"
+  },
+  {
+    "name": "Men's Wearhouse",
+    "neighborhood": "Katy, Sugar Land, The Woodlands, Pearland, Cypress, Memorial City",
+    "whatItIs": "Suit and formalwear retailer/tuxedo rental chain founded and headquartered in Houston, serving business and event dressing.",
+    "whyNotable": "A genuinely Houston-born chain (founded here in 1973) with dedicated in-house tailoring at multiple suburban locations.",
+    "website": "https://www.menswearhouse.com",
+    "evidence": "Company website; Houston HQ well documented",
+    "angle": "suburban"
+  },
+  {
+    "name": "Jos. A. Bank Clothiers",
+    "neighborhood": "Sugar Land, The Woodlands, Cypress area",
+    "whatItIs": "National suiting and business-casual retailer selling suits, dress shirts, and outerwear to professional men.",
+    "whyNotable": "Known for frequent buy-one-get-several suit promotions and full alterations departments in-store.",
+    "website": "https://www.josbank.com",
+    "evidence": "Company store locator/website",
+    "angle": "suburban"
+  },
+  {
+    "name": "Von Maur",
+    "neighborhood": "Sugar Land (First Colony Mall)",
+    "whatItIs": "Upscale department store with a dedicated men's shop selling suiting, sportswear, and dress furnishings.",
+    "whyNotable": "Known nationally for interest-free financing, free gift wrapping, and hands-on personal shopping for men's suiting.",
+    "website": "https://www.vonmaur.com",
+    "evidence": "Von Maur corporate store list",
+    "angle": "suburban"
+  },
+  {
+    "name": "Mr. Formal",
+    "neighborhood": "Multiple Houston suburbs including Katy, Sugar Land, Pearland",
+    "whatItIs": "Locally operated tuxedo and suit rental/sales shop outfitting men for weddings, proms, and black-tie events.",
+    "whyNotable": "A long-running, family-run Houston-area formalwear alternative to the national chains, with fast custom fittings.",
+    "website": "https://www.mrformal.com",
+    "evidence": "Business website/store locator",
+    "angle": "suburban"
+  },
+  {
+    "name": "Circle T Western Wear",
+    "neighborhood": "Katy / greater Houston exurbs",
+    "whatItIs": "Texas western wear retailer selling men's cowboy boots, hats, jeans, and pearl-snap shirts.",
+    "whyNotable": "A hometown Texas western outfitter offering full head-to-boot western dressing outside the big-box western chains.",
+    "website": "https://www.circletwesternwear.com",
+    "evidence": "Retailer website/store listings",
+    "angle": "suburban"
+  }
+]
