@@ -1,7 +1,29 @@
 import type { SessionState, WardrobePlan } from "../types";
 import { getHoustonClimateStyleBrief } from "./styleWeather";
-import { runAllScouts } from "./storeScout";
+import { runAllScouts, type ScoutReport } from "./storeScout";
 import { buildWardrobePlan } from "./wardrobePlanner";
+
+// Scouts only need the finished profile, which is final the moment the
+// interview submits — so they start right then, while the user is still
+// on the photo screen, instead of when he presses "build my plan". By
+// generate time they're usually done, cutting their ~12s off the visible
+// wait. Keyed off-session so types.ts stays free of agent imports.
+const prewarmedScouts = new Map<string, Promise<ScoutReport[] | null>>();
+
+export function prewarmScouts(session: SessionState): void {
+  if (!session.styleProfile) return;
+  const t0 = Date.now();
+  const promise = runAllScouts(session.styleProfile, getHoustonClimateStyleBrief())
+    .then((reports) => {
+      console.log(`[orchestrator] scouts pre-warmed in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+      return reports;
+    })
+    .catch((err: Error) => {
+      console.warn(`[orchestrator] scout pre-warm failed (${err.message?.slice(0, 80)}) — will rerun at plan time`);
+      return null;
+    });
+  prewarmedScouts.set(session.id, promise);
+}
 
 /**
  * Runs the back half of the pipeline once the interview (and optionally the
@@ -30,11 +52,14 @@ export async function generateWardrobePlan(session: SessionState): Promise<Wardr
 
   const climateBrief = getHoustonClimateStyleBrief();
 
-  // Scouts and photo analysis overlap — scouts only need the profile.
+  // Scouts and photo analysis overlap — scouts only need the profile,
+  // and usually already ran via prewarmScouts at interview submit.
   session.planStage = "scouts";
   const t0 = Date.now();
+  const prewarmed = prewarmedScouts.get(session.id);
+  prewarmedScouts.delete(session.id);
   const [scoutReports] = await Promise.all([
-    runAllScouts(session.styleProfile, climateBrief),
+    (async () => (prewarmed ? await prewarmed : null) ?? runAllScouts(session.styleProfile!, climateBrief))(),
     waitForPhotoAnalysis(session),
   ]);
   const tScouts = Date.now();
