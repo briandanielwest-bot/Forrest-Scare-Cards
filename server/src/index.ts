@@ -70,6 +70,19 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
   if (err instanceof Anthropic.APIError) {
     console.error("Anthropic API error:", err.status, err.message);
+    // An exhausted credit balance arrives as a generic 400 whose only
+    // clue is the message text. Calling it out by name turns a baffling
+    // outage into a two-minute fix, for the operator and the user alike.
+    if (/credit balance is too low/i.test(err.message)) {
+      console.error(
+        "\n*** ANTHROPIC CREDITS EXHAUSTED — the app cannot generate plans until you add credits at\n" +
+          "*** https://console.anthropic.com → Plans & Billing\n",
+      );
+      return res.status(503).json({
+        error:
+          "Kyla's team is offline — the app's AI credits ran out. If this is your app, top up at console.anthropic.com (Plans & Billing) and it comes right back.",
+      });
+    }
     return res.status(502).json({ error: "Upstream AI request failed" });
   }
 

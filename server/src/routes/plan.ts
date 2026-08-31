@@ -67,7 +67,10 @@ planRouter.post("/generate", agentRouteLimiter, async (req, res, next) => {
       })
       .catch((err) => {
         session.planStatus = "error";
-        session.planError = err instanceof Error ? err.message : "Plan generation failed";
+        const raw = err instanceof Error ? err.message : "Plan generation failed";
+        session.planError = /credit balance is too low/i.test(raw)
+          ? "Kyla's team is offline — the app's AI credits ran out. If this is your app, top up at console.anthropic.com (Plans & Billing)."
+          : raw;
         track("plan_failed");
         console.error("Plan generation failed after retries:", err);
       });
