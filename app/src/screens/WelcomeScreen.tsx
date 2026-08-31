@@ -70,10 +70,18 @@ export function WelcomeScreen({ navigation }: Props) {
         <View style={styles.hero}>
           <Text style={styles.kicker}>HOUSTON, TX</Text>
           <Text style={styles.title}>Bayou & Blazer</Text>
+          <View style={styles.heroKylaRow}>
+            <KylaPortrait size={64} />
+            <View style={styles.heroKylaTextWrap}>
+              <Text style={styles.heroKylaName}>Kyla, your Lead Stylist</Text>
+              <Text style={styles.heroKylaLine}>
+                "One real conversation with me, and you walk out with a priced, dated, store-by-store rebuild plan.
+                Not a quiz. A build-out."
+              </Text>
+            </View>
+          </View>
           <Text style={styles.subtitle}>
-            A team of AI stylists that turns one real conversation into a priced, dated, store-by-store wardrobe
-            rebuild plan — built specifically for Houston's climate, culture, and shops. Not a quiz. Not generic
-            advice. A build-out.
+            Built specifically for Houston's climate, culture, and shops — a team of AI stylists behind every plan.
           </Text>
         </View>
 
@@ -173,6 +181,10 @@ const styles = StyleSheet.create({
   hero: { marginTop: spacing.md, marginBottom: spacing.sm },
   kicker: { color: colors.gold, letterSpacing: 2, fontWeight: "700", fontSize: 12, marginBottom: spacing.sm },
   title: { color: colors.cream, fontSize: 40, fontWeight: "800", marginBottom: spacing.md },
+  heroKylaRow: { flexDirection: "row", gap: spacing.md, alignItems: "center", marginBottom: spacing.md },
+  heroKylaTextWrap: { flex: 1 },
+  heroKylaName: { color: colors.gold, fontWeight: "800", fontSize: 14, marginBottom: 2 },
+  heroKylaLine: { color: colors.cream, fontSize: 14, lineHeight: 20, fontStyle: "italic" },
   subtitle: { color: colors.cream, opacity: 0.9, fontSize: 16, lineHeight: 23 },
   card: {
     backgroundColor: colors.paper,
