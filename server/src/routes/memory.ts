@@ -2,6 +2,7 @@ import { Router } from "express";
 import { loadMemory, saveMemory } from "../memoryStore";
 import { createSession, requireSession } from "../sessionStore";
 import type { StyleProfile, WardrobePlan } from "../types";
+import { track } from "../analytics";
 
 export const memoryRouter = Router();
 
@@ -28,7 +29,11 @@ memoryRouter.post("/save", (req, res, next) => {
       wardrobePlan: session.wardrobePlan,
       purchasedKeys: Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
       existingCode: typeof existingCode === "string" ? existingCode : undefined,
+      photoAssessment: session.photoAssessment,
+      planQAHistory: session.planQAHistory,
+      outfits: session.outfits,
     });
+    track("plan_saved");
     res.json({ code: record.code });
   } catch (err) {
     next(err);
@@ -50,6 +55,12 @@ memoryRouter.post("/restore", (req, res, next) => {
     session.wardrobePlan = record.wardrobePlan as WardrobePlan;
     session.interviewComplete = true;
     session.planStatus = "done";
+    // Rehydrate the whole dossier: Kyla remembers the chat they already
+    // had, his photo read, and the outfit matrix.
+    session.photoAssessment = record.photoAssessment;
+    session.planQAHistory = record.planQAHistory;
+    session.outfits = record.outfits;
+    track("plan_restored");
     res.json({
       sessionId: session.id,
       profile: record.styleProfile,

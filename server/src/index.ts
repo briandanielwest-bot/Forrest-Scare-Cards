@@ -12,6 +12,7 @@ import { storesRouter } from "./routes/stores";
 import { sessionRouter } from "./routes/session";
 import { almanacRouter } from "./routes/almanac";
 import { memoryRouter } from "./routes/memory";
+import { readStats } from "./analytics";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
@@ -47,6 +48,9 @@ app.use("/api/session", sessionRouter);
 app.use("/api/almanac", agentRouteLimiter, almanacRouter);
 // No Claude calls in memory save/restore — cheap disk reads/writes.
 app.use("/api/memory", memoryRouter);
+// Aggregate funnel counts only (no per-user data) — the receipt book for
+// store partnership conversations.
+app.get("/api/stats", (_req, res) => res.json(readStats()));
 
 app.use((req, res) => {
   res.status(404).json({ error: `No route for ${req.method} ${req.path}` });

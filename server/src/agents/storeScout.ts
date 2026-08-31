@@ -92,7 +92,7 @@ function buildSystemPrompt(def: ScoutDefinition): string {
   return `You are ${plainName}, a Houston menswear buying director inside the Bayou & Blazer app — a seasoned category expert in ${def.focus}. You will be given a candidate list of real Houston stores in your specialty — each with a full profile of what it carries, how buying there works, its neighborhood, and its price tier — and a man's style profile. Read each store's full profile so your recommendation reflects what that store actually sells and how it actually operates, then pick and rank the stores that best fit HIS budget, style, and lifestyle. If his profile includes a homeBase (where in the Houston area he lives/works), weigh each store's neighborhood against it — Houston distances are real, and a store he'll actually get to beats a marginally better one 45 minutes away; a genuinely superior fit can still earn the drive, just say so in the reason. Do not recommend a store outside the given list, and do not recommend a store that is clearly a budget mismatch (e.g. a $$$$ bespoke house for a shoestring budget) unless nothing else in the list fits. Each reason must name the SPECIFIC thing he'd buy there and why THAT store earns it — lean on each store's knownFor (its signature items) and catersTo (its real clientele): "his paper-pattern dress shirts, because a fit file means every reorder fits" beats "good for shirts". If a store's catersTo clearly isn't him, that's a reason to rank it down even when the category matches. A "rightNow" note on a store is current, live-researched intel — weigh it (a running sale can promote a store; a disruption can demote it). Recommend your TOP 3 (4 only when a fourth genuinely earns it) — the planner needs your best calls, not coverage. Each reason MAX 25 words: the item he'd buy + the store fact that wins it, nothing else. Call submit_recommendations exactly once.`;
 }
 
-async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrief: string): Promise<ScoutReport> {
+async function runScout(def: ScoutDefinition, profile: StyleProfile, climateBrief: string, extraContext?: string): Promise<ScoutReport> {
   const candidates = def.categories.flatMap((c) => getStoresByCategory(c));
 
   if (candidates.length === 0) {
@@ -128,7 +128,7 @@ ${JSON.stringify(
   )}`;
 
   const userMessage = `MAN'S STYLE PROFILE:
-${JSON.stringify(profile, null, 2)}`;
+${JSON.stringify(profile, null, 2)}${extraContext ? `\n\n${extraContext}` : ""}`;
 
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
     model: FAST_AGENT_MODEL,
@@ -163,4 +163,23 @@ ${JSON.stringify(profile, null, 2)}`;
 
 export async function runAllScouts(profile: StyleProfile, climateBrief: string): Promise<ScoutReport[]> {
   return Promise.all(SCOUT_DEFINITIONS.map((def) => runScout(def, profile, climateBrief)));
+}
+
+// The late-photo courtesy pass: the directors usually finish before Watt's
+// photo read lands (that's the right latency trade). When a face read
+// exists, the accessories director — whose eyewear calls depend on face
+// shape most — gets one re-run with it. ~4s, only when photos were
+// actually uploaded.
+export async function rerunAccessoriesWithFace(
+  profile: StyleProfile,
+  climateBrief: string,
+  faceContext: string,
+): Promise<ScoutReport | null> {
+  const def = SCOUT_DEFINITIONS.find((d) => d.categories.includes("eyewear")) ?? SCOUT_DEFINITIONS[SCOUT_DEFINITIONS.length - 1];
+  try {
+    return await runScout(def, profile, climateBrief, `PHOTO TEAM'S FACE READ (weigh for eyewear and accessory picks):\n${faceContext}`);
+  } catch (err) {
+    console.warn(`[scouts] face re-run failed (${(err as Error).message?.slice(0, 60)}) — keeping original picks`);
+    return null;
+  }
 }

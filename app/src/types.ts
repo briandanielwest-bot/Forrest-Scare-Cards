@@ -12,6 +12,9 @@ export interface StyleProfile {
   brandAffinities: string[];
   occasionsToPlanFor: string[];
   timeline: string;
+  northStar?: string;
+  urgentEvent?: string;
+  handleWithCare?: string;
   notes: string;
 }
 

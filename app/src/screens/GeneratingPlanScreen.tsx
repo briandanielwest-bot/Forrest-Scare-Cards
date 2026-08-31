@@ -8,6 +8,7 @@ import { getPlanStatus, startPlanGeneration } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
 import { TEAM } from "../data/team";
+import { KYLA_TIPS } from "../data/kylaTips";
 import { colors, radii, spacing, typography } from "../theme/theme";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
@@ -29,11 +30,39 @@ function formatElapsed(ms: number): string {
   return `${m}:${String(sec).padStart(2, "0")}`;
 }
 
+interface WaitCard {
+  kind: "tip" | "store";
+  title: string;
+  text: string;
+}
+
 export function GeneratingPlanScreen({ navigation }: Props) {
-  const { sessionId, setWardrobePlan } = useAppContext();
+  const { sessionId, setWardrobePlan, stores } = useAppContext();
   const [error, setError] = useState<string | null>(null);
   const [memberIndex, setMemberIndex] = useState(0);
+  const [draftedPhases, setDraftedPhases] = useState<string[]>([]);
+  const [cardIndex, setCardIndex] = useState(0);
   const startedAtRef = useRef(Date.now());
+
+  // The while-you-wait deck: her tips interleaved with real facts about
+  // the stores his experts are walking right now. Built once per mount
+  // from data already on the device — zero network, zero latency.
+  const deckRef = useRef<WaitCard[] | null>(null);
+  if (!deckRef.current) {
+    const tips: WaitCard[] = KYLA_TIPS.map((t) => ({ kind: "tip", title: "KYLA'S TIP", text: t }));
+    const facts: WaitCard[] = stores
+      .filter((st) => st.knownFor)
+      .map((st) => ({ kind: "store", title: st.name.toUpperCase(), text: st.knownFor! }));
+    const deck: WaitCard[] = [];
+    const shuffled = [...facts].sort(() => Math.random() - 0.5);
+    // Alternate: tip, store fact, tip, store fact…
+    for (let i = 0; i < Math.max(tips.length, shuffled.length); i++) {
+      if (tips[i]) deck.push(tips[i]);
+      if (shuffled[i]) deck.push(shuffled[i]);
+    }
+    deckRef.current = deck.length > 0 ? deck : tips;
+  }
+  const deck = deckRef.current;
 
   const [elapsedMs, setElapsedMs] = useState(0);
 
@@ -42,9 +71,11 @@ export function GeneratingPlanScreen({ navigation }: Props) {
       setMemberIndex((i) => (i + 1) % TEAM.length);
     }, ROTATE_INTERVAL_MS);
     const ticker = setInterval(() => setElapsedMs(Date.now() - startedAtRef.current), 1000);
+    const deckTimer = setInterval(() => setCardIndex((i) => i + 1), 8000);
     return () => {
       clearInterval(interval);
       clearInterval(ticker);
+      clearInterval(deckTimer);
     };
   }, []);
 
@@ -57,6 +88,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
       try {
         const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
+        if (result.draftedPhases?.length) setDraftedPhases(result.draftedPhases);
 
         if (result.status === "done" && result.plan) {
           setWardrobePlan(result.plan);
@@ -120,10 +152,31 @@ export function GeneratingPlanScreen({ navigation }: Props) {
               <Text style={styles.memberDuty}>{member.duty}</Text>
             </View>
 
-            <Text style={styles.valueLine}>
-              Usually about a minute. The wait is real work: eight experts reading your profile against 40+ vetted
-              Houston stores, matching every piece to your budget, your build, and this city's calendar.
-            </Text>
+            {draftedPhases.length > 0 ? (
+              <View style={styles.draftBox}>
+                <Text style={styles.draftLabel}>
+                  YOUR PLAN, DRAFTING LIVE — {draftedPhases.length} {draftedPhases.length === 1 ? "PIECE" : "PIECES"} IN
+                </Text>
+                {draftedPhases.slice(-5).map((name, i) => (
+                  <Text key={i} style={styles.draftLine}>
+                    ✓ {name}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
+
+            <Pressable style={styles.waitCard} onPress={() => setCardIndex((i) => i + 1)}>
+              {deck[cardIndex % deck.length].kind === "tip" ? (
+                <View style={styles.waitCardHeader}>
+                  <KylaPortrait size={26} />
+                  <Text style={styles.waitCardTitle}>{deck[cardIndex % deck.length].title}</Text>
+                </View>
+              ) : (
+                <Text style={styles.waitCardTitle}>🏬 {deck[cardIndex % deck.length].title}</Text>
+              )}
+              <Text style={styles.waitCardText}>{deck[cardIndex % deck.length].text}</Text>
+              <Text style={styles.waitCardHint}>tap for another</Text>
+            </Pressable>
           </>
         )}
       </View>
@@ -151,6 +204,20 @@ const styles = StyleSheet.create({
   memberTitle: { color: colors.gold, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 },
   memberDuty: { ...typography.body, color: colors.cream, opacity: 0.9, textAlign: "center", marginTop: spacing.xs },
   valueLine: { ...typography.small, color: colors.cream, opacity: 0.65, textAlign: "center", paddingHorizontal: spacing.md },
+  draftBox: { alignSelf: "stretch", backgroundColor: "rgba(255,255,255,0.06)", borderRadius: radii.md, padding: spacing.md, gap: 4 },
+  draftLabel: { color: colors.gold, fontSize: 10, fontWeight: "800", letterSpacing: 1.2, marginBottom: 2 },
+  draftLine: { ...typography.small, color: colors.cream, opacity: 0.9 },
+  waitCard: {
+    alignSelf: "stretch",
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderRadius: radii.md,
+    padding: spacing.md,
+    gap: 6,
+  },
+  waitCardHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  waitCardTitle: { color: colors.gold, fontSize: 10, fontWeight: "800", letterSpacing: 1.2 },
+  waitCardText: { ...typography.body, color: colors.cream, fontSize: 14, lineHeight: 20 },
+  waitCardHint: { color: colors.cream, opacity: 0.4, fontSize: 10, textAlign: "right" },
   error: { color: "#FFD9CE", textAlign: "center", fontSize: 16 },
   retry: { color: colors.gold, textAlign: "center", marginTop: spacing.md, fontWeight: "700" },
 });

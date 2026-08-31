@@ -4,6 +4,7 @@ import { generateWardrobePlan } from "../agents/orchestrator";
 import { askAboutPlan } from "../agents/planQA";
 import { buildOutfitMatrix } from "../agents/outfits";
 import { agentRouteLimiter } from "../rateLimiter";
+import { track } from "../analytics";
 import type { SessionState } from "../types";
 
 export const planRouter = Router();
@@ -50,13 +51,23 @@ planRouter.post("/generate", agentRouteLimiter, (req, res, next) => {
     // long-lived request open.
     session.planStatus = "generating";
     session.planError = undefined;
+    const t0 = Date.now();
     generatePlanWithRetry(session)
       .then(() => {
         session.planStatus = "done";
+        const storeIds = Array.from(
+          new Set(
+            (session.wardrobePlan?.phases ?? []).flatMap((ph) =>
+              (ph.items ?? []).flatMap((i) => i.recommendedStoreIds ?? []),
+            ),
+          ),
+        );
+        track("plan_generated", { seconds: Math.round((Date.now() - t0) / 1000), storeIds });
       })
       .catch((err) => {
         session.planStatus = "error";
         session.planError = err instanceof Error ? err.message : "Plan generation failed";
+        track("plan_failed");
         console.error("Plan generation failed after retries:", err);
       });
 
@@ -92,6 +103,7 @@ planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
       question.trim().slice(0, 1000),
       Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
     );
+    track("plan_question_asked");
     res.json({ reply });
   } catch (err) {
     next(err);
@@ -111,6 +123,7 @@ planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
     }
     if (!session.wardrobePlan) return res.status(409).json({ error: "No plan yet for this session" });
     const outfits = await buildOutfitMatrix(session);
+    track("outfits_built", { count: outfits.length });
     res.json({ outfits });
   } catch (err) {
     next(err);
@@ -133,6 +146,7 @@ planRouter.get("/:sessionId", (req, res) => {
   res.json({
     status: session.planStatus,
     stage: session.planStage,
+    draftedPhases: session.draftedPhases,
     plan: session.wardrobePlan,
     error: session.planError,
   });

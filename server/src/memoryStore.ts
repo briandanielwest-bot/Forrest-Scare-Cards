@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { randomBytes } from "crypto";
-import type { StyleProfile, WardrobePlan } from "./types";
+import type Anthropic from "@anthropic-ai/sdk";
+import type { PhotoAssessment, StyleProfile, WardrobePlan } from "./types";
 
 /**
  * Claim-code memory: guest-by-default persistence without accounts.
@@ -25,6 +26,10 @@ export interface MemoryRecord {
   styleProfile: StyleProfile | null;
   wardrobePlan: WardrobePlan | null;
   purchasedKeys: string[];
+  /** Full dossier: everything a returning customer expects Kyla to remember. */
+  photoAssessment?: PhotoAssessment;
+  planQAHistory?: Anthropic.MessageParam[];
+  outfits?: { name: string; occasion: string; pieces: string[] }[];
 }
 
 // No lookalike characters (0/O, 1/I/L) — these get read over the phone.
@@ -53,6 +58,9 @@ export function saveMemory(record: {
   wardrobePlan: WardrobePlan | null;
   purchasedKeys: string[];
   existingCode?: string;
+  photoAssessment?: PhotoAssessment;
+  planQAHistory?: Anthropic.MessageParam[];
+  outfits?: { name: string; occasion: string; pieces: string[] }[];
 }): MemoryRecord {
   ensureDir();
   const now = new Date().toISOString();
@@ -66,6 +74,9 @@ export function saveMemory(record: {
     styleProfile: record.styleProfile,
     wardrobePlan: record.wardrobePlan,
     purchasedKeys: record.purchasedKeys ?? [],
+    photoAssessment: record.photoAssessment ?? prior?.photoAssessment,
+    planQAHistory: record.planQAHistory ?? prior?.planQAHistory,
+    outfits: record.outfits ?? prior?.outfits,
   };
   fs.writeFileSync(codePath(code), JSON.stringify(full));
   return full;

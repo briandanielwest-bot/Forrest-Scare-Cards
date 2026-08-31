@@ -11,6 +11,13 @@ name: Monthly data refresh
 on:
   schedule:
     - cron: "0 11 1 * *" # 1st of each month, 11:00 UTC (~6am Houston)
+    # Weekly sales pulse during the discount windows that matter:
+    - cron: "0 12 * 11,12 1" # Mondays in Nov-Dec (holiday/Black Friday season)
+    - cron: "0 12 * 7 1" # Mondays in July (summer markdowns)
+    # Pre-event sweeps ~2 weeks ahead of Houston's big three:
+    - cron: "0 12 16 2 *" # Feb 16 — before rodeo season opens
+    - cron: "0 12 9 3 *" # Mar 9 — before CERAWeek
+    - cron: "0 12 20 4 *" # Apr 20 — before OTC
   workflow_dispatch: {}
 
 permissions:
