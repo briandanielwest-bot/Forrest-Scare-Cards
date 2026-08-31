@@ -7,6 +7,7 @@ import { PhotoUploadScreen } from "../screens/PhotoUploadScreen";
 import { GeneratingPlanScreen } from "../screens/GeneratingPlanScreen";
 import { PlanScreen } from "../screens/PlanScreen";
 import { StoreDirectoryScreen } from "../screens/StoreDirectoryScreen";
+import { StaplesScreen } from "../screens/StaplesScreen";
 import { colors } from "../theme/theme";
 
 export type RootStackParamList = {
@@ -16,6 +17,7 @@ export type RootStackParamList = {
   GeneratingPlan: undefined;
   Plan: undefined;
   StoreDirectory: undefined;
+  Staples: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export function RootNavigator({
         />
         <Stack.Screen name="Plan" component={PlanScreen} options={{ title: "Your Houston Guide" }} />
         <Stack.Screen name="StoreDirectory" component={StoreDirectoryScreen} options={{ title: "Houston Store Directory" }} />
+        <Stack.Screen name="Staples" component={StaplesScreen} options={{ title: "Kyla's Starter Staples" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
