@@ -6,8 +6,9 @@ import { fetchStores } from "../api/client";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, StoreCategory } from "../types";
 
+// Domain only — full URLs with paths overflow the card on phone widths.
 function formatWebsite(url: string): string {
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
 }
 
 function telUrl(contact: string): string | null {
@@ -112,8 +113,10 @@ export function StoreDirectoryScreen() {
             ) : null}
             <View style={styles.linkRow}>
               {item.website ? (
-                <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8}>
-                  <Text style={styles.website}>{formatWebsite(item.website)} →</Text>
+                <Pressable onPress={() => Linking.openURL(item.website)} hitSlop={8} style={styles.linkShrink}>
+                  <Text style={styles.website} numberOfLines={1}>
+                    {formatWebsite(item.website)} →
+                  </Text>
                 </Pressable>
               ) : null}
               <Pressable onPress={() => Linking.openURL(mapsUrl(item))} hitSlop={8}>
@@ -186,7 +189,8 @@ const styles = StyleSheet.create({
   howToBuy: { ...typography.small },
   contact: { ...typography.small, fontWeight: "700", color: colors.ink },
   contactLink: { ...typography.small, fontWeight: "700", color: colors.bayou },
-  linkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 2 },
+  linkRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 2, gap: spacing.sm },
+  linkShrink: { flexShrink: 1 },
   website: { ...typography.small, color: colors.bayou, fontWeight: "700", marginTop: 2 },
   disclaimer: { ...typography.small, textAlign: "center", marginTop: spacing.lg, marginBottom: spacing.xl },
 });
