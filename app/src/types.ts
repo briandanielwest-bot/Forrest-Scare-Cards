@@ -41,6 +41,7 @@ export interface WardrobeItem {
   estimatedBudgetHighUsd: number;
   priority: StorePriority;
   recommendedStoreIds: string[];
+  itemName?: string;
   sayThis?: string;
   keySpecs?: string[];
   tip?: string;

@@ -3,6 +3,7 @@ import { anthropic } from "../anthropicClient";
 import { AGENT_MODEL } from "../config";
 import type { ScoutReport } from "./storeScout";
 import { PRICE_AND_TIMING_REALITY } from "../data/houstonKnowledge";
+import { getHoustonClimateStyleBrief } from "./styleWeather";
 import type { PhotoAssessment, StyleProfile, WardrobePlan } from "../types";
 
 /**
@@ -23,7 +24,7 @@ RULES
 - EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. The whyThisStore field carries the justification; a "rightNow" note on a store (live-researched current intel — a sale, a move, a program) belongs in logistics or phase timing when it genuinely helps ("their sale is running — buy this phase first").
 - Phase names never repeat the timingLabel — the UI shows the timing right above the name, so "Q1 — Fix What's Boxy" not "Q1 — Fix What's Boxy (Weeks 1-2)".
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
-- Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the five in-store script fields below.
+- Every line-item wardrobe piece needs: category, an itemName (the short shoppable name — color, fabric, type, MAX 6 words; it's what the timeline and store lists print), description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the in-store script fields below.
 - THE IN-STORE SCRIPT IS LEAN: an opening line, 1-2 specs, and at most one tip. He reads it standing in a store; the shortest script he'll actually use beats the most complete one he won't.
   - sayThis (required, max 22 words): the literal opening line to the salesperson — fabric, color, cut, budget ("Navy tropical-wool suit, trim through the body, around $550 all in").
   - keySpecs (required, 1-2 bullets, max 10 words each): only the specs that matter for HIS fit, face, and coloring — from his preferences and, if provided, the photo reads.
@@ -41,12 +42,19 @@ RULES
 - Call submit_wardrobe_plan exactly once with the complete plan.
 
 ${PRICE_AND_TIMING_REALITY}
-Use the reality tables above for every budget range, alterations reserve, lead time, and buy-timing call — they are your pricing ground truth for Houston; don't re-derive them.`;
+Use the reality tables above for every budget range, alterations reserve, lead time, and buy-timing call — they are your pricing ground truth for Houston; don't re-derive them.
+
+${getHoustonClimateStyleBrief()}`;
 
 const WARDROBE_ITEM_SCHEMA = {
   type: "object",
   properties: {
     category: { type: "string" },
+    itemName: {
+      type: "string",
+      description:
+        "Short shoppable name with color/fabric/type, MAX 6 words, NO counts (quantity is its own field) — e.g. 'Navy tropical-wool MTM suit', 'White poplin dress shirts'. Shown in the timeline and store lists.",
+    },
     description: { type: "string" },
     quantity: { type: "number" },
     estimatedBudgetLowUsd: { type: "number" },
@@ -77,6 +85,7 @@ const WARDROBE_ITEM_SCHEMA = {
   },
   required: [
     "category",
+    "itemName",
     "description",
     "quantity",
     "estimatedBudgetLowUsd",
@@ -153,41 +162,48 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
 export async function buildWardrobePlan(args: {
   profile: StyleProfile;
   photoAssessment?: PhotoAssessment;
-  climateBrief: string;
   scoutReports: ScoutReport[];
 }): Promise<WardrobePlan> {
-  const { profile, photoAssessment, climateBrief, scoutReports } = args;
+  const { profile, photoAssessment, scoutReports } = args;
 
   // The planner gets each vetted store's full profile — what it actually
   // carries, how buying there works, and its contact — so item-to-store
   // matching reflects real inventory, and the script fields can tell the man
-  // exactly who to call and how to book.
-  const vettedStores = scoutReports.flatMap((report) =>
-    report.recommendations.map((r) => ({
-      id: r.store.id,
-      name: r.store.name,
-      category: r.store.category,
-      neighborhood: r.store.neighborhood,
-      priceTier: r.store.priceTier,
-      whatItIs: r.store.description,
-      knownFor: r.store.knownFor,
-      catersTo: r.store.catersTo,
-      bestFor: r.store.bestFor,
-      howToBuy: r.store.howToBuy,
-      rightNow: r.store.seasonalNote,
-      contact: r.store.contact ?? "no phone listed — use its website",
-      expertTake: r.reason,
-    })),
-  );
+  // exactly who to call and how to book. Directors sometimes vet the same
+  // store from different categories; each store appears ONCE with the
+  // experts' takes merged, which reads better and trims prefill tokens.
+  const byId = new Map<string, Record<string, unknown> & { expertTake: string }>();
+  for (const report of scoutReports) {
+    for (const r of report.recommendations) {
+      const existing = byId.get(r.store.id);
+      if (existing) {
+        existing.expertTake += ` ALSO: ${r.reason}`;
+        continue;
+      }
+      byId.set(r.store.id, {
+        id: r.store.id,
+        name: r.store.name,
+        category: r.store.category,
+        neighborhood: r.store.neighborhood,
+        priceTier: r.store.priceTier,
+        whatItIs: r.store.description,
+        knownFor: r.store.knownFor,
+        catersTo: r.store.catersTo,
+        bestFor: r.store.bestFor,
+        howToBuy: r.store.howToBuy,
+        rightNow: r.store.seasonalNote,
+        contact: r.store.contact ?? "no phone listed — use its website",
+        expertTake: r.reason,
+      });
+    }
+  }
+  const vettedStores = Array.from(byId.values());
 
   const userMessage = `STYLE PROFILE:
 ${JSON.stringify(profile)}
 
 PHOTO ASSESSMENT:
 ${photoAssessment ? JSON.stringify(photoAssessment) : "None provided — the man did not upload photos."}
-
-HOUSTON CLIMATE & STYLE BRIEF:
-${climateBrief}
 
 VETTED STORE CANDIDATES (use ONLY these ids in recommendedStoreIds):
 ${JSON.stringify(vettedStores)}
