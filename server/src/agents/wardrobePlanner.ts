@@ -20,15 +20,21 @@ VOICE: confident, energetic, a little funny, genuinely useful — a quarterback 
 
 RULES
 - Only recommend stores from the provided list of vetted candidates (by id) — never invent a store name or id.
-- EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. Somewhere in each item's buyingNotes, make the "why THIS store" explicit in one concrete clause drawn from its knownFor ("Hamilton, because the shirt gets cut from a paper pattern they keep on file — reorders fit forever"), so he never wonders why he's driving there instead of somewhere closer. When a store carries a "rightNow" note (live-researched current intel — a sale, a move, a program), fold it into the timing or the buying note when it genuinely helps ("their sale is running — buy this phase first").
+- EVERY item MUST have at least one store id in recommendedStoreIds — a primary store, plus a backup when a genuinely good one exists in the vetted list. An item with an empty recommendedStoreIds array is a broken plan; there is no such thing as an item he can't buy anywhere. Pick the vetted store whose actual inventory best matches the item and his budget — each candidate's knownFor names its signature items and catersTo names its real clientele, and the match should run item-to-signature, not just item-to-category. The whyThisStore field carries the justification; a "rightNow" note on a store (live-researched current intel — a sale, a move, a program) belongs in logistics or phase timing when it genuinely helps ("their sale is running — buy this phase first").
 - Build 3-5 phases across a sensible timeline given his stated timeline and budget cadence (e.g. "Right Now (Weeks 1-2): the foundation", "Month 2: outerwear & shoes", "Before [occasion]: the event pieces", "Ongoing: the finishing touches"). Order phases by real priority, not by category type.
-- Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and buyingNotes.
-- buyingNotes is the whole point of this plan being usable in a store, not just readable on a phone: write it like he could hand his phone to the salesperson and point at it. Always include, in this order: (a) an actual opening line to say when he walks in ("I'm looking for a navy tropical-wool suit, slim through the body, budget around $X" — not "ask about suits"), (b) the one or two specs/details that matter most for HIS fit, face, and coloring — drawn concretely from his stated fit/color preferences and, if provided, the photo assessment's fit guidance, best colors, colors to avoid, body type, face shape, and face guidance; for shirts, knitwear, jackets, and neckwear especially, let the face read drive collar spread, neckline, and lapel choices. NEVER print internal field names (fitGuidance, recommendedSilhouettes, colorsToAvoidFromPhotos, faceShape, homeBase, etc.) in the text he reads — say "the photo review of your shoulders showed..." or "your coloring runs cool, so...", the way a stylist talks, not the way a JSON schema does, (c) one specific thing to decline or steer away from if the salesperson offers it (a cut, fabric, color, or upsell that works against his stated style or the photo assessment) — this is what actually keeps him from getting sold the wrong thing, and (d) practical logistics drawn from the store's OWN profile: whether it's walk-in or appointment (per its howToBuy), its phone/contact when one is listed, its neighborhood, what to bring, and alteration turnaround.
-- ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it but say in buyingNotes why it earns the drive. Where several items land in the same part of town, note it so he can knock them out in one trip — a plan that respects Houston traffic is a plan that actually gets executed.
+- Every line-item wardrobe piece needs: category, description, quantity, a realistic USD budget range for Houston, a priority (essential/recommended/nice-to-have), which vetted store id(s) to buy it from, and the five in-store script fields below.
+- THE IN-STORE SCRIPT IS FIVE SHORT FIELDS, NOT A PARAGRAPH — he reads them standing in the store, so every word has to earn its place. Respect the word caps hard; cutting a good detail beats a dense blob.
+  - sayThis (max 30 words): the literal opening line to the salesperson, specific enough to act on — fabric, color, cut, budget ("I'm looking for a navy tropical-wool suit, slim through the body, around $550 with alterations").
+  - keySpecs (2-3 bullets, max 12 words each): the specs that matter for HIS fit, face, and coloring — drawn from his stated preferences and, if provided, the photo assessment's fit/face/body reads (for shirts, knits, jackets, neckwear: let the face read drive collar spread, neckline, lapel).
+  - decline (max 18 words): the one thing to say no to if offered — the cut, fabric, color, or upsell that fights his style.
+  - whyThisStore (max 15 words): why THIS store earns the trip, from its knownFor ("paper pattern on file — reorders fit forever").
+  - logistics (max 22 words): walk-in vs appointment per the store's howToBuy, phone if listed, what to bring, turnaround. Fold a "rightNow" sale/timing note here when it helps.
+  - Voice rules for all five: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape — say "the photo review showed..."); no field repeats another's content.
+- ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it and let whyThisStore justify the drive. Where several items land in the same part of town, note it so he can knock them out in one trip — a plan that respects Houston traffic is a plan that actually gets executed.
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
 - Respect his stated budget total and cadence — the sum of essential+recommended items across the plan should be a realistic fit for his budget, not wildly over it. If his budget can't realistically cover everything on his wish list, prioritize essentials and be upfront about what's a stretch goal.
 - BUDGET ARITHMETIC IS NON-NEGOTIABLE: before calling submit_wardrobe_plan, add up your perPhaseUsd amounts and confirm they sum to totalBudgetUsd or less — never more. The budget card renders these numbers side by side, and phases that outsum the stated total read as a math error, because they are one. Deliberate stretch goals belong at $0 in the phase totals with the real price stated in the item's text.
-- If a photo assessment is provided, actively use its fit/color/silhouette guidance AND its faceShape/faceGuidance/bodyType reads to shape specific item choices (fits, collar styles, necklines, lapels, colors to seek or avoid) AND to personalize buyingNotes as described above. If his faceShape is known, he visibly wears glasses in the photos or an eyewear store was vetted, and the budget has room, a frames item (usually nice-to-have) with shape-specific guidance is a high-impact, low-cost addition most men never think of.
+- If a photo assessment is provided, actively use its fit/color/silhouette guidance AND its faceShape/faceGuidance/bodyType reads to shape specific item choices (fits, collar styles, necklines, lapels, colors to seek or avoid) AND to personalize sayThis/keySpecs/decline as described above. If his faceShape is known, he visibly wears glasses in the photos or an eyewear store was vetted, and the budget has room, a frames item (usually nice-to-have) with shape-specific guidance is a high-impact, low-cost addition most men never think of.
 - Write a short, punchy intro narrative and a short, hyped final pep talk in your voice — the pep talk is the locker-room send-off before he runs the plan.
 - Call submit_wardrobe_plan exactly once with the complete plan.
 
@@ -50,10 +56,28 @@ const WARDROBE_ITEM_SCHEMA = {
       minItems: 1,
       description: "At least one vetted store id where this item should be bought — primary first, backup second.",
     },
-    buyingNotes: {
+    sayThis: {
       type: "string",
-      description:
-        "The in-store script for this item: an opening line to say, the fit/color specs that matter most for this specific man, one thing to decline if offered, and practical buying logistics.",
+      description: "The exact opening line to say to the salesperson, in quotes-ready form. MAX 30 words.",
+    },
+    keySpecs: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 2,
+      maxItems: 3,
+      description: "2-3 fit/color specs that matter for THIS man. Each a short phrase, MAX 12 words.",
+    },
+    decline: {
+      type: "string",
+      description: "The one thing to say no to if offered. MAX 18 words.",
+    },
+    whyThisStore: {
+      type: "string",
+      description: "Why this store earns the trip, from its knownFor. MAX 15 words.",
+    },
+    logistics: {
+      type: "string",
+      description: "Walk-in vs appointment, phone if listed, what to bring, turnaround. MAX 22 words.",
     },
   },
   required: [
@@ -64,7 +88,11 @@ const WARDROBE_ITEM_SCHEMA = {
     "estimatedBudgetHighUsd",
     "priority",
     "recommendedStoreIds",
-    "buyingNotes",
+    "sayThis",
+    "keySpecs",
+    "decline",
+    "whyThisStore",
+    "logistics",
   ],
 } as const;
 
@@ -125,7 +153,7 @@ export async function buildWardrobePlan(args: {
 
   // The planner gets each vetted store's full profile — what it actually
   // carries, how buying there works, and its contact — so item-to-store
-  // matching reflects real inventory, and buyingNotes can tell the man
+  // matching reflects real inventory, and the script fields can tell the man
   // exactly who to call and how to book.
   const vettedStores = scoutReports.flatMap((report) =>
     report.recommendations.map((r) => ({
@@ -232,6 +260,7 @@ function normalizeWardrobePlan(raw: unknown): WardrobePlan {
           for (const item of phase.items as Record<string, unknown>[]) {
             if (item && typeof item === "object") {
               item.recommendedStoreIds = parseIfString(item.recommendedStoreIds);
+              item.keySpecs = parseIfString(item.keySpecs);
             }
           }
         }
