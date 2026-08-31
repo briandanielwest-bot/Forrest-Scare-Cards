@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
 import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
-import { AskCampbell } from "../components/AskCampbell";
+import { AskConcierge } from "../components/AskConcierge";
 import { TEAM } from "../data/team";
 
 type InterviewOpener = Awaited<ReturnType<typeof startInterview>>;
@@ -138,11 +138,11 @@ export function WelcomeScreen({ navigation }: Props) {
           />
           <Step
             number="2"
-            text="Optional: send Watt your photos. He reads shoulders, face shape, and coloring the way he'd read game film, and every recommendation after that gets sharper."
+            text="Optional: send Theo your photos. He spent a decade fitting men who never fit a standard size, and he reads shoulder slope and torso length off a photo. Every recommendation after that gets sharper."
           />
           <Step
             number="3"
-            text="Four buying directors work their categories: tailoring, designer floors, footwear, accessories. Moon takes their picks and builds one phased plan that fits your number."
+            text="Vinh, Simone, Ade and Priya work their categories: tailoring, designer floors, footwear, accessories. Elena takes their picks and builds one phased plan your budget can carry."
           />
         </View>
 
@@ -160,23 +160,29 @@ export function WelcomeScreen({ navigation }: Props) {
             <Text style={styles.staplesLink}>Browse the staples →</Text>
           </Pressable>
 
-          <AskCampbell />
+          <AskConcierge />
         </View>
 
         <View style={styles.teamCard}>
           <Text style={styles.teamTitle}>Meet the team</Text>
-          <View style={styles.teamRow}>
-            {TEAM.map((member) => (
-              <View key={member.id} style={styles.teamPill}>
-                {member.id === "kyla" ? <KylaPortrait size={44} /> : <TeamAvatar look={member.look} size={44} />}
-                <Text style={styles.teamPillName}>{member.name}</Text>
-                <Text style={styles.teamPillRole}>{member.title}</Text>
+          {/* A row each rather than a grid of name pills: the point of this
+              section is where they learned the job and what they do on your
+              plan, and neither of those fits under a portrait. */}
+          {TEAM.map((member) => (
+            <View key={member.id} style={styles.teamMember}>
+              {member.id === "kyla" ? <KylaPortrait size={52} /> : <TeamAvatar look={member.look} size={52} />}
+              <View style={styles.teamMemberText}>
+                <Text style={styles.teamMemberName}>
+                  {member.name} <Text style={styles.teamMemberRole}>· {member.title}</Text>
+                </Text>
+                <Text style={styles.teamMemberBio}>{member.bio}</Text>
+                <Text style={styles.teamMemberDoes}>{member.does}</Text>
               </View>
-            ))}
-          </View>
+            </View>
+          ))}
           <Text style={styles.teamDisclaimer}>
-            Kyla and the team are characters, not real people. Their names are a fan homage to Houston sports
-            legends, and this app is not affiliated with or endorsed by the people they honor.
+            Kyla and the team are characters, not real people, and their portraits are illustrations rather than
+            likenesses of anyone.
           </Text>
         </View>
       </ScrollView>
@@ -295,6 +301,12 @@ const styles = StyleSheet.create({
   },
   teamTitle: { color: colors.cream, fontSize: 16, fontWeight: "700" },
   teamRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  teamMember: { flexDirection: "row", gap: spacing.sm, alignItems: "flex-start", marginTop: spacing.sm },
+  teamMemberText: { flex: 1, gap: 2 },
+  teamMemberName: { color: colors.gold, fontWeight: "700", fontSize: 14 },
+  teamMemberRole: { color: colors.cream, opacity: 0.7, fontWeight: "500", fontSize: 12 },
+  teamMemberBio: { color: colors.cream, opacity: 0.8, fontSize: 12, lineHeight: 17 },
+  teamMemberDoes: { color: colors.cream, opacity: 0.95, fontSize: 12, lineHeight: 17, fontStyle: "italic" },
   teamPill: {
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: radii.md,

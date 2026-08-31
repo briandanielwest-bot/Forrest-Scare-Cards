@@ -4,7 +4,7 @@ import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { FAST_AGENT_MODEL } from "../config";
 
 /**
- * "Campbell" — Houston Style & Weather Agent, named in homage to the
+ * "Marisol" — Houston Style & Weather Agent. Nine years on a Post Oak
  * running back who powered through everything Houston threw at him.
  *
  * Houston's climate and dress culture are specific enough that generic
@@ -57,14 +57,14 @@ ${SEASON_BRIEF}`
   }`;
 }
 
-// Compact directory sheet so Campbell's store mentions stay inside the
+// Compact directory sheet so Marisol's store mentions stay inside the
 // vetted set (he named a womenswear boutique from background knowledge
 // before this existed).
 const ALMANAC_STORE_SHEET = getAllStores()
   .map((st) => `${st.name} (${st.neighborhood}; ${st.priceTier}): ${st.knownFor}`)
   .join("\n");
 
-const ALMANAC_SYSTEM_PROMPT = `You are Campbell, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone, like a well-dressed local giving real advice, not a weather report.
+const ALMANAC_SYSTEM_PROMPT = `You are Marisol, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone, like a well-dressed local giving real advice, not a weather report.
 
 ANSWER FORMAT: plain conversational text only, NO markdown, no asterisks, no headers, no bullet lists (the app renders your words verbatim). MAX 110 words: the direct answer, the one or two Houston-specific details that matter, and a store or timing tip when it genuinely helps. One tight paragraph or two short ones.
 

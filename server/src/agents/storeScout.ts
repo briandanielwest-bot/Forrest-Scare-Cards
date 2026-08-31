@@ -32,29 +32,29 @@ interface ScoutDefinition {
   focus: string;
 }
 
-// Scout names are a fan homage to Houston sports legends, matched to each
+// The buying directors, each a category specialist matched to each
 // role — the craftsman, the smoothest style in the building, the footwork,
 // the closer. Not affiliated with or endorsed by the people they honor.
 const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   {
-    scoutName: "Biggio (Director of Tailoring)",
+    scoutName: "Vinh (Director of Tailoring)",
     categories: ["bespoke-tailoring", "alterations"],
     focus:
       "custom and made-to-measure tailoring, suits and shirts built or fitted specifically to this man, plus dedicated alterations shops for making off-the-rack pieces fit",
   },
   {
-    scoutName: "Drexler (Director of Designer Floors)",
+    scoutName: "Simone (Director of Designer Floors)",
     categories: ["luxury-department", "contemporary-boutique", "formal-wear", "big-tall"],
     focus:
       "designer ready-to-wear, department-store and big & tall menswear, contemporary boutique pieces, and tuxedo/formal-wear for black-tie events",
   },
   {
-    scoutName: "Olajuwon (Director of Footwear)",
+    scoutName: "Ade (Director of Footwear)",
     categories: ["western-boots-leather", "footwear"],
     focus: "dress and casual footwear, plus boots and western wear for the man who genuinely wants that category, not a default push toward it",
   },
   {
-    scoutName: "Wagner (Director of Accessories)",
+    scoutName: "Priya (Director of Accessories)",
     categories: ["lifestyle-accessories", "eyewear"],
     focus:
       "grooming, small leather goods, finishing accessories, and eyewear (the planner downstream matches frames to his face shape, so include an eyewear option at his price tier when glasses could plausibly matter)",
@@ -169,7 +169,7 @@ export async function runAllScouts(profile: StyleProfile, climateBrief: string):
   return Promise.all(SCOUT_DEFINITIONS.map((def) => runScout(def, profile, climateBrief)));
 }
 
-// The late-photo courtesy pass: the directors usually finish before Watt's
+// The late-photo courtesy pass: the directors usually finish before Theo's
 // photo read lands (that's the right latency trade). When a face read
 // exists, the accessories director — whose eyewear calls depend on face
 // shape most — gets one re-run with it. ~4s, only when photos were

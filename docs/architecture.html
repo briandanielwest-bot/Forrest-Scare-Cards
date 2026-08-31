@@ -58,14 +58,14 @@
 flowchart TD
   U([Customer]) --> K[Kyla · Lead Stylist<br/>interview, streamed replies, chips]
   K -->|typed profile + client brief| PW[Experts pre-warm<br/>during photo screen]
-  U --> W[Watt · Fit and Build<br/>photo read, async]
-  PW --> B[Biggio · Tailoring]
-  PW --> D[Drexler · Designer Floors]
-  PW --> O[Olajuwon · Footwear]
-  PW --> G[Wagner · Accessories]
+  U --> W[Theo · Fit and Build<br/>photo read, async]
+  PW --> B[Vinh · Tailoring]
+  PW --> D[Simone · Designer Floors]
+  PW --> O[Ade · Footwear]
+  PW --> G[Priya · Accessories]
   W -.->|late face read| G
-  B & D & O & G -->|top picks, merged and deduped| M[Moon · Head of Planning<br/>streams the draft ticker]
-  C[Campbell · Houston Concierge<br/>climate, calendar, season, prices] -.->|cached briefs| K & B & D & O & G & M
+  B & D & O & G -->|top picks, merged and deduped| M[Elena · Head of Planning<br/>streams the draft ticker]
+  C[Marisol · Houston Concierge<br/>climate, calendar, season, prices] -.->|cached briefs| K & B & D & O & G & M
   M -->|inspected plan| P([The Plan])
   P --> QA[Kyla · Plan Chat<br/>knows purchases + outfits]
   P --> OM[Outfit Matrix<br/>on demand]
@@ -81,10 +81,10 @@ flowchart TD
     <div class="table-scroll"><table>
       <tr><th>Agent</th><th>Role</th><th>Model / effort</th><th>Key mechanics</th></tr>
       <tr><td>Kyla</td><td>Interview → profile</td><td>Sonnet · medium</td><td>Cached persona + calendar/districts/prices; SSE streaming; anticipatory chips; magic question; typed client brief (northStar, urgentEvent, handleWithCare); four-line send-off</td></tr>
-      <tr><td>Watt</td><td>Photo → fit/face/body</td><td>Sonnet · medium</td><td>Async 202; on-device resize first; overlapped with experts so it costs no wait</td></tr>
-      <tr><td>Campbell</td><td>City intelligence</td><td>Pure data + Sonnet Q&amp;A</td><td>Climate/calendar/district/price briefs baked into every cached prompt; almanac box on the directory (plain text, ≤110 words)</td></tr>
-      <tr><td>Biggio / Drexler / Olajuwon / Wagner</td><td>Category buying directors</td><td>Sonnet · low, parallel</td><td>Pre-warm at interview submit; top 3–4 picks, 25-word takes; Wagner re-runs with a late face read (~4s, photo runs only)</td></tr>
-      <tr><td>Moon</td><td>The plan</td><td>Opus · medium</td><td>Cached system (rules + prices + climate); fast-mode attempt with fallback; streams the draft ticker; budget arithmetic + retry</td></tr>
+      <tr><td>Theo</td><td>Photo → fit/face/body</td><td>Sonnet · medium</td><td>Async 202; on-device resize first; overlapped with experts so it costs no wait</td></tr>
+      <tr><td>Marisol</td><td>City intelligence</td><td>Pure data + Sonnet Q&amp;A</td><td>Climate/calendar/district/price briefs baked into every cached prompt; almanac box on the directory (plain text, ≤110 words)</td></tr>
+      <tr><td>Vinh / Simone / Ade / Priya</td><td>Category buying directors</td><td>Sonnet · low, parallel</td><td>Pre-warm at interview submit; top 3–4 picks, 25-word takes; Priya re-runs with a late face read (~4s, photo runs only)</td></tr>
+      <tr><td>Elena</td><td>The plan</td><td>Opus · medium</td><td>Cached system (rules + prices + climate); fast-mode attempt with fallback; streams the draft ticker; budget arithmetic + retry</td></tr>
       <tr><td>Kyla (plan chat)</td><td>Post-plan Q&amp;A</td><td>Sonnet · low</td><td>Full plan + directory + live purchases + outfit names in context; rolling history; survives claim-code restore</td></tr>
       <tr><td>Ryan</td><td>Offline researcher</td><td>Sonnet + web search</td><td>Monthly + seasonal crons; store status, insider notes, season brief, price brief; recency and apology guards</td></tr>
     </table></div>
@@ -103,9 +103,9 @@ flowchart TD
       <tr><td>Plan chat answer</td><td class="num">4–7s</td><td>—</td></tr>
       <tr><td>Outfit matrix</td><td class="num">10–12s once</td><td>On-demand button, then cached</td></tr>
       <tr><td>Save / restore code</td><td class="num">&lt;0.5s</td><td>Disk, no model</td></tr>
-      <tr><td>Ask Campbell</td><td class="num">4–6s</td><td>—</td></tr>
+      <tr><td>Ask Marisol</td><td class="num">4–6s</td><td>—</td></tr>
     </table></div>
-    <p>The honest bottleneck is Moon's minute — and it's now a minute the customer <em>watches work happen in</em>: his own items appearing line by line, Kyla's tips, real store facts. Fast-mode (already wired with automatic fallback) halves it whenever Anthropic capacity opens.</p>
+    <p>The honest bottleneck is Elena's minute — and it's now a minute the customer <em>watches work happen in</em>: his own items appearing line by line, Kyla's tips, real store facts. Fast-mode (already wired with automatic fallback) halves it whenever Anthropic capacity opens.</p>
   </section>
 
   <section>
@@ -128,7 +128,7 @@ flowchart TD
       <li>Optional photo read (on-device resize, async, graceful when unreadable)</li>
       <li>The plan, in buying order: timeline with first-move banner and per-store item/price lines → store run list (phones, maps, known-for, prices) → full item detail with lean in-store scripts (say-this, specs, one tip) → buying tips → Kyla's personal sign-off</li>
       <li>Living checklist: tap-to-buy check-offs with a progress bar; copy-plan hand-over text with store contacts</li>
-      <li>Ask Kyla plan chat (purchase-aware), on-demand outfit matrix, claim-code save/restore, Ask Campbell on the store directory, searchable directory with monthly "right now" notes</li>
+      <li>Ask Kyla plan chat (purchase-aware), on-demand outfit matrix, claim-code save/restore, Ask Marisol on the store directory, searchable directory with monthly "right now" notes</li>
       <li>Hold screen: team spotlight with legend-true lines, elapsed timer, tappable tip/store-fact deck, live plan-draft ticker</li>
       <li>Starter Staples showcase (4 industries × 3 levels), Kyla-fronted Welcome with team portraits</li>
     </ul>
@@ -162,7 +162,7 @@ flowchart TD
     <h2>The big builds, in order of impact</h2>
     <ol>
       <li><strong>Real accounts + database.</strong> Postgres (or managed equivalent) behind the claim-code system: email/passkey login, plans that survive anything, shareable read-only plan links, returning-customer Kyla by default. The foundation every revenue feature stands on.</li>
-      <li><strong>Progressive plan render.</strong> The ticker proves the stream parses; the next step renders finished phases as cards while Moon writes the rest — first phase readable in ~20 seconds.</li>
+      <li><strong>Progressive plan render.</strong> The ticker proves the stream parses; the next step renders finished phases as cards while Elena writes the rest — first phase readable in ~20 seconds.</li>
       <li><strong>Native apps.</strong> The Expo codebase already targets iOS/Android; App Store presence needs accounts, push notifications (phase reminders: "Week 3 — shoe week"), and the $99/yr Apple program.</li>
       <li><strong>Seasonal re-engagement.</strong> With accounts: Kyla emails/pushes at the calendar moments the app already knows — "Gala season's six weeks out; your tux plan is ready."</li>
       <li><strong>Store portal.</strong> Give partner stores a login to see (aggregate) referral counts and post their own trunk-show dates into the directory — turns the receipt book into a product.</li>
@@ -176,7 +176,7 @@ flowchart TD
     <p>Everything city-specific already lives in swappable data, which makes a new market a research project, not an engineering one:</p>
     <ol>
       <li><strong>Research the pack</strong> — 40+ stores with knownFor/catersTo/howToBuy, the city's events calendar, shopping districts with drive times, industry decoder (Dallas: finance/tech/defense; Austin: tech/startup/music). Ryan's script re-verifies it monthly from day one.</li>
-      <li><strong>Localize the voices</strong> — Kyla's Houston references and the team's homage names become city-true equivalents; the climate brief rewrites (Dallas heat is real but the AC-swing culture differs; Austin is business-casual-first).</li>
+      <li><strong>Localize the voices</strong> — Kyla's Houston references and the team's backstories become city-true equivalents (Vinh's Bellaire alterations shop has a Dallas or Austin counterpart); the climate brief rewrites (Dallas heat is real but the AC-swing culture differs; Austin is business-casual-first).</li>
       <li><strong>Ship behind a city selector</strong> — one codebase, one brand, <code>?city=dallas</code> loading the pack; never a separate app per city.</li>
       <li><strong>Sequence</strong> — Dallas first (closest culture match, same store chains plus strong independents), Austin second, then San Antonio/Fort Worth. Each launch re-runs the Houston GTM: local face, event-timed pushes, independent-store partnerships.</li>
       <li><strong>Gate</strong> — expand only after Houston shows paying users; a second city doubles research and marketing surface, not revenue, until the model is proven.</li>

@@ -157,7 +157,7 @@ export function InterviewScreen({ navigation }: Props) {
 
         {interviewDone ? (
           <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("PhotoUpload")}>
-            <Text style={styles.primaryButtonText}>Next: show Watt your photos →</Text>
+            <Text style={styles.primaryButtonText}>Next: show Theo your photos →</Text>
           </Pressable>
         ) : (
           <View style={styles.inputRow}>

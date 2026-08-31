@@ -1,8 +1,8 @@
 /**
  * The Houston events a man actually has to dress for, as tappable
- * questions for Campbell.
+ * questions for the concierge.
  *
- * Campbell could always answer these; nobody knew to ask him. The card
+ * The concierge could always answer these; nobody knew to ask. The card
  * had one placeholder question and a text box, which is a search box, and
  * a search box only helps a man who already knows what he wants. These
  * chips are the feature announcing itself.
@@ -15,7 +15,7 @@
 export interface HoustonEvent {
   /** Chip label, short enough to read at a glance. */
   label: string;
-  /** The question actually sent to Campbell. */
+  /** The question actually sent to the concierge. */
   question: string;
   /** Months (1-12) this is live or close enough to be worth planning. */
   months: number[];

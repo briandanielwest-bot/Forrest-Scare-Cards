@@ -4,7 +4,7 @@ import { track } from "../analytics";
 
 export const almanacRouter = Router();
 
-// One-off Houston style questions answered by Campbell — no session
+// One-off Houston style questions answered by Marisol, no session
 // needed; the rate limiter is applied at mount (it's a Claude call).
 almanacRouter.post("/ask", async (req, res, next) => {
   try {
