@@ -1,7 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
+import { EM_DASH, HUMAN_VOICE_RULES, findVoiceTells, sanitizeVoice } from "./voice";
 import { anthropic } from "../anthropicClient";
-import { AGENT_MODEL } from "../config";
+import { AGENT_MODEL, FAST_AGENT_MODEL } from "../config";
 import type { ScoutReport } from "./storeScout";
 import { PRICE_AND_TIMING_REALITY } from "../data/houstonKnowledge";
 import { getHoustonClimateStyleBrief } from "./styleWeather";
@@ -320,7 +320,72 @@ Build the complete wardrobe plan now.`;
     throw new Error("Wardrobe planner did not return a plan");
   }
 
-  return normalizeWardrobePlan(toolUse.input, profile);
+  return repairVoice(normalizeWardrobePlan(toolUse.input, profile));
+}
+
+
+/**
+ * The two fields a man reads first and last are the two where the voice
+ * rules are absolute, and they were the two the model still slipped on in
+ * roughly one run out of four. Regenerating the whole plan over one
+ * sentence costs another minute; rewriting the offending field on the fast
+ * model costs about a second, so the rule became enforceable rather than
+ * merely stated.
+ *
+ * Every failure path keeps the original text. A plan that reads slightly
+ * machine-made beats a plan with an empty intro.
+ */
+async function repairVoice(plan: WardrobePlan): Promise<WardrobePlan> {
+  const targets: { key: "introNarrative" | "finalPepTalk"; label: string; maxWords: number; maxSentences?: number }[] = [
+    { key: "introNarrative", label: "the plan's opening narrative", maxWords: 70 },
+    { key: "finalPepTalk", label: "Kyla's sign-off, in her voice", maxWords: 45, maxSentences: 3 },
+  ];
+
+  await Promise.all(
+    targets.map(async (t) => {
+      const original = String((plan as unknown as Record<string, unknown>)[t.key] ?? "");
+      const tells = findVoiceTells(original, { maxSentences: t.maxSentences });
+      if (tells.length === 0) return;
+      console.log(`[planner] repairing ${t.key}: ${tells.join("; ")}`);
+      const startedAt = Date.now();
+
+      try {
+        const res = await anthropic.messages.create({
+          model: FAST_AGENT_MODEL,
+          max_tokens: 400,
+          system: `You rewrite one short passage of menswear copy so it stops sounding machine-written. Keep every fact, name, number, and the writer's warmth exactly as they are. Change only the sentence construction. Reply with the rewritten passage and nothing else: no preamble, no quotation marks around it, no commentary.\n\n${HUMAN_VOICE_RULES}`,
+          messages: [
+            {
+              role: "user",
+              content: `This is ${t.label}. It has ${tells.length === 1 ? "a problem" : "problems"}: ${tells.join("; ")}.\n\nRewrite it under ${t.maxWords} words${t.maxSentences ? ` and in at most ${t.maxSentences} sentences` : ""}, fixing that and nothing else.\n\n${original}`,
+            },
+          ],
+          output_config: { effort: "low" },
+        } as Parameters<typeof anthropic.messages.create>[0]);
+
+        const rewritten = sanitizeVoice(
+          (res as Anthropic.Message).content
+            .filter((b): b is Anthropic.TextBlock => b.type === "text")
+            .map((b) => b.text)
+            .join(" ")
+            .trim(),
+        );
+        // Only accept a rewrite that actually cleared the tells and didn't
+        // run away with the length. Otherwise the original stands.
+        const stillBad = findVoiceTells(rewritten, { maxSentences: t.maxSentences });
+        const words = rewritten.split(/\s+/).filter(Boolean).length;
+        if (rewritten && stillBad.length === 0 && words <= t.maxWords + 10) {
+          (plan as unknown as Record<string, unknown>)[t.key] = rewritten;
+          console.log(`[planner] repaired ${t.key} in ${Date.now() - startedAt}ms`);
+        } else {
+          console.log(`[planner] repair rejected for ${t.key} (${stillBad.join("; ") || `${words} words`})`);
+        }
+      } catch (err) {
+        console.warn(`[planner] voice repair failed for ${t.key}: ${(err as Error).message?.slice(0, 80)}`);
+      }
+    }),
+  );
+  return plan;
 }
 
 // The model occasionally emits a nested array/object field as a JSON
@@ -429,7 +494,7 @@ function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): WardrobePl
   // it past the prompt rules rather than paying a regenerate for it. The
   // count is logged because it's the honest measure of whether the prompt
   // rules are working or the sanitizer is quietly carrying them.
-  const dashes = (JSON.stringify(plan).match(/—/g) ?? []).length;
+  const dashes = (JSON.stringify(plan).match(new RegExp(EM_DASH, "g")) ?? []).length;
   if (dashes > 0) console.log(`[planner] sanitized ${dashes} em-dash(es) out of the plan`);
   return sanitizeVoice(plan) as unknown as WardrobePlan;
 }

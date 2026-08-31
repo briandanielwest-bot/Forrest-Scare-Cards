@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
+import { EM_DASH, HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
 import { coerceArray } from "./toolInput";
@@ -293,7 +293,7 @@ export async function runTurnStreaming(
   let pending = "";
   stream.on("text", (delta) => {
     pending += delta;
-    const held = /(\S+\s*(—\s*)?)$/.exec(pending);
+    const held = new RegExp(`(\\S+\\s*(${EM_DASH}\\s*)?)$`).exec(pending);
     const cut = held ? held.index : pending.length;
     const ready = sanitizeVoice(pending.slice(0, cut));
     pending = pending.slice(cut);

@@ -10,7 +10,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "refresh:data": "ts-node --transpile-only scripts/refresh-data.ts"
+    "refresh:data": "ts-node --transpile-only scripts/refresh-data.ts",
+    "voice:check": "ts-node --transpile-only scripts/voice-check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",
