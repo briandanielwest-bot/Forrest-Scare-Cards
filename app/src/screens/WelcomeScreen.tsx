@@ -92,7 +92,7 @@ export function WelcomeScreen({ navigation }: Props) {
       setChatMessages([{ id: "opening", role: "assistant", text: reply, quickReplies }]);
       navigation.navigate("Interview");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't reach the server — is it running?");
+      setError(e instanceof Error ? e.message : "Couldn't reach the server. Is it running?");
     } finally {
       setLoading(false);
     }
@@ -109,46 +109,48 @@ export function WelcomeScreen({ navigation }: Props) {
             <View style={styles.heroKylaTextWrap}>
               <Text style={styles.heroKylaName}>Kyla, your Lead Stylist</Text>
               <Text style={styles.heroKylaLine}>
-                "One real conversation with me, and you walk out with a priced, dated, store-by-store rebuild plan.
-                Not a quiz. A build-out."
+                "Give me ten minutes of straight answers and I'll hand you the whole rebuild. What to buy, what it
+                costs, which Houston store has it, and the week to go in."
               </Text>
             </View>
           </View>
           <Text style={styles.subtitle}>
-            Built specifically for Houston's climate, culture, and shops — a team of AI stylists behind every plan.
+            43 Houston shops we've researched store by store, from the Galleria designer floors to the shirtmaker on
+            Richmond cutting paper patterns since 1883. We know the brands they carry, what things run, and the lead
+            times.
           </Text>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>What you walk away with</Text>
-          <Bullet text="A phased wardrobe rebuild, priced in real dollars against your actual budget." />
-          <Bullet text="A timeline for exactly when to buy each piece — not everything at once." />
-          <Bullet text="Specific Houston stores matched to your budget and style, not a generic shopping list." />
-          <Bullet text="A plan that accounts for Houston's climate and culture — the AC-vs-August swing, gala season, and (if it's relevant to you) rodeo season." />
+          <Text style={styles.cardTitle}>What you walk out with</Text>
+          <Bullet text="A rebuild in phases, priced in real dollars against your budget, down to the alterations line." />
+          <Bullet text="Dates. Which piece to buy in week one, and what waits for the January markdowns." />
+          <Bullet text="Stores by name. Suitsupply for the navy suit, QC Tailors for the jackets already in your closet." />
+          <Bullet text="Fabrics that survive August. Half-lined jackets and high-twist wool, because you park in a garage and walk two blocks." />
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Here's how it works</Text>
+          <Text style={styles.cardTitle}>How it goes</Text>
           <Step
             number="1"
-            text="A real conversation with Kyla — not a form. She digs into your style, your budget, what's not working right now, and what you're actually trying to look like."
+            text="Kyla interviews you. What you do all day, where in Houston you live, what you hate about your closet, and what you want people to think when you walk in. She pushes back when you go vague."
           />
           <Step
             number="2"
-            text="Optional: show Watt your photos — he reads your face shape, body type, fit, and coloring like game film, and it sharpens every recommendation."
+            text="Optional: send Watt your photos. He reads shoulders, face shape, and coloring the way he'd read game film, and every recommendation after that gets sharper."
           />
           <Step
             number="3"
-            text="Your buying directors — tailoring, designer floors, footwear, accessories — and Moon, your head planner, turn all of that into your full, phased rebuild plan."
+            text="Four buying directors work their categories: tailoring, designer floors, footwear, accessories. Moon takes their picks and builds one phased plan that fits your number."
           />
         </View>
 
         <Pressable style={styles.staplesCard} onPress={() => navigation.navigate("Staples")}>
-          <Text style={styles.staplesKicker}>FREE SAMPLE — NO INTERVIEW REQUIRED</Text>
+          <Text style={styles.staplesKicker}>FREE. NO INTERVIEW NEEDED.</Text>
           <Text style={styles.staplesTitle}>Kyla's Starter Staples</Text>
           <Text style={styles.staplesText}>
-            Four Houston industries. Three career levels. The two pieces she'd make you buy first — with the store,
-            the price, and exactly why. Tap in, steal freely.
+            Pick your industry and where you are in your career. Kyla names the two pieces she'd have you buy first,
+            where to get them, and what they run. Nothing to fill out.
           </Text>
           <Text style={styles.staplesLink}>Browse the staples →</Text>
         </Pressable>
@@ -165,8 +167,8 @@ export function WelcomeScreen({ navigation }: Props) {
             ))}
           </View>
           <Text style={styles.teamDisclaimer}>
-            Agent names are a fan homage to Houston sports legends — this app is not affiliated with or endorsed by
-            the people they honor.
+            Kyla and the team are AI stylists. Their names are a fan homage to Houston sports legends, and this app
+            is not affiliated with or endorsed by the people they honor.
           </Text>
         </View>
       </ScrollView>
