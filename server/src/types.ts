@@ -50,6 +50,8 @@ export interface WardrobeItem {
   estimatedBudgetLowUsd: number;
   estimatedBudgetHighUsd: number;
   priority: StorePriority;
+  /** Short shoppable name (color/fabric/type) shown in timeline and store lists. */
+  itemName?: string;
   recommendedStoreIds: string[];
   /** Structured in-store script (current plans). */
   sayThis?: string;

@@ -71,7 +71,7 @@ function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonSt
         runs.set(primary, run);
       }
       run.items.push({
-        label: `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.category}`,
+        label: `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.itemName ?? item.category}`,
         phaseName: phase.timingLabel || phase.name || "",
         low: Number(item.estimatedBudgetLowUsd) || 0,
         high: Number(item.estimatedBudgetHighUsd) || 0,
@@ -229,7 +229,7 @@ function buildPlanText(plan: WardrobePlan, storeName: (id: string) => string): s
   for (const phase of asArray<WardrobePlan["phases"][number]>(plan.phases)) {
     lines.push(`== ${(phase.timingLabel ?? "").toUpperCase()} — ${phase.name ?? "Phase"} ==`);
     for (const item of asArray<WardrobeItem>(phase.items)) {
-      const label = `${item.quantity > 1 ? `${item.quantity}x ` : ""}${item.category}`;
+      const label = `${item.quantity > 1 ? `${item.quantity}x ` : ""}${item.itemName ?? item.category}`;
       const stores = asArray<string>(item.recommendedStoreIds).map(storeName).join(" / ");
       lines.push(`• ${label} (${moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)}) — ${stores}`);
       if (item.sayThis) lines.push(`  Say: "${unquote(cleanText(item.sayThis))}"`);
@@ -257,7 +257,7 @@ function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (i
         for (const item of asArray<WardrobeItem>(phase.items)) {
           const primary = asArray<string>(item.recommendedStoreIds)[0];
           if (!primary) continue;
-          const label = `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.category ?? "item"}`;
+          const label = `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.itemName ?? item.category ?? "item"} (${moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)})`;
           byStore.set(primary, [...(byStore.get(primary) ?? []), label]);
         }
         return (
@@ -313,6 +313,7 @@ function StoreRunList({ runs }: { runs: StoreRun[] }) {
                 );
               })()
             ) : null}
+            {run.store?.knownFor ? <Text style={styles.runStoreKnownFor}>Known for: {run.store.knownFor}</Text> : null}
             {run.store?.howToBuy ? <Text style={styles.runStoreMeta}>{run.store.howToBuy}</Text> : null}
             {run.items.map((it, i) => (
               <Text key={i} style={styles.runItem}>
@@ -356,7 +357,7 @@ function ItemRow({ item, storeName }: { item: WardrobeItem; storeName: (id: stri
       <View style={styles.itemHeader}>
         <Text style={styles.itemCategory}>
           {item.quantity > 1 ? `${item.quantity}× ` : ""}
-          {item.category}
+          {item.itemName ?? item.category}
         </Text>
         <View style={[styles.priorityPill, { backgroundColor: PRIORITY_COLOR[item.priority] ?? colors.muted }]}>
           <Text style={styles.priorityText}>{item.priority ?? "recommended"}</Text>
@@ -503,6 +504,7 @@ const styles = StyleSheet.create({
   runStoreName: { color: colors.cream, fontSize: 16, fontWeight: "700", flexShrink: 1 },
   runStoreBudget: { color: colors.gold, fontWeight: "700", fontSize: 13 },
   runStoreMeta: { color: colors.cream, opacity: 0.75, fontSize: 12, lineHeight: 17 },
+  runStoreKnownFor: { color: colors.gold, opacity: 0.95, fontSize: 12, lineHeight: 17, fontWeight: "700" },
   runStoreContact: { color: colors.gold, fontSize: 13, fontWeight: "700" },
   runItem: { color: colors.cream, fontSize: 13, lineHeight: 19 },
   runStoreLink: { color: colors.gold, fontSize: 12, fontWeight: "700", textDecorationLine: "underline", marginTop: 2 },
