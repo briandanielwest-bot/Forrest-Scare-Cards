@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import type { HoustonStore, PhotoAssessment, StoreCategory, StyleProfile, WardrobePlan } from "../types";
+import type { HoustonStore, StoreCategory, StyleProfile, WardrobePlan } from "../types";
 
 // Set EXPO_PUBLIC_API_BASE_URL in app/.env to point at your running server
 // (see the root README). Falls back to localhost for the iOS simulator.
@@ -60,7 +60,9 @@ export async function analyzePhotos(sessionId: string, photos: PickedPhoto[]) {
     });
   }
 
-  return request<{ assessment: PhotoAssessment }>("/api/photo/analyze", {
+  // The server answers 202 immediately and analyzes in the background —
+  // the plan pipeline picks up the assessment when it's ready.
+  return request<{ status: string }>("/api/photo/analyze", {
     method: "POST",
     body: form,
   });

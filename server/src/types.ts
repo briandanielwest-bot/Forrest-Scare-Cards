@@ -75,6 +75,7 @@ export interface WardrobePlan {
 }
 
 export type PlanStatus = "idle" | "generating" | "done" | "error";
+export type PhotoStatus = "idle" | "analyzing" | "done" | "error";
 
 export interface SessionState {
   id: string;
@@ -83,6 +84,7 @@ export interface SessionState {
   interviewComplete: boolean;
   styleProfile?: StyleProfile;
   photoAssessment?: PhotoAssessment;
+  photoStatus: PhotoStatus;
   wardrobePlan?: WardrobePlan;
   planStatus: PlanStatus;
   planError?: string;

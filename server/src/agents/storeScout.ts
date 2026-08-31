@@ -1,7 +1,8 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
-import { AGENT_MODEL } from "../config";
+import { FAST_AGENT_MODEL } from "../config";
 import { getStoresByCategory, STORE_CATEGORY_LABELS, type HoustonStore, type StoreCategory } from "../data/houstonStores";
+import { coerceArray } from "./toolInput";
 import type { StyleProfile } from "../types";
 
 /**
@@ -116,7 +117,7 @@ ${JSON.stringify(
   )}`;
 
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
-    model: AGENT_MODEL,
+    model: FAST_AGENT_MODEL,
     max_tokens: 2048,
     system: buildSystemPrompt(def),
     messages: [{ role: "user", content: userMessage }],
@@ -132,8 +133,9 @@ ${JSON.stringify(
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_recommendations",
   );
-  const rawRecs = (toolUse?.input as { recommendations?: { storeId: string; reason: string }[] } | undefined)
-    ?.recommendations ?? [];
+  const rawRecs = coerceArray<{ storeId: string; reason: string }>(
+    (toolUse?.input as { recommendations?: unknown } | undefined)?.recommendations,
+  );
 
   const recommendations: StoreRecommendation[] = rawRecs
     .map((r) => {
