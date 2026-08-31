@@ -282,7 +282,12 @@ export function PlanScreen({ navigation }: Props) {
         <ProgressStrip plan={plan} purchasedKeys={purchasedKeys} />
 
         {/* Read order matches how he'll actually use it: WHEN to buy,
-            then WHERE (with what), then the full detail per item. */}
+            then WHERE (with what), then the full detail per item. The
+            plan leads — save and copy sit under the thing they act on. */}
+        <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
+
+        <StoreRunList runs={buildStoreRuns(plan, storeById)} />
+
         <Pressable style={styles.copyButton} onPress={handleCopyPlan}>
           <Text style={styles.copyButtonText}>
             {copied ? "✓ Copied — paste it anywhere" : "📋 Copy plan to hand to the store"}
@@ -303,10 +308,6 @@ export function PlanScreen({ navigation }: Props) {
         )}
         {saveError ? <Text style={styles.askError}>{saveError}</Text> : null}
 
-        <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
-
-        <StoreRunList runs={buildStoreRuns(plan, storeById)} />
-
         <Text style={styles.sectionHeader}>The game plan</Text>
         <Text style={styles.narrative}>{cleanText(plan.introNarrative)}</Text>
 
@@ -315,7 +316,7 @@ export function PlanScreen({ navigation }: Props) {
           <Text style={styles.calloutText}>{cleanText(plan.climateNotes)}</Text>
         </View>
 
-        <Text style={styles.sectionHeader}>The full breakdown — every item, with your in-store script</Text>
+        <Text style={styles.sectionHeader}>Every item — tap to check off as you buy</Text>
 
         {asArray<WardrobePlan["phases"][number]>(plan.phases).map((phase, i) => (
           <View key={phase.name ?? i} style={styles.phaseCard}>
