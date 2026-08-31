@@ -1,5 +1,5 @@
 import React from "react";
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
@@ -84,6 +84,23 @@ function buildStoreRuns(plan: WardrobePlan, storeById: (id: string) => HoustonSt
 
 export function PlanScreen({ navigation }: Props) {
   const { wardrobePlan, stores, setStores, setCategoryLabels, storeById, resetSession } = useAppContext();
+  const [copied, setCopied] = React.useState(false);
+
+  async function handleCopyPlan() {
+    if (!wardrobePlan) return;
+    const text = buildPlanText(wardrobePlan, (id) => storeById(id)?.name ?? id);
+    try {
+      if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        await Share.share({ message: text });
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Clipboard/share denied — nothing to clean up.
+    }
+  }
 
   // On a cold app restore, the persisted plan can land here before the
   // store directory has ever been fetched (that normally happens on the
@@ -124,6 +141,12 @@ export function PlanScreen({ navigation }: Props) {
 
         {/* Read order matches how he'll actually use it: WHEN to buy,
             then WHERE (with what), then the full detail per item. */}
+        <Pressable style={styles.copyButton} onPress={handleCopyPlan}>
+          <Text style={styles.copyButtonText}>
+            {copied ? "✓ Copied — paste it anywhere" : "📋 Copy plan to hand to the store"}
+          </Text>
+        </Pressable>
+
         <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
 
         <StoreRunList runs={buildStoreRuns(plan, storeById)} />
@@ -195,6 +218,26 @@ function AtAGlance({ plan }: { plan: WardrobePlan }) {
       ))}
     </View>
   );
+}
+
+// Renders the whole plan as clean plain text — what he pastes into Notes,
+// texts to himself, or shows at a store counter.
+function buildPlanText(plan: WardrobePlan, storeName: (id: string) => string): string {
+  const lines: string[] = [plan.guideTitle ?? "Your Houston Wardrobe Plan", ""];
+  lines.push(`TOTAL BUDGET: ${money(plan.budgetSummary?.totalBudgetUsd)}`, "");
+  for (const phase of asArray<WardrobePlan["phases"][number]>(plan.phases)) {
+    lines.push(`== ${(phase.timingLabel ?? "").toUpperCase()} — ${phase.name ?? "Phase"} ==`);
+    for (const item of asArray<WardrobeItem>(phase.items)) {
+      const label = `${item.quantity > 1 ? `${item.quantity}x ` : ""}${item.category}`;
+      const stores = asArray<string>(item.recommendedStoreIds).map(storeName).join(" / ");
+      lines.push(`• ${label} (${moneyRange(item.estimatedBudgetLowUsd, item.estimatedBudgetHighUsd)}) — ${stores}`);
+      if (item.sayThis) lines.push(`  Say: "${unquote(cleanText(item.sayThis))}"`);
+      for (const spec of asArray<string>(item.keySpecs)) lines.push(`  - ${cleanText(spec)}`);
+      if (item.tip) lines.push(`  Tip: ${cleanText(item.tip)}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
 }
 
 // The top-of-report summary: when he's buying, what he's buying, from
@@ -413,6 +456,13 @@ const styles = StyleSheet.create({
   timelineTotalRow: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
   timelineTotalLabel: { ...typography.body, fontWeight: "800" },
   pepLabel: { color: colors.bayouDark, fontWeight: "800", fontSize: 11, letterSpacing: 1.2, marginBottom: 4 },
+  copyButton: {
+    backgroundColor: colors.bayou,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.sm + 2,
+    alignItems: "center",
+  },
+  copyButtonText: { color: colors.cream, fontWeight: "800", fontSize: 14 },
   budgetTotal: { color: colors.cream, fontSize: 20, fontWeight: "800", marginBottom: spacing.xs },
   budgetRow: { flexDirection: "row", justifyContent: "space-between" },
   budgetPhase: { color: colors.cream, opacity: 0.85 },
