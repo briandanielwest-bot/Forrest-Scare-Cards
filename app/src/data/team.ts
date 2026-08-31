@@ -25,7 +25,7 @@ export const TEAM: TeamMember[] = [
     id: "kyla",
     name: "Kyla",
     title: "Lead Stylist",
-    duty: "Reading the team your file line by line — every confession you typed is now actionable intelligence.",
+    duty: "Reading the team your file line by line. Every confession you typed is now actionable intelligence.",
     stage: "warmup",
     look: {
       bg: "#EFE0D2",
@@ -43,7 +43,7 @@ export const TEAM: TeamMember[] = [
     id: "watt",
     name: "Watt",
     title: "Fit & Build Specialist",
-    duty: "Breaking down your photos like game film — nobody sacks a bad collar choice in the backfield faster.",
+    duty: "Breaking down your photos like game film. Nobody sacks a bad collar choice faster in the backfield.",
     stage: "warmup",
     look: {
       bg: "#D8E0DC",
@@ -59,7 +59,7 @@ export const TEAM: TeamMember[] = [
     id: "campbell",
     name: "Campbell",
     title: "Houston Concierge",
-    duty: "Power-running your plan through Houston humidity — you don't fight August in this city, you outdress it.",
+    duty: "Power-running your plan through Houston humidity. You don't fight August in this city, you outdress it.",
     stage: "warmup",
     look: {
       bg: "#E3D6D0",
@@ -76,7 +76,7 @@ export const TEAM: TeamMember[] = [
     id: "biggio",
     name: "Biggio",
     title: "Director of Tailoring",
-    duty: "Grinding Houston's tailor benches like a 3,000-hit career — dirt on the helmet, chalk on your sleeve.",
+    duty: "Grinding Houston's tailor benches like a 3,000-hit career. Dirt on the helmet, chalk on your sleeve.",
     stage: "scouts",
     look: {
       bg: "#DCE2D2",
@@ -93,7 +93,7 @@ export const TEAM: TeamMember[] = [
     id: "drexler",
     name: "Drexler",
     title: "Director of Designer Floors",
-    duty: "Gliding the Galleria's designer floors — smooth, zero wasted steps, only the racks that matter.",
+    duty: "Gliding the Galleria's designer floors. Smooth, zero wasted steps, only the racks that matter.",
     stage: "scouts",
     look: {
       bg: "#E0D8E4",
@@ -110,7 +110,7 @@ export const TEAM: TeamMember[] = [
     id: "olajuwon",
     name: "Olajuwon",
     title: "Director of Footwear",
-    duty: "Giving your shoe game the Dream Shake — footwork first, and the recraftable sole always wins the post.",
+    duty: "Giving your shoe game the Dream Shake. Footwork first, and the recraftable sole always wins the post.",
     stage: "scouts",
     look: {
       bg: "#D9DEE6",
@@ -125,7 +125,7 @@ export const TEAM: TeamMember[] = [
     id: "wagner",
     name: "Wagner",
     title: "Director of Accessories",
-    duty: "Coming out of the bullpen to close your look — belt, frames, watch: three pitches, all heat.",
+    duty: "Coming out of the bullpen to close your look. Belt, frames, watch: three pitches, all heat.",
     stage: "scouts",
     look: {
       bg: "#E6DCCB",
@@ -143,7 +143,7 @@ export const TEAM: TeamMember[] = [
     id: "moon",
     name: "Moon",
     title: "Head of Wardrobe Planning",
-    duty: "Reading 40+ stores like a defense and calling the audible — every route timed, one budget, no sacks.",
+    duty: "Reading 40+ stores like a defense and calling the audible. Every route timed, one budget, no sacks.",
     stage: "planner",
     look: {
       bg: "#DFD9CE",

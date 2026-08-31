@@ -5,7 +5,7 @@
  */
 export const KYLA_TIPS: string[] = [
   "The shoulder seam is the one thing no tailor can fix. Everything else is $20 to $50.",
-  "A tailor can always take in — letting out needs seam allowance. Buy for the biggest part of you.",
+  "A tailor can always take in. Letting out needs seam allowance, so buy for the biggest part of you.",
   "Half-lined jackets wear about ten degrees cooler. August will thank you.",
   "One $350 recraftable shoe beats three $120 pairs across a decade. That's just math.",
   "Houston offices run 66°F in August. The blazer is survival gear, not decoration.",
@@ -18,6 +18,6 @@ export const KYLA_TIPS: string[] = [
   "Cedar shoe trees the same night doubles a dress shoe's life. Sweat is the killer, not miles.",
   "Wash jeans and blazers less, hang them more. Half of 'worn out' is just over-laundered.",
   "Say 'trim through the body,' not 'slim.' 'Slim' gets you a smaller boxy jacket.",
-  "A gap between your collar and jacket means wrong size. Walk away — don't alter.",
+  "A gap between your collar and jacket means wrong size. Walk away, don't alter.",
   "Merino doesn't hold smell the way cotton does. Travel gold, long-day gold.",
 ];
