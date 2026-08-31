@@ -28,14 +28,15 @@ export const TEAM: TeamMember[] = [
     duty: "Briefing the whole team on your profile — every answer you gave her is shaping what gets picked.",
     stage: "warmup",
     look: {
-      bg: "#E8DCC8",
-      skin: "#E9C9A8",
-      hair: "#4A2E1E",
-      eye: "#5C3A21",
+      bg: "#EFE0D2",
+      skin: "#EFCBA8",
+      hair: "#3E2617",
+      eye: "#6B4226",
       jacket: "#1F3A34",
       hairStyle: "long",
       accessory: "necklace",
-      accent: "#D9B24C",
+      accent: "#E4C05C",
+      lips: true,
     },
   },
   {
@@ -46,9 +47,9 @@ export const TEAM: TeamMember[] = [
     stage: "warmup",
     look: {
       bg: "#D8E0DC",
-      skin: "#E2B58E",
-      hair: "#3A2A20",
-      eye: "#3E5C46",
+      skin: "#EBC49E",
+      hair: "#4E3A28",
+      eye: "#4A6E9C",
       jacket: "#2E3B4E",
       hairStyle: "short",
       beard: true,
@@ -118,7 +119,6 @@ export const TEAM: TeamMember[] = [
       eye: "#241A12",
       jacket: "#4A3226",
       hairStyle: "buzz",
-      beard: true,
     },
   },
   {
@@ -136,6 +136,7 @@ export const TEAM: TeamMember[] = [
       hairStyle: "short",
       accessory: "tie",
       accent: "#2E4A6E",
+      beard: true,
     },
   },
   {
@@ -153,6 +154,7 @@ export const TEAM: TeamMember[] = [
       hairStyle: "short",
       accessory: "tie",
       accent: "#B08A3E",
+      beard: true,
     },
   },
 ];

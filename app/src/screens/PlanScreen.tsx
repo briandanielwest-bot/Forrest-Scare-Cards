@@ -124,7 +124,7 @@ export function PlanScreen({ navigation }: Props) {
 
         {/* Read order matches how he'll actually use it: WHEN to buy,
             then WHERE (with what), then the full detail per item. */}
-        <BuyingTimeline plan={plan} />
+        <BuyingTimeline plan={plan} storeName={(id) => storeById(id)?.name ?? id} />
 
         <StoreRunList runs={buildStoreRuns(plan, storeById)} />
 
@@ -197,9 +197,9 @@ function AtAGlance({ plan }: { plan: WardrobePlan }) {
   );
 }
 
-// The top-of-report summary: when he's buying, what each phase is, and
-// what it costs — the whole plan's shape in five lines, before any detail.
-function BuyingTimeline({ plan }: { plan: WardrobePlan }) {
+// The top-of-report summary: when he's buying, what he's buying, from
+// which store, and what it costs — the whole plan before any detail.
+function BuyingTimeline({ plan, storeName }: { plan: WardrobePlan; storeName: (id: string) => string }) {
   const phases = asArray<WardrobePlan["phases"][number]>(plan.phases);
   const amounts = asArray<{ phaseName: string; amountUsd: number }>(plan.budgetSummary?.perPhaseUsd);
   if (phases.length === 0) return null;
@@ -208,16 +208,25 @@ function BuyingTimeline({ plan }: { plan: WardrobePlan }) {
       <Text style={styles.timelineHeader}>Your buying timeline</Text>
       {phases.map((phase, i) => {
         const amount = amounts.find((a) => a.phaseName === phase.name)?.amountUsd ?? amounts[i]?.amountUsd;
-        const itemCount = asArray<WardrobeItem>(phase.items).length;
+        // One line per store this phase visits: "Store — item, item".
+        const byStore = new Map<string, string[]>();
+        for (const item of asArray<WardrobeItem>(phase.items)) {
+          const primary = asArray<string>(item.recommendedStoreIds)[0];
+          if (!primary) continue;
+          const label = `${item.quantity > 1 ? `${item.quantity}× ` : ""}${item.category ?? "item"}`;
+          byStore.set(primary, [...(byStore.get(primary) ?? []), label]);
+        }
         return (
-          <View key={phase.name ?? i} style={styles.timelineRow}>
-            <View style={styles.timelineLeft}>
+          <View key={phase.name ?? i} style={styles.timelinePhase}>
+            <View style={styles.timelineRow}>
               <Text style={styles.timelineWhen}>{phase.timingLabel || `Phase ${i + 1}`}</Text>
-              <Text style={styles.timelineWhat}>
-                {phase.name ?? "Phase"} · {itemCount} {itemCount === 1 ? "item" : "items"}
-              </Text>
+              <Text style={styles.timelineAmount}>{amount != null ? money(amount) : ""}</Text>
             </View>
-            <Text style={styles.timelineAmount}>{amount != null ? money(amount) : ""}</Text>
+            {Array.from(byStore.entries()).map(([storeId, items]) => (
+              <Text key={storeId} style={styles.timelineStoreLine}>
+                <Text style={styles.timelineStoreName}>{storeName(storeId)}</Text> — {items.join(", ")}
+              </Text>
+            ))}
           </View>
         );
       })}
@@ -390,9 +399,10 @@ const styles = StyleSheet.create({
   },
   timelineHeader: { ...typography.title, fontSize: 18, color: colors.bayouDark },
   timelineRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
-  timelineLeft: { flexShrink: 1 },
-  timelineWhen: { ...typography.small, color: colors.bayou, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.5 },
-  timelineWhat: { ...typography.body, fontSize: 14 },
+  timelinePhase: { gap: 2 },
+  timelineWhen: { ...typography.small, color: colors.bayou, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.5, flexShrink: 1 },
+  timelineStoreLine: { ...typography.small, lineHeight: 18, color: colors.ink },
+  timelineStoreName: { fontWeight: "800", color: colors.bayouDark },
   timelineAmount: { color: colors.bayouDark, fontWeight: "800", fontSize: 15 },
   timelineTotalRow: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
   timelineTotalLabel: { ...typography.body, fontWeight: "800" },
