@@ -32,6 +32,8 @@ export interface PickedPhoto {
   uri: string;
   fileName?: string | null;
   mimeType?: string | null;
+  width?: number;
+  height?: number;
 }
 
 export async function analyzePhotos(sessionId: string, photos: PickedPhoto[]) {
