@@ -138,5 +138,34 @@ export const STORE_SOCIAL: Record<string, StoreSocial> = {
     "instagram": "zadokjewelers",
     "facebook": "https://www.facebook.com/zadokjewelers/",
     "active": true
+  },
+  "hermes-river-oaks": {
+    "instagram": "hermes",
+    "facebook": "https://www.facebook.com/Hermes",
+    "active": true
+  },
+  "als-formal-wear": {
+    "instagram": "alsformalwear",
+    "facebook": "https://www.facebook.com/alsformalwear/",
+    "active": true
+  },
+  "marine-layer-rice-village": {
+    "instagram": "marinelayer",
+    "facebook": "https://www.facebook.com/marinelayer/",
+    "active": true
+  },
+  "cavenders": {
+    "instagram": "cavenders",
+    "active": true
+  },
+  "republic-boot-co": {
+    "instagram": "republicboot1836",
+    "facebook": "https://www.facebook.com/RepublicBootCo/",
+    "active": true
+  },
+  "johnston-murphy-galleria": {
+    "instagram": "johnstonmurphy",
+    "facebook": "https://www.facebook.com/johnstonmurphy",
+    "active": true
   }
 };
