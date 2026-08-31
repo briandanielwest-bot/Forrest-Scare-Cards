@@ -1,0 +1,208 @@
+<title>Bayou & Blazer Playbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Archivo:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground: #F7F3EA;
+    --paper: #FFFFFF;
+    --ink: #22201B;
+    --muted: #6B675C;
+    --bayou: #1F3A34;
+    --bayou-soft: #2A4F3D;
+    --gold: #B08A27;
+    --gold-bright: #D9B24C;
+    --flag: #8A3B2E;
+    --flag-ground: #F6E7E1;
+    --line: #E2DCCB;
+    --card: #FDFBF5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #171B19;
+      --paper: #1F2522;
+      --ink: #EDE8DB;
+      --muted: #A39E90;
+      --bayou: #9DC3B2;
+      --bayou-soft: #7FAE97;
+      --gold: #D9B24C;
+      --gold-bright: #D9B24C;
+      --flag: #E5967F;
+      --flag-ground: #33231E;
+      --line: #35403A;
+      --card: #232A26;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #171B19;
+    --paper: #1F2522;
+    --ink: #EDE8DB;
+    --muted: #A39E90;
+    --bayou: #9DC3B2;
+    --bayou-soft: #7FAE97;
+    --gold: #D9B24C;
+    --gold-bright: #D9B24C;
+    --flag: #E5967F;
+    --flag-ground: #33231E;
+    --line: #35403A;
+    --card: #232A26;
+  }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header.brand { border-bottom: 3px solid var(--bayou); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+  .brandmark { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .brandmark h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    margin: 0;
+    color: var(--bayou);
+    text-wrap: balance;
+  }
+  .brandmark .amp { color: var(--gold); }
+  .doc-kind { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .standfirst { color: var(--muted); max-width: 60ch; margin: .8rem 0 0; }
+  section { margin: 0 0 2.75rem; }
+  .eyebrow {
+    font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700; margin: 0 0 .3rem;
+  }
+  h2 {
+    font-family: "Fraunces", Georgia, serif; font-weight: 700;
+    font-size: 1.45rem; margin: 0 0 .9rem; color: var(--ink); text-wrap: balance;
+  }
+  h3 { font-size: 1.02rem; font-weight: 700; margin: 1.4rem 0 .4rem; }
+  p { margin: 0 0 .9rem; max-width: 65ch; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; max-width: 62ch; }
+  li { margin-bottom: .45rem; }
+  strong { font-weight: 700; }
+  .money { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; font-size: .92em; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  .table-scroll { overflow-x: auto; margin: 0 0 1rem; }
+  th { text-align: left; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--bayou); padding: .45rem .7rem .45rem 0; }
+  td { border-bottom: 1px solid var(--line); padding: .55rem .7rem .55rem 0; vertical-align: top; }
+  td:first-child { font-weight: 700; white-space: nowrap; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.1rem 1.25rem; margin: 0 0 1rem;
+  }
+  .flag {
+    background: var(--flag-ground); border-left: 4px solid var(--flag);
+    border-radius: 0 10px 10px 0; padding: 1.1rem 1.25rem; margin: 1.2rem 0;
+  }
+  .flag .eyebrow { color: var(--flag); }
+  .ladder { list-style: none; padding: 0; counter-reset: rung; max-width: 65ch; }
+  .ladder li {
+    counter-increment: rung; position: relative; padding-left: 2.4rem; margin-bottom: .9rem;
+  }
+  .ladder li::before {
+    content: counter(rung); position: absolute; left: 0; top: .05rem;
+    width: 1.6rem; height: 1.6rem; border-radius: 50%;
+    background: var(--bayou); color: var(--ground);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .85rem; font-family: "IBM Plex Mono", monospace;
+  }
+  .footer-note { border-top: 1px solid var(--line); padding-top: 1.2rem; color: var(--muted); font-size: .85rem; max-width: 65ch; }
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <p class="doc-kind">Business Plan · August 2026</p>
+    <div class="brandmark"><h1>Bayou <span class="amp">&amp;</span> Blazer Playbook</h1></div>
+    <p class="standfirst">How a working AI stylist for Houston men becomes a business: revenue, growth, store partnerships, legal footing, and the expansion map — womenswear and new cities included.</p>
+  </header>
+
+  <section>
+    <p class="eyebrow">Where you stand</p>
+    <h2>You already own the hard part</h2>
+    <p>Most people pitching an idea like this have a deck. You have a working product: an eight-expert AI pipeline that turns one conversation into a priced, dated, store-by-store wardrobe plan in about a minute — with a 43-store directory that re-verifies itself monthly by live web research, a stylist persona customers talk to like a person, plan chat, outfit matrices, purchase tracking, and cross-device claim codes. Monthly infrastructure cost today: roughly <span class="money">$7–25</span> in hosting and API credits.</p>
+    <p>Everything below builds on that asset.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Revenue</p>
+    <h2>How the money works</h2>
+    <p>Know your unit cost first: a full plan runs a realistic <span class="money">$0.60–1.50</span> in API spend (the planner is the expensive call), and each Kyla chat turn costs pennies. That means healthy margin at even modest prices — and it means the free tier must be designed, not accidental.</p>
+    <div class="table-scroll"><table>
+      <tr><th>Stream</th><th>Model</th><th>Realistic price</th></tr>
+      <tr><td>The plan</td><td>First plan free (growth engine), or free interview + paywall the full plan</td><td><span class="money">$19–29</span> one-time per plan</td></tr>
+      <tr><td>Kyla+</td><td>Subscription: seasonal refreshes, plan chat, outfit matrix, photo re-reads</td><td><span class="money">$6–9</span>/month</td></tr>
+      <tr><td>Store referrals</td><td>Stores pay per fitted customer Kyla sends (tracked below)</td><td><span class="money">$10–50</span>/customer or 5–10%</td></tr>
+      <tr><td>Featured placement</td><td>Verified store profiles, "featured partner" slots in the directory</td><td><span class="money">$99–299</span>/month per store</td></tr>
+    </table></div>
+    <p><strong>The honest read:</strong> consumer fees keep the lights on; the store side is where a Houston-sized business lives. A single mid-tier menswear store spends thousands a month on marketing that doesn't send them pre-qualified customers with a shopping list. You do.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Growth</p>
+    <h2>Getting popular in Houston</h2>
+    <ol class="ladder">
+      <li><strong>Make your wife the face everywhere.</strong> The Kyla brand is already hers. Short vertical videos: her voiceover reading a real plan's best lines, before/after fits, "what Kyla told a lawyer to say at the tailor." Instagram + TikTok, Houston hashtags. This is your only marketing job for month one.</li>
+      <li><strong>Own the search.</strong> "Personal stylist Houston," "what to wear to the rodeo," "CERAWeek what to wear," "Houston tailor recommendations." Campbell's almanac answers already exist — publish them as pages on a simple marketing site. Nobody else is writing this for Houston with real store names.</li>
+      <li><strong>Time the calendar you already track.</strong> The app knows CERAWeek, OTC, rodeo season, and gala season. Run pushes three to six weeks before each — exactly when the app tells its own users to shop.</li>
+      <li><strong>Referrals through claim codes.</strong> The code system doubles as a referral hook: "Send a friend — when they finish a plan, you both get a month of Kyla+."</li>
+      <li><strong>Reddit and group chats.</strong> r/houston, r/malefashionadvice, office Slack channels. One genuinely great free plan screenshot does more than an ad.</li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="eyebrow">Partnerships</p>
+    <h2>Getting the stores involved</h2>
+    <p>Start with independents — Hamilton Shirts, QC Tailors, Q Clothier, Rye 51 — where you can talk to an owner, not a regional manager. The ladder:</p>
+    <ol class="ladder">
+      <li><strong>They're already listed.</strong> Walk in with the app open: "We've been sending customers here with a script for your counter. Wanted you to know."</li>
+      <li><strong>Prove the traffic.</strong> Have customers say "Kyla sent me" (put it in the plan's logistics lines). After a month: "We sent you N fitted customers who each spent about $X."</li>
+      <li><strong>The referral deal.</strong> A flat fee or small percentage per customer who mentions the app. Handshake first; paper later. The tracked claim code shown at the counter is the receipt.</li>
+      <li><strong>The paid tier.</strong> Once three or four stores pay referrals, offer featured placement and verified profiles — the store's own words in its listing, their trunk-show dates pushed to users.</li>
+    </ol>
+    <p>What you never sell: the plan's picks. The moment placement buys a recommendation, Kyla stops being trustworthy and the product dies. Featured slots live in the directory, never inside a customer's plan.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Legal &amp; IP</p>
+    <h2>Copyright, trademark, and one real risk</h2>
+    <ul>
+      <li><strong>Copyright:</strong> your code and content are automatically copyrighted the moment they're written — registration is optional evidence. Registering with the U.S. Copyright Office (~<span class="money">$65</span>) is cheap and worth doing once the product settles. It is not the urgent item.</li>
+      <li><strong>Trademark is the urgent item:</strong> the name "Bayou &amp; Blazer" and Kyla's identity are the brand. A USPTO application runs roughly <span class="money">$250–350</span> per class. Do this before marketing spend, not after.</li>
+      <li><strong>Form an LLC</strong> before revenue (Texas filing ~<span class="money">$300</span>), add plain-language Terms of Service and a privacy policy (you handle photos — say what happens to them), and put the app's "style advice, not guarantees" nature in writing.</li>
+      <li><strong>Your wife's likeness:</strong> fine with her consent — get a one-page written release between her and the LLC anyway. Clean paper now prevents mess later, especially if you ever sell.</li>
+    </ul>
+    <div class="flag">
+      <p class="eyebrow">Before you take money</p>
+      <p><strong>The athlete names are a real legal exposure once this is a business.</strong> Watt, Olajuwon, Drexler, Biggio, Wagner, Campbell, and Moon are living, famous people, and Texas right-of-publicity law is strong. A fan-homage disclaimer does not license commercial use of a celebrity's identity to sell a product. As a free project it likely draws no attention; as a revenue business it's the kind of thing that draws a demand letter. <strong>Recommendation: rename the seven expert personas to original names before monetizing</strong> (Kyla and the app name are yours and unaffected — one afternoon of work), or spend an hour with an IP attorney first if keeping the homage matters to you.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Valuation</p>
+    <h2>What the app is worth</h2>
+    <p>The honest answer: today, as a pre-revenue product with no users, its market value is close to zero — buyers pay for traction, not code. That is not bad news; it's the roadmap. Small software businesses commonly sell for <strong>three to five times annual revenue</strong>. The same product at <span class="money">$3,000</span>/month of revenue is a ~<span class="money">$100–180K</span> asset; at <span class="money">$10K</span>/month it's several hundred thousand dollars — and the city playbook below multiplies that.</p>
+    <p>What you own right now that <em>does</em> have value: a finished product that would cost real money to rebuild, a self-refreshing data moat, a brand with a face, and a repeatable formula. Value it by what it lets you do next, not what someone would pay today.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Expansion</p>
+    <h2>Women's line, then the city playbook</h2>
+    <p><strong>Womenswear is the natural second product, and Kyla is even more at home there.</strong> The engine doesn't change — what changes is data and voice: a women's store directory, dress-code decoders, fit-and-body playbook, staples showcase, and interview adjustments. Realistically a few weeks of focused work on top of what exists. Run it inside the same app ("Who are we dressing today?") to share the brand and the store relationships.</p>
+    <p><strong>Cities are packs, not new apps.</strong> Everything Houston-specific already lives in data files: the store directory, the events calendar, shopping districts, industry decoders, the monthly refresh. A "Dallas pack" is those files researched for Dallas — the personas, pipeline, and app carry over. Keep one codebase and one brand with a city selector; separate apps per city would multiply your maintenance by the number of cities. Sequence: Houston womenswear → Dallas → Austin — and only after Houston has paying users proving the model.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Next 90 days</p>
+    <h2>The order of operations</h2>
+    <ol class="ladder">
+      <li>Rename the seven athlete personas (keep Kyla); file the LLC and the Bayou &amp; Blazer trademark.</li>
+      <li>Upgrade hosting (~<span class="money">$7–10</span>/month with a persistent disk) so sessions and claim codes survive deploys.</li>
+      <li>Get 25 real Houston men through free plans — friends, coworkers, Reddit. Watch where they stall; fix that.</li>
+      <li>Start the content engine: two short videos a week with your wife, five SEO pages from Campbell's answers.</li>
+      <li>Walk into three independent stores with traffic receipts and open the referral conversation.</li>
+      <li>Turn on the first paywall (plan #2 costs money, or Kyla+ subscription) only after the funnel shows people finishing plans and coming back.</li>
+    </ol>
+  </section>
+
+  <p class="footer-note">Prepared from the live product as of August 31, 2026. Dollar figures are planning estimates, not quotes; legal items are orientation, not legal advice — the trademark filing and the persona-name question deserve one real conversation with an attorney.</p>
+</div>
