@@ -13,7 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "GeneratingPlan">;
 // actual job that agent is doing right now (fan homage — see WelcomeScreen).
 const STATUS_LINES = [
   "Kyla is walking your profile into the war room…",
-  "Watt is breaking down your photos like Thursday-night film…",
+  "Watt is still breaking down your photos like Thursday-night film…",
   "Olajuwon is giving your shoe game the Dream Shake…",
   "Drexler is gliding through the Galleria's designer floors…",
   "Biggio is grinding through Houston's custom tailors, ready for anything…",

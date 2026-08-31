@@ -1,6 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
-import { AGENT_MODEL } from "../config";
+import { FAST_AGENT_MODEL } from "../config";
+import { coerceArray } from "./toolInput";
 import type { SessionState, StyleProfile } from "../types";
 
 /**
@@ -134,7 +135,8 @@ export interface InterviewTurnResult {
 
 async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
-    model: AGENT_MODEL,
+    // Chat turns live or die on latency — the fast model keeps Kyla snappy.
+    model: FAST_AGENT_MODEL,
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: session.interviewHistory,
@@ -158,9 +160,10 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
       reply += (reply ? "\n" : "") + block.text;
     } else if (block.type === "tool_use" && block.name === "offer_quick_replies") {
       const input = block.input as { replies?: unknown };
-      quickReplies = Array.isArray(input.replies)
-        ? (input.replies as unknown[]).filter((r): r is string => typeof r === "string").slice(0, 5)
-        : undefined;
+      {
+        const parsed = coerceArray<unknown>(input.replies).filter((r): r is string => typeof r === "string");
+        quickReplies = parsed.length > 0 ? parsed.slice(0, 5) : undefined;
+      }
       toolResults.push({ type: "tool_result", tool_use_id: block.id, content: "Options shown as tappable chips." });
     } else if (block.type === "tool_use" && block.name === "submit_style_profile") {
       const input = block.input as Record<string, unknown>;
@@ -170,13 +173,13 @@ async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
         budgetCadence: (input.budgetCadence as StyleProfile["budgetCadence"]) ?? "one-time",
         lifestyle: String(input.lifestyle ?? ""),
         homeBase: typeof input.homeBase === "string" ? input.homeBase : undefined,
-        dressCodes: Array.isArray(input.dressCodes) ? (input.dressCodes as string[]) : [],
-        styleArchetypes: Array.isArray(input.styleArchetypes) ? (input.styleArchetypes as string[]) : [],
+        dressCodes: coerceArray<string>(input.dressCodes),
+        styleArchetypes: coerceArray<string>(input.styleArchetypes),
         fitPreferences: String(input.fitPreferences ?? ""),
-        colorPreferences: Array.isArray(input.colorPreferences) ? (input.colorPreferences as string[]) : [],
-        colorsToAvoid: Array.isArray(input.colorsToAvoid) ? (input.colorsToAvoid as string[]) : [],
-        brandAffinities: Array.isArray(input.brandAffinities) ? (input.brandAffinities as string[]) : [],
-        occasionsToPlanFor: Array.isArray(input.occasionsToPlanFor) ? (input.occasionsToPlanFor as string[]) : [],
+        colorPreferences: coerceArray<string>(input.colorPreferences),
+        colorsToAvoid: coerceArray<string>(input.colorsToAvoid),
+        brandAffinities: coerceArray<string>(input.brandAffinities),
+        occasionsToPlanFor: coerceArray<string>(input.occasionsToPlanFor),
         timeline: String(input.timeline ?? ""),
         sizes: (input.sizes as StyleProfile["sizes"]) ?? undefined,
         notes: String(input.notes ?? ""),

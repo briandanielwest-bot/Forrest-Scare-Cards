@@ -2,8 +2,16 @@ import "dotenv/config";
 
 export const PORT = Number(process.env.PORT ?? 4000);
 
-// Every agent shares one model — swap here to tune cost/quality app-wide.
+// The wardrobe planner runs on the most capable model — it carries the
+// budget arithmetic and the final synthesis, and downgrading it was tried
+// and reverted earlier (wrong budget math at lower settings).
 export const AGENT_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-opus-5";
+
+// The conversational/extraction agents (interviewer, photo analyst, store
+// scouts, almanac) run on a faster model — their jobs are chat turns and
+// structured reads where speed IS the feature. Override with
+// ANTHROPIC_FAST_MODEL to experiment.
+export const FAST_AGENT_MODEL = process.env.ANTHROPIC_FAST_MODEL ?? "claude-sonnet-5";
 
 export const CORS_ORIGIN = process.env.CORS_ORIGIN ?? "*";
 

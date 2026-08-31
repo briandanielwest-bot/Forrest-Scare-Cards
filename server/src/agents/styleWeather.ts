@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
-import { AGENT_MODEL } from "../config";
+import { FAST_AGENT_MODEL } from "../config";
 
 /**
  * "Campbell" — Houston Style & Weather Agent, named in homage to the
@@ -45,7 +45,7 @@ ${getHoustonClimateStyleBrief()}`;
 
 export async function askAlmanac(question: string): Promise<string> {
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
-    model: AGENT_MODEL,
+    model: FAST_AGENT_MODEL,
     max_tokens: 1024,
     system: ALMANAC_SYSTEM_PROMPT,
     messages: [{ role: "user", content: question }],

@@ -1,6 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { anthropic, type WithEffort } from "../anthropicClient";
-import { AGENT_MODEL } from "../config";
+import { FAST_AGENT_MODEL } from "../config";
+import { coerceArray } from "./toolInput";
 import type { PhotoAssessment, StyleProfile, UploadedImage } from "../types";
 
 /**
@@ -101,7 +102,7 @@ export async function analyzePhotos(
   ];
 
   const params: WithEffort<Anthropic.MessageCreateParamsNonStreaming> = {
-    model: AGENT_MODEL,
+    model: FAST_AGENT_MODEL,
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content }],
@@ -122,20 +123,16 @@ export async function analyzePhotos(
   return {
     numPhotosAnalyzed: images.length,
     currentStyleSummary: String(input.currentStyleSummary ?? ""),
-    strengths: Array.isArray(input.strengths) ? (input.strengths as string[]) : [],
-    gapsOrIssues: Array.isArray(input.gapsOrIssues) ? (input.gapsOrIssues as string[]) : [],
+    strengths: coerceArray<string>(input.strengths),
+    gapsOrIssues: coerceArray<string>(input.gapsOrIssues),
     skinUndertone: String(input.skinUndertone ?? ""),
-    bestColors: Array.isArray(input.bestColors) ? (input.bestColors as string[]) : [],
-    colorsToAvoidFromPhotos: Array.isArray(input.colorsToAvoidFromPhotos)
-      ? (input.colorsToAvoidFromPhotos as string[])
-      : [],
+    bestColors: coerceArray<string>(input.bestColors),
+    colorsToAvoidFromPhotos: coerceArray<string>(input.colorsToAvoidFromPhotos),
     faceShape: String(input.faceShape ?? ""),
-    faceGuidance: Array.isArray(input.faceGuidance) ? (input.faceGuidance as string[]) : [],
+    faceGuidance: coerceArray<string>(input.faceGuidance),
     bodyType: String(input.bodyType ?? ""),
     bodyProportionNotes: String(input.bodyProportionNotes ?? ""),
-    recommendedSilhouettes: Array.isArray(input.recommendedSilhouettes)
-      ? (input.recommendedSilhouettes as string[])
-      : [],
-    fitGuidance: Array.isArray(input.fitGuidance) ? (input.fitGuidance as string[]) : [],
+    recommendedSilhouettes: coerceArray<string>(input.recommendedSilhouettes),
+    fitGuidance: coerceArray<string>(input.fitGuidance),
   };
 }
