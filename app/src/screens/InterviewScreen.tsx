@@ -26,12 +26,13 @@ export function InterviewScreen({ navigation }: Props) {
     useAppContext();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
-  const [dots, setDots] = useState("•");
+  const [dotBeat, setDotBeat] = useState(0);
 
-  // Animated "Kyla is typing" dots while her reply is in flight.
+  // Pulses the classic three-dot typing indicator while Kyla's reply is
+  // in flight — one dot lights up at a time, like every texting app.
   React.useEffect(() => {
     if (!sending) return;
-    const interval = setInterval(() => setDots((d) => (d.length >= 3 ? "•" : d + "•")), 400);
+    const interval = setInterval(() => setDotBeat((b) => (b + 1) % 3), 350);
     return () => clearInterval(interval);
   }, [sending]);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +74,14 @@ export function InterviewScreen({ navigation }: Props) {
   const activeQuickReplies =
     !interviewDone && !sending && lastMessage?.role === "assistant" ? lastMessage.quickReplies ?? [] : [];
 
+  // The chip row and typing bubble appearing/disappearing resize the list
+  // viewport, which used to leave the latest message half-scrolled out —
+  // re-anchor to the bottom whenever the layout around the list changes.
+  React.useEffect(() => {
+    const t = setTimeout(() => listRef.current?.scrollToEnd({ animated: false }), 50);
+    return () => clearTimeout(t);
+  }, [activeQuickReplies.length, sending]);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -89,9 +98,13 @@ export function InterviewScreen({ navigation }: Props) {
           renderItem={({ item }) =>
             item.id === "typing" ? (
               <View style={styles.assistantRow}>
-                <KylaPortrait size={28} />
+                <KylaPortrait size={34} />
                 <View style={[styles.bubble, styles.assistantBubble, styles.typingBubble]}>
-                  <Text style={styles.typingText}>Kyla is typing {dots}</Text>
+                  <View style={styles.dotRow}>
+                    {[0, 1, 2].map((i) => (
+                      <View key={i} style={[styles.dot, dotBeat === i && styles.dotActive]} />
+                    ))}
+                  </View>
                 </View>
               </View>
             ) : item.role === "user" ? (
@@ -100,7 +113,7 @@ export function InterviewScreen({ navigation }: Props) {
               </View>
             ) : (
               <View style={styles.assistantRow}>
-                <KylaPortrait size={28} />
+                <KylaPortrait size={34} />
                 <View style={[styles.bubble, styles.assistantBubble]}>
                   <Text style={styles.assistantText}>{item.text}</Text>
                 </View>
@@ -136,6 +149,15 @@ export function InterviewScreen({ navigation }: Props) {
               multiline
               editable={!sending}
               onSubmitEditing={handleSend}
+              onKeyPress={(e) => {
+                // Web: Enter sends like a real messenger; Shift+Enter makes
+                // a new line. (Native keyboards use the return key instead.)
+                const native = e.nativeEvent as { key?: string; shiftKey?: boolean };
+                if (Platform.OS === "web" && native.key === "Enter" && !native.shiftKey) {
+                  (e as { preventDefault?: () => void }).preventDefault?.();
+                  handleSend();
+                }
+              }}
             />
             <Pressable style={styles.sendButton} onPress={handleSend} disabled={sending || !draft.trim()}>
               {sending ? <ActivityIndicator color={colors.cream} /> : <Text style={styles.sendButtonText}>Send</Text>}
@@ -150,13 +172,23 @@ export function InterviewScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
   list: { padding: spacing.md, gap: spacing.sm },
-  bubble: { maxWidth: "85%", borderRadius: radii.md, padding: spacing.md, marginBottom: spacing.sm },
+  bubble: { maxWidth: "85%", borderRadius: radii.lg, padding: spacing.md, marginBottom: spacing.sm },
   assistantRow: { flexDirection: "row", alignItems: "flex-end", gap: 6, marginBottom: 0 },
-  assistantBubble: { backgroundColor: colors.paper, alignSelf: "flex-start", borderWidth: 1, borderColor: colors.border, flexShrink: 1 },
-  userBubble: { backgroundColor: colors.bayou, alignSelf: "flex-end" },
+  assistantBubble: {
+    backgroundColor: colors.paper,
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: colors.border,
+    flexShrink: 1,
+    // Small corner nearest her face — the classic speech-bubble tail cue.
+    borderBottomLeftRadius: 4,
+  },
+  userBubble: { backgroundColor: colors.bayou, alignSelf: "flex-end", borderBottomRightRadius: 4 },
   assistantText: { ...typography.body },
-  typingBubble: { paddingVertical: spacing.sm },
-  typingText: { ...typography.small, color: colors.muted, fontStyle: "italic" },
+  typingBubble: { paddingVertical: spacing.sm + 2 },
+  dotRow: { flexDirection: "row", gap: 5, alignItems: "center" },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.muted, opacity: 0.35 },
+  dotActive: { opacity: 1, backgroundColor: colors.bayou },
   userText: { ...typography.body, color: colors.cream },
   chipRow: {
     flexDirection: "row",
