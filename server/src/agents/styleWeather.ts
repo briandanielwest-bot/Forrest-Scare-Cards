@@ -16,6 +16,8 @@ import { FAST_AGENT_MODEL } from "../config";
  * on, plus a small conversational surface for one-off questions.
  */
 
+import { HOUSTON_CALENDAR, SHOPPING_DISTRICTS } from "../data/houstonKnowledge";
+
 export function getHoustonClimateStyleBrief(): string {
   return `HOUSTON CLIMATE & STYLE ALMANAC
 
@@ -36,7 +38,11 @@ STYLE CULTURE — Houston is a huge, cosmopolitan, international city; western w
 SEASONAL PLANNING CUES
 - Buy the hot-weather foundation first — it's worn 7+ months a year and does the most day-to-day work.
 - Buy the winter/gala capsule in fall, timed before the holiday party and gala season hits.
-- If Western/rodeo-season pieces are actually relevant to this man, buy them ahead of February, not during it — good boots and hats can have lead time.`;
+- If Western/rodeo-season pieces are actually relevant to this man, buy them ahead of February, not during it — good boots and hats can have lead time.
+
+${HOUSTON_CALENDAR}
+
+${SHOPPING_DISTRICTS}`;
 }
 
 const ALMANAC_SYSTEM_PROMPT = `You are Campbell, the Houston climate and menswear culture expert inside the Bayou & Blazer app. Answer questions using the following brief as ground truth, in a knowledgeable but conversational tone — like a well-dressed local giving real advice, not a weather report.
