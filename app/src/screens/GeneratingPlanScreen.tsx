@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
+import type { WardrobePlan } from "../types";
 import { getPlanStatus, startPlanGeneration } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { TeamAvatar } from "../components/TeamAvatar";
@@ -41,6 +42,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [memberIndex, setMemberIndex] = useState(0);
   const [draftedPhases, setDraftedPhases] = useState<string[]>([]);
+  const [draftedPlanPhases, setDraftedPlanPhases] = useState<WardrobePlan["phases"]>([]);
   const [cardIndex, setCardIndex] = useState(0);
   const startedAtRef = useRef(Date.now());
 
@@ -89,6 +91,7 @@ export function GeneratingPlanScreen({ navigation }: Props) {
         const result = await getPlanStatus(sessionId!);
         if (cancelled) return;
         if (result.draftedPhases?.length) setDraftedPhases(result.draftedPhases);
+        if (result.draftedPlanPhases?.length) setDraftedPlanPhases(result.draftedPlanPhases);
 
         if (result.status === "done" && result.plan) {
           setWardrobePlan(result.plan);
@@ -152,12 +155,36 @@ export function GeneratingPlanScreen({ navigation }: Props) {
               <Text style={styles.memberDuty}>{member.duty}</Text>
             </View>
 
-            {draftedPhases.length > 0 ? (
+            {/* A finished phase is real, readable plan. Elena writes them in
+                order, so the first is done long before the last and a man
+                can start reading instead of watching a spinner. The ticker
+                below stays for the phase still being written. */}
+            {draftedPlanPhases.map((phase: WardrobePlan["phases"][number], i: number) => (
+              <View key={`phase-${i}`} style={styles.readyPhase}>
+                <Text style={styles.readyPhaseTiming}>
+                  {(phase.timingLabel ?? "").toUpperCase()}
+                  {i === 0 ? "  ·  READY TO READ" : ""}
+                </Text>
+                <Text style={styles.readyPhaseName}>{phase.name}</Text>
+                {phase.goal ? <Text style={styles.readyPhaseGoal}>{phase.goal}</Text> : null}
+                {(phase.items ?? []).map((item: WardrobePlan["phases"][number]["items"][number], j: number) => (
+                  <Text key={j} style={styles.readyPhaseItem}>
+                    • {item.quantity > 1 ? `${item.quantity}× ` : ""}
+                    {item.itemName ?? item.category}
+                    {Number(item.estimatedBudgetHighUsd) > 0
+                      ? `  $${Math.round(Number(item.estimatedBudgetLowUsd))}–${Math.round(Number(item.estimatedBudgetHighUsd))}`
+                      : ""}
+                  </Text>
+                ))}
+              </View>
+            ))}
+
+            {draftedPhases.length > draftedPlanPhases.length ? (
               <View style={styles.draftBox}>
                 <Text style={styles.draftLabel}>
-                  DRAFTING YOUR PLAN: {draftedPhases.length} {draftedPhases.length === 1 ? "PIECE" : "PIECES"} IN
+                  STILL WRITING: {draftedPhases.length} {draftedPhases.length === 1 ? "PIECE" : "PIECES"} IN
                 </Text>
-                {draftedPhases.slice(-5).map((name, i) => (
+                {draftedPhases.slice(-4).map((name, i) => (
                   <Text key={i} style={styles.draftLine}>
                     ✓ {name}
                   </Text>
@@ -204,6 +231,19 @@ const styles = StyleSheet.create({
   memberTitle: { color: colors.gold, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 },
   memberDuty: { ...typography.body, color: colors.cream, opacity: 0.9, textAlign: "center", marginTop: spacing.xs },
   valueLine: { ...typography.small, color: colors.cream, opacity: 0.65, textAlign: "center", paddingHorizontal: spacing.md },
+  readyPhase: {
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderRadius: radii.md,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.gold,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    gap: 3,
+  },
+  readyPhaseTiming: { ...typography.small, color: colors.gold, fontSize: 10, letterSpacing: 1, fontWeight: "700" },
+  readyPhaseName: { ...typography.title, color: colors.cream, fontSize: 16 },
+  readyPhaseGoal: { ...typography.small, color: colors.cream, opacity: 0.8, marginBottom: 4 },
+  readyPhaseItem: { ...typography.small, color: colors.cream, opacity: 0.95, fontSize: 12, lineHeight: 18 },
   draftBox: { alignSelf: "stretch", backgroundColor: "rgba(255,255,255,0.06)", borderRadius: radii.md, padding: spacing.md, gap: 4 },
   draftLabel: { color: colors.gold, fontSize: 10, fontWeight: "800", letterSpacing: 1.2, marginBottom: 2 },
   draftLine: { ...typography.small, color: colors.cream, opacity: 0.9 },

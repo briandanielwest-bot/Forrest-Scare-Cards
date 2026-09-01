@@ -138,6 +138,7 @@ export function getPlanStatus(sessionId: string) {
     status: PlanStatus;
     stage?: "scouts" | "planner";
     draftedPhases?: string[];
+    draftedPlanPhases?: WardrobePlan["phases"];
     plan?: WardrobePlan;
     error?: string;
   }>(`/api/plan/${sessionId}`);

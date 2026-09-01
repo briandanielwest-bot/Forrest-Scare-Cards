@@ -107,6 +107,8 @@ export interface SessionState {
   planStage?: "scouts" | "planner";
   /** Phase names Elena has drafted so far — the live ticker. */
   draftedPhases?: string[];
+  /** Whole phases streamed as they complete, for progressive render. */
+  draftedPlanPhases?: WardrobePlan["phases"];
   planError?: string;
   /** Rolling post-plan Q&A history with Kyla (seeded with plan context). */
   planQAHistory?: Anthropic.MessageParam[];

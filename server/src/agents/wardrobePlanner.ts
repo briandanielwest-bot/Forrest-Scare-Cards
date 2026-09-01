@@ -115,15 +115,6 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
   input_schema: {
     type: "object",
     properties: {
-      guideTitle: { type: "string", description: "A catchy title for this man's personal guide." },
-      introNarrative: {
-        type: "string",
-        description: "His situation and the promise, personal and punchy. HARD MAX 90 words.",
-      },
-      climateNotes: {
-        type: "string",
-        description: "How Houston's climate specifically shapes this plan. HARD MAX 70 words.",
-      },
       phases: {
         type: "array",
         items: {
@@ -136,6 +127,15 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
           },
           required: ["name", "timingLabel", "goal", "items"],
         },
+      },
+      guideTitle: { type: "string", description: "A catchy title for this man's personal guide." },
+      introNarrative: {
+        type: "string",
+        description: "His situation and the promise, personal and punchy. HARD MAX 90 words.",
+      },
+      climateNotes: {
+        type: "string",
+        description: "How Houston's climate specifically shapes this plan. HARD MAX 70 words.",
       },
       budgetSummary: {
         type: "object",
@@ -167,9 +167,70 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
           "Kyla the stylist's personal sign-off, in her warm, bossy, funny voice: 3-4 sentences, HARD MAX 55 words. Her sharpest callback, one concrete first move, a confident send-off.",
       },
     },
-    required: ["guideTitle", "introNarrative", "climateNotes", "phases", "budgetSummary", "generalBuyingTips", "finalPepTalk"],
+    // phases first, deliberately: tool input streams in schema order, so
+    // this is what makes the first phase readable while the rest is written.
+    required: ["phases", "guideTitle", "introNarrative", "climateNotes", "budgetSummary", "generalBuyingTips", "finalPepTalk"],
   },
 };
+
+/**
+ * Pulls finished phase objects out of a partially-streamed tool input.
+ *
+ * Only whole, brace-balanced objects are returned: a half-written phase is
+ * worse than no phase.
+ *
+ * MEASURED, because the obvious assumption is wrong. This was built to make
+ * the first phase readable around twenty seconds into a fifty-second wait.
+ * It does not, and cannot as things stand: generation is thinking-bound,
+ * not writing-bound. At 46 seconds of a 51-second run the stream held 830
+ * characters; the remaining 7,400 arrived in the last five. The model is
+ * reasoning between fragments, so the phases do not exist to stream.
+ *
+ * What it does buy is the tail. Putting phases first in the tool schema
+ * moved them ahead of the budget summary, buying tips and sign-off, so a
+ * man now sees real phases about five seconds before the plan completes
+ * rather than half a second. Worth keeping, and worth knowing that the
+ * lever for a real improvement is reasoning time, not stream parsing.
+ *
+ * Returns every complete phase found; the caller tracks which it has
+ * already emitted.
+ */
+export function completePhasesInPartialJson(buffer: string): unknown[] {
+  const key = buffer.indexOf('"phases"');
+  if (key < 0) return [];
+  const open = buffer.indexOf("[", key);
+  if (open < 0) return [];
+
+  const out: unknown[] = [];
+  let depth = 0;
+  let start = -1;
+  let inStr = false;
+  let esc = false;
+  for (let i = open + 1; i < buffer.length; i++) {
+    const c = buffer[i];
+    if (esc) { esc = false; continue; }
+    if (c === "\\") { esc = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === "{") {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (c === "}") {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try {
+          out.push(JSON.parse(buffer.slice(start, i + 1)));
+        } catch {
+          // A phase that will not parse yet is simply not ready.
+        }
+        start = -1;
+      }
+    } else if (c === "]" && depth === 0) {
+      break;
+    }
+  }
+  return out;
+}
 
 export async function buildWardrobePlan(args: {
   profile: StyleProfile;
@@ -177,8 +238,10 @@ export async function buildWardrobePlan(args: {
   scoutReports: ScoutReport[];
   /** Called with each phase name the moment Elena writes it — powers the live drafting ticker. */
   onPhaseName?: (name: string) => void;
+  /** A finished phase, the moment it is whole enough to read. */
+  onPhase?: (phase: unknown, index: number) => void;
 }): Promise<WardrobePlan> {
-  const { profile, photoAssessment, scoutReports, onPhaseName } = args;
+  const { profile, photoAssessment, scoutReports, onPhaseName, onPhase } = args;
 
   // Watches the tool call's JSON as it streams and surfaces phase names as
   // they appear. Phases are the only objects in the schema with a bare
@@ -190,9 +253,19 @@ export async function buildWardrobePlan(args: {
   // Phases ("name") and pieces ("itemName") both feed the live ticker —
   // the customer watches his actual plan assemble line by line.
   const nameRegex = /"(?:name|itemName)"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  let emittedPhases = 0;
+  const tStream = Date.now();
+  let firstDeltaAt = 0;
   const watchDelta = (partialJson: string) => {
-    if (!onPhaseName) return;
+    if (!firstDeltaAt) firstDeltaAt = Date.now();
+    if (!onPhaseName && !onPhase) return;
     draftBuffer += partialJson;
+    if (onPhase) {
+      const done = completePhasesInPartialJson(draftBuffer);
+      for (let i = emittedPhases; i < done.length; i++) onPhase(done[i], i);
+      emittedPhases = Math.max(emittedPhases, done.length);
+    }
+    if (!onPhaseName) return;
     nameRegex.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = nameRegex.exec(draftBuffer)) !== null) {

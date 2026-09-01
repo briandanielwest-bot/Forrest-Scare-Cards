@@ -90,12 +90,20 @@ export async function generateWardrobePlan(session: SessionState): Promise<Wardr
 
   session.planStage = "planner";
   session.draftedPhases = [];
+  session.draftedPlanPhases = [];
   const plan = await buildWardrobePlan({
     profile: session.styleProfile,
     photoAssessment: session.photoAssessment,
     scoutReports,
     onPhaseName: (name) => {
       session.draftedPhases = [...(session.draftedPhases ?? []), name];
+    },
+    // Whole phases as they finish, so the hold screen can show a man the
+    // first part of his real plan while the rest is still being written.
+    // These are unvalidated drafts: the inspected plan still replaces them.
+    onPhase: (phase, index) => {
+      console.log(`[orchestrator] phase ${index + 1} readable at ${((Date.now() - tScouts) / 1000).toFixed(1)}s`);
+      session.draftedPlanPhases = [...(session.draftedPlanPhases ?? []), phase as WardrobePlan["phases"][number]];
     },
   });
   console.log(`[orchestrator] planner: ${((Date.now() - tScouts) / 1000).toFixed(1)}s`);
