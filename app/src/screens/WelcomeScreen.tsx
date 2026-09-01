@@ -175,8 +175,14 @@ export function WelcomeScreen({ navigation }: Props) {
                 <Text style={styles.teamMemberName}>
                   {member.name} <Text style={styles.teamMemberRole}>· {member.title}</Text>
                 </Text>
-                <Text style={styles.teamMemberBio}>{member.bio}</Text>
-                <Text style={styles.teamMemberDoes}>{member.does}</Text>
+                <Text style={styles.teamMemberLine}>
+                  <Text style={styles.teamMemberLabel}>Does </Text>
+                  {member.does}
+                </Text>
+                <Text style={styles.teamMemberLine}>
+                  <Text style={styles.teamMemberLabel}>Likes </Text>
+                  {member.likes}
+                </Text>
               </View>
             </View>
           ))}
@@ -305,8 +311,8 @@ const styles = StyleSheet.create({
   teamMemberText: { flex: 1, gap: 2 },
   teamMemberName: { color: colors.gold, fontWeight: "700", fontSize: 14 },
   teamMemberRole: { color: colors.cream, opacity: 0.7, fontWeight: "500", fontSize: 12 },
-  teamMemberBio: { color: colors.cream, opacity: 0.8, fontSize: 12, lineHeight: 17 },
-  teamMemberDoes: { color: colors.cream, opacity: 0.95, fontSize: 12, lineHeight: 17, fontStyle: "italic" },
+  teamMemberLine: { color: colors.cream, opacity: 0.88, fontSize: 12, lineHeight: 17 },
+  teamMemberLabel: { color: colors.gold, fontWeight: "700" },
   teamPill: {
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: radii.md,
