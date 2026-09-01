@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAppContext } from "../context/AppContext";
-import { askKylaAboutPlan, fetchOutfits, fetchStores, saveMemory, type Outfit } from "../api/client";
+import { sendPlanFeedback, askKylaAboutPlan, fetchOutfits, fetchStores, saveMemory, type Outfit } from "../api/client";
 import { KylaPortrait } from "../components/KylaPortrait";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, WardrobeItem, WardrobePlan, StorePriority } from "../types";
@@ -135,6 +135,74 @@ function OutfitMatrix({ sessionId }: { sessionId: string | null }) {
 
 // Post-plan chat: Kyla answers questions about her picks, right on the
 // plan. Local exchange list only — the server keeps the real history.
+// Tester feedback, at the bottom where a man has actually read the thing.
+// Two taps and an optional sentence: any more friction and the only people
+// who answer are the ones who already loved it.
+function PlanFeedback({ sessionId }: { sessionId: string | null }) {
+  const [rating, setRating] = React.useState<"up" | "down" | null>(null);
+  const [comment, setComment] = React.useState("");
+  const [sent, setSent] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function submit(next: "up" | "down", withComment?: string) {
+    if (!sessionId) return;
+    setRating(next);
+    setError(null);
+    try {
+      await sendPlanFeedback(sessionId, next, withComment);
+      if (withComment !== undefined) setSent(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't send that, try again?");
+    }
+  }
+
+  if (sent) {
+    return (
+      <View style={styles.feedbackCard}>
+        <Text style={styles.feedbackThanks}>Got it. This is genuinely how the plans get better.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.feedbackCard}>
+      <Text style={styles.feedbackTitle}>Was this plan any good?</Text>
+      <View style={styles.feedbackRow}>
+        <Pressable
+          style={[styles.feedbackChoice, rating === "up" && styles.feedbackChoiceOn]}
+          onPress={() => submit("up")}
+        >
+          <Text style={[styles.feedbackChoiceText, rating === "up" && styles.feedbackChoiceTextOn]}>Yes</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.feedbackChoice, rating === "down" && styles.feedbackChoiceOn]}
+          onPress={() => submit("down")}
+        >
+          <Text style={[styles.feedbackChoiceText, rating === "down" && styles.feedbackChoiceTextOn]}>Not really</Text>
+        </Pressable>
+      </View>
+      {/* The rating is already recorded, so the box is a bonus rather than a
+          gate. Anyone who stops here has still told us something. */}
+      {rating ? (
+        <>
+          <TextInput
+            style={styles.feedbackInput}
+            value={comment}
+            onChangeText={setComment}
+            placeholder={rating === "up" ? "What was most useful?" : "What was wrong with it?"}
+            placeholderTextColor={colors.muted}
+            multiline
+          />
+          <Pressable style={styles.feedbackSend} onPress={() => submit(rating, comment.trim())}>
+            <Text style={styles.feedbackSendText}>Send to Kyla</Text>
+          </Pressable>
+        </>
+      ) : null}
+      {error ? <Text style={styles.askError}>{error}</Text> : null}
+    </View>
+  );
+}
+
 function AskKyla({ sessionId, purchasedKeys }: { sessionId: string | null; purchasedKeys: string[] }) {
   const [question, setQuestion] = React.useState("");
   const [exchanges, setExchanges] = React.useState<{ q: string; a: string }[]>([]);
@@ -356,6 +424,8 @@ export function PlanScreen({ navigation }: Props) {
         </View>
 
         <AskKyla sessionId={sessionId} purchasedKeys={purchasedKeys} />
+
+        <PlanFeedback sessionId={sessionId} />
 
         <Pressable style={styles.directoryButton} onPress={() => navigation.navigate("StoreDirectory")}>
           <Text style={styles.directoryButtonText}>Browse the full Houston store directory</Text>
@@ -752,6 +822,34 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   askTitle: { ...typography.title, fontSize: 16 },
+  feedbackCard: {
+    backgroundColor: colors.paper,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginTop: spacing.lg,
+    gap: spacing.sm,
+  },
+  feedbackTitle: { ...typography.title, fontSize: 15 },
+  feedbackThanks: { ...typography.body, color: colors.bayouDark },
+  feedbackRow: { flexDirection: "row", gap: spacing.sm },
+  feedbackChoice: {
+    borderWidth: 1, borderColor: colors.bayou, borderRadius: radii.md,
+    paddingVertical: 8, paddingHorizontal: 16,
+  },
+  feedbackChoiceOn: { backgroundColor: colors.bayou },
+  feedbackChoiceText: { ...typography.body, color: colors.bayouDark, fontWeight: "600" },
+  feedbackChoiceTextOn: { color: colors.cream },
+  feedbackInput: {
+    borderWidth: 1, borderColor: colors.border, borderRadius: radii.md,
+    padding: spacing.sm, minHeight: 64, textAlignVertical: "top", color: colors.ink,
+  },
+  feedbackSend: {
+    backgroundColor: colors.bayou, borderRadius: radii.md,
+    paddingVertical: 10, alignItems: "center",
+  },
+  feedbackSendText: { color: colors.cream, fontWeight: "700" },
   askHint: { ...typography.small, color: colors.muted },
   askExchange: { gap: 2, borderLeftWidth: 3, borderLeftColor: colors.gold, paddingLeft: spacing.sm },
   askQ: { ...typography.small, fontWeight: "800", color: colors.bayouDark },

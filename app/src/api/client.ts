@@ -205,3 +205,13 @@ export function askConcierge(question: string) {
     body: JSON.stringify({ question }),
   });
 }
+
+// What a tester thought of the plan. The rating is the signal; the comment
+// is where the useful part usually is.
+export function sendPlanFeedback(sessionId: string, rating: "up" | "down", comment?: string) {
+  return request<{ ok: boolean }>("/api/plan/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, rating, comment }),
+  });
+}

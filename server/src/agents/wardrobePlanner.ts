@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage, recordOperation } from "../costs";
 import { EM_DASH, HUMAN_VOICE_RULES, findVoiceTells, sanitizeVoice } from "./voice";
 import { anthropic } from "../anthropicClient";
 import { AGENT_MODEL, FAST_AGENT_MODEL } from "../config";
@@ -285,6 +286,9 @@ Build the complete wardrobe plan now.`;
   // rate limit, a non-Opus model override — falls back to the standard
   // lane, so quality and reliability never depend on it. Note the two
   // lanes keep separate prompt caches.
+  // Accumulates every call this plan makes, including the repair pass, so
+  // the answer to "what does a plan cost" is measured rather than assumed.
+  let plannerCostUsd = 0;
   let response: Anthropic.Message;
   try {
     const fastStream = anthropic.beta.messages.stream({
@@ -295,12 +299,14 @@ Build the complete wardrobe plan now.`;
     } as never);
     attachWatcher(fastStream as unknown as { on: (ev: "streamEvent", cb: (e: Anthropic.MessageStreamEvent) => void) => unknown });
     response = (await fastStream.finalMessage()) as Anthropic.Message;
+    plannerCostUsd += recordUsage("planner", AGENT_MODEL, response.usage);
     console.log("[planner] fast mode");
   } catch (err) {
     console.warn(`[planner] fast mode unavailable (${(err as Error).message?.slice(0, 80)}), standard lane`);
     const stream = anthropic.messages.stream(baseParams);
     attachWatcher(stream);
     response = await stream.finalMessage();
+    plannerCostUsd += recordUsage("planner", AGENT_MODEL, response.usage);
   }
 
   // A "max_tokens" stop reason means the tool call's JSON was cut off
@@ -320,7 +326,12 @@ Build the complete wardrobe plan now.`;
     throw new Error("Wardrobe planner did not return a plan");
   }
 
-  return repairVoice(normalizeWardrobePlan(toolUse.input, profile));
+  const repaired = await repairVoice(normalizeWardrobePlan(toolUse.input, profile));
+  const plan = repaired.plan;
+  plannerCostUsd += repaired.usd;
+  recordOperation("plan", plannerCostUsd);
+  console.log(`[planner] this plan cost $${plannerCostUsd.toFixed(3)} in planner + repair calls`);
+  return plan;
 }
 
 
@@ -335,7 +346,8 @@ Build the complete wardrobe plan now.`;
  * Every failure path keeps the original text. A plan that reads slightly
  * machine-made beats a plan with an empty intro.
  */
-async function repairVoice(plan: WardrobePlan): Promise<WardrobePlan> {
+async function repairVoice(plan: WardrobePlan): Promise<{ plan: WardrobePlan; usd: number }> {
+  let usd = 0;
   const targets: { key: "introNarrative" | "finalPepTalk"; label: string; maxWords: number; maxSentences?: number }[] = [
     { key: "introNarrative", label: "the plan's opening narrative", maxWords: 70 },
     { key: "finalPepTalk", label: "Kyla's sign-off, in her voice", maxWords: 45, maxSentences: 3 },
@@ -363,6 +375,7 @@ async function repairVoice(plan: WardrobePlan): Promise<WardrobePlan> {
           output_config: { effort: "low" },
         } as Parameters<typeof anthropic.messages.create>[0]);
 
+        usd += recordUsage("voiceRepair", FAST_AGENT_MODEL, (res as Anthropic.Message).usage);
         const rewritten = sanitizeVoice(
           (res as Anthropic.Message).content
             .filter((b): b is Anthropic.TextBlock => b.type === "text")
@@ -385,7 +398,7 @@ async function repairVoice(plan: WardrobePlan): Promise<WardrobePlan> {
       }
     }),
   );
-  return plan;
+  return { plan, usd };
 }
 
 // The model occasionally emits a nested array/object field as a JSON

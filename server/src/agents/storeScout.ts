@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
@@ -147,6 +148,7 @@ ${JSON.stringify(profile, null, 2)}${extraContext ? `\n\n${extraContext}` : ""}`
     output_config: { effort: "low" },
   };
   const response = await anthropic.messages.create(params);
+  recordUsage("buyingDirector", FAST_AGENT_MODEL, response.usage);
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_recommendations",

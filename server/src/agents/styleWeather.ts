@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { FAST_AGENT_MODEL } from "../config";
@@ -93,6 +94,7 @@ export async function askAlmanac(question: string): Promise<string> {
     output_config: { effort: "low" },
   };
   const response = await anthropic.messages.create(params);
+  recordUsage("concierge", FAST_AGENT_MODEL, response.usage);
 
   return sanitizeVoice(
     response.content

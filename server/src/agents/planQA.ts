@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
@@ -84,6 +85,7 @@ export async function askAboutPlan(
     output_config: { effort: "low" },
   };
   const response = await anthropic.messages.create(params);
+  recordUsage("planQA", FAST_AGENT_MODEL, response.usage);
   const reply = sanitizeVoice(
     response.content
       .filter((b): b is Anthropic.TextBlock => b.type === "text")

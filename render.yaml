@@ -25,6 +25,12 @@ services:
         value: claude-opus-5
       - key: CORS_ORIGIN
         value: "*"
+      # The daily spend ceiling. Unset means no limit, which is right for
+      # local development and wrong for a link anyone can open: without
+      # this the guard ships switched off. Raise it once real usage has a
+      # shape; $15/day covers roughly forty plans at the measured cost.
+      - key: DAILY_LIMIT_USD
+        value: "15"
       # Wired automatically from the database declared below — sessions,
       # saved plans (claim codes), and analytics then survive restarts,
       # redeploys, and running more than one instance. Remove this block
