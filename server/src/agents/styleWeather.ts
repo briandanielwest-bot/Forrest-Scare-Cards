@@ -5,19 +5,14 @@ import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { FAST_AGENT_MODEL } from "../config";
 
 /**
- * "Marisol" — Houston Style & Weather Agent. Nine years on a Post Oak
- * running back who powered through everything Houston threw at him.
+ * "Marisol" — Houston Style & Weather Agent. She knows what every kind of
+ * room in this city actually wears, and keeps a file on it.
  *
- * Houston's climate and dress culture are specific enough that generic
- * wardrobe advice fails here: nine-plus-degree AC/outdoor swings, a
- * subtropical summer that runs half the calendar, and a genuinely
- * cosmopolitan, international business culture (energy, the Texas Medical
- * Center, NASA/aerospace) where western wear is one legitimate optional
- * category, not the app's default aesthetic. This module is the shared
- * knowledge base every other agent (mainly the Wardrobe Planner) builds
- * on, plus a small conversational surface for one-off questions.
+ * Houston's climate and dress culture are specific enough that the other
+ * agents shouldn't re-derive them per request. This module holds the
+ * almanac as cacheable text, and answers one-off "what do I wear to X"
+ * questions directly.
  */
-
 import { HOUSTON_CALENDAR, HOUSTON_VENUES, SHOPPING_DISTRICTS } from "../data/houstonKnowledge";
 import { getAllStores } from "../data/houstonStores";
 import { SEASON_BRIEF, SEASON_BRIEF_DATE } from "../data/seasonBrief";

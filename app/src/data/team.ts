@@ -4,12 +4,15 @@ import type { AvatarLook } from "../components/TeamAvatar";
  * The Bayou & Blazer staff: one shared roster so the welcome screen, the
  * plan-building screen, and the agents all agree on who these people are.
  *
- * They are written as a real Houston shop's team, because that is what
- * they are meant to become. Each one learned the job somewhere specific in
- * this city, and each one does a real piece of the work on every plan. An
- * earlier roster named them after Houston sports legends, which was a fun
- * insider joke that made them mascots rather than staff, and it needed a
- * non-affiliation disclaimer besides.
+ * They are written as a real shop's team, because that is what they are
+ * meant to become. Two sentences each: what they are good at, then one
+ * human thing that is true of a person and not of a job description.
+ *
+ * No real streets or shops appear in a bio. Naming one implies a real
+ * person worked there, and it reads as a claim about a business we do not
+ * speak for. An earlier roster was named after Houston sports legends,
+ * which made them mascots rather than staff and needed a non-affiliation
+ * disclaimer besides.
  *
  * Portraits are original flat illustrations. They are not likenesses of
  * anyone real.
@@ -37,7 +40,7 @@ export const TEAM: TeamMember[] = [
     id: "kyla",
     name: "Kyla",
     title: "Lead Stylist",
-    bio: "Fifteen years dressing Houston men, from summer interns to the corner office. She has seen every closet disaster this city produces, which is why nothing you say will faze her.",
+    bio: "Fifteen years of dressing men has made her quick at it. She can tell inside one conversation what a man will actually wear and what will hang in his closet with the tag still on.",
     does: "Runs your interview and signs off on the finished plan.",
     duty: "Reading the team your file line by line, so nobody has to ask you the same question twice.",
     stage: "warmup",
@@ -57,7 +60,7 @@ export const TEAM: TeamMember[] = [
     id: "theo",
     name: "Theo",
     title: "Fit & Build Specialist",
-    bio: "Played offensive line until a knee gave out, then spent a decade fitting men who have never once fit a standard size. He can tell a sloped shoulder from a photo across a room.",
+    bio: "He reads shoulder slope, torso length and posture off a photo, which covers most of what a jacket off the rack gets wrong. He was a big kid who never found one that fit, and he has not entirely gotten over it.",
     does: "Reads your photos for the measurements off-the-rack always gets wrong.",
     duty: "Reading your photos for shoulder slope and torso length, the two things a rack jacket never accounts for.",
     stage: "warmup",
@@ -75,7 +78,7 @@ export const TEAM: TeamMember[] = [
     id: "marisol",
     name: "Marisol",
     title: "Houston Concierge",
-    bio: "Nine years running guest services at a Post Oak hotel, where she fielded the \"what do I wear tonight\" call so many times she started keeping a file on every venue in the city. She still keeps it.",
+    bio: "She knows what every kind of room in this city actually wears, from a black-tie table to a client dinner to a Tuesday at the office. She keeps a file on it and updates it whenever she hears a dress code has drifted, which is more often than people expect.",
     does: "Knows what the room you are walking into actually wears.",
     duty: "Checking what your calendar has coming and what those rooms actually wear this month.",
     stage: "warmup",
@@ -95,7 +98,7 @@ export const TEAM: TeamMember[] = [
     id: "vinh",
     name: "Vinh",
     title: "Director of Tailoring",
-    bio: "Grew up in his parents' alterations shop on Bellaire Boulevard and could set a sleeve before he could drive. He knows which Houston benches do real work and which ones just shorten sleeves.",
+    bio: "He learned tailoring from his parents and can see what a jacket will look like altered before the chalk comes out. He is the one who tells you your favorite blazer is past saving, kindly, and he is usually right.",
     does: "Picks the tailor, and decides what you already own is worth saving.",
     duty: "Working out what in your closet a tailor can rescue before we spend a dollar on anything new.",
     stage: "scouts",
@@ -114,9 +117,9 @@ export const TEAM: TeamMember[] = [
     id: "simone",
     name: "Simone",
     title: "Director of Designer Floors",
-    bio: "Fifteen years on the Galleria floors, Neiman's and then Saks. She knows which labels get marked down in July and which never do, and she has never once been impressed by a logo.",
+    bio: "Fifteen years selling designer menswear taught her which labels earn the money and which are charging for the name. She has never been impressed by a logo and she will not pretend otherwise to move a jacket.",
     does: "Works the designer floors for what is actually in stock in your size.",
-    duty: "Walking the Galleria floors for what is in stock in your size, which is a different list from the lookbook.",
+    duty: "Checking the designer floors for what is in stock in your size, which is a different list from the lookbook.",
     stage: "scouts",
     look: {
       bg: "#E0D8E4",
@@ -134,7 +137,7 @@ export const TEAM: TeamMember[] = [
     id: "ade",
     name: "Ade",
     title: "Director of Footwear",
-    bio: "Apprenticed at a resole bench before he ever sold a pair, so he judges a shoe by whether it can be rebuilt in ten years. He will talk you out of the cheap pair twice before he gives up.",
+    bio: "He repaired shoes before he ever sold a pair, so he judges every one by whether it can be rebuilt in ten years. He owns four pairs and has resoled two of them twice.",
     does: "Picks shoes and boots that survive Houston and can be resoled.",
     duty: "Sorting which shoes on your list can be resoled for a decade and which are disposable.",
     stage: "scouts",
@@ -151,7 +154,7 @@ export const TEAM: TeamMember[] = [
     id: "priya",
     name: "Priya",
     title: "Director of Accessories",
-    bio: "Trained as an optician, then moved into buying frames, belts, and watches. She thinks most men spend their last two hundred dollars in exactly the wrong place, and she is usually right.",
+    bio: "Trained as an optician, she matches frames to a face better than anyone here, and she buys the belts and watches too. She thinks most men spend their last two hundred dollars in the wrong place, and she will say so before you do it.",
     does: "Handles frames, belts, and the small things that finish a look.",
     duty: "Matching frames to your face and a belt to the shoes we just picked, in that order.",
     stage: "scouts",
@@ -171,7 +174,7 @@ export const TEAM: TeamMember[] = [
     id: "elena",
     name: "Elena",
     title: "Head of Wardrobe Planning",
-    bio: "A retail buyer for a decade before she got tired of selling men things in the wrong order. She builds the phased plan, and she is the reason the numbers add up.",
+    bio: "She turns everyone else's picks into one plan with the money and the order worked out. She checks the arithmetic twice because she was four hundred dollars off once, years ago, and has never quite let it go.",
     does: "Turns everyone's picks into one phased plan your budget can actually carry.",
     duty: "Laying all of it against your budget and Houston's calendar, in the order you should buy it.",
     stage: "planner",
