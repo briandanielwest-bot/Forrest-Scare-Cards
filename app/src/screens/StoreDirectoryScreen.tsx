@@ -7,6 +7,14 @@ import { AskConcierge } from "../components/AskConcierge";
 import { colors, radii, spacing, typography } from "../theme/theme";
 import type { HoustonStore, StoreCategory } from "../types";
 
+// "2026-08-31" reads as machine output. "Aug 31" reads as someone checked.
+function formatChecked(iso: string): string {
+  const d = new Date(iso + "T12:00:00");
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 // Domain only — full URLs with paths overflow the card on phone widths.
 function formatWebsite(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
@@ -116,6 +124,11 @@ export function StoreDirectoryScreen() {
             <Text style={styles.neighborhood}>{item.neighborhood}</Text>
             <Text style={styles.description}>{item.description}</Text>
             {item.seasonalNote ? <Text style={styles.seasonalNote}>Right now: {item.seasonalNote}</Text> : null}
+            {/* The footer promises we re-check this directory monthly. This
+                is that promise made checkable on the row it applies to. */}
+            {item.lastVerified ? (
+              <Text style={styles.lastChecked}>Confirmed open {formatChecked(item.lastVerified)}</Text>
+            ) : null}
             {item.knownFor ? <Text style={styles.knownFor}>Known for: {item.knownFor}</Text> : null}
             {item.catersTo ? <Text style={styles.catersTo}>Caters to: {item.catersTo}</Text> : null}
             <Text style={styles.bestFor}>Best for: {item.bestFor}</Text>
@@ -228,6 +241,7 @@ const styles = StyleSheet.create({
   priceTier: { color: colors.gold, fontWeight: "800" },
   neighborhood: { ...typography.small },
   description: { ...typography.body },
+  lastChecked: { ...typography.small, color: colors.muted, fontSize: 11 },
   seasonalNote: {
     ...typography.small,
     color: colors.bayouDark,
