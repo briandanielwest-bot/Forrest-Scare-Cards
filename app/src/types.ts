@@ -102,6 +102,7 @@ export interface HoustonStore {
   knownFor?: string;
   catersTo?: string;
   seasonalNote?: string;
+  /** Date the monthly refresh last confirmed this store is operating. */
   lastVerified?: string;
   brands?: string[];
   pricePoints?: string[];
