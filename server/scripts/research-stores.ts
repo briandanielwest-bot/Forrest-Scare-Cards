@@ -238,10 +238,12 @@ Up to 10 brands and 6 price points. Empty arrays are correct answers when resear
 // ---------------------------------------------------------------------
 
 async function main() {
-  const phase = (process.argv.find((a) => a.startsWith("--phase="))?.split("=")[1] ?? "both") as
-    | "discover"
-    | "enrich"
-    | "both";
+  // --only names existing stores to enrich, so it can only mean the enrich
+  // phase. Defaulting to "both" there kicks off eight angles of discovery
+  // nobody asked for, which is exactly the expensive half.
+  const onlyFlag = process.argv.some((a) => a.startsWith("--only="));
+  const phase = (process.argv.find((a) => a.startsWith("--phase="))?.split("=")[1] ??
+    (onlyFlag ? "enrich" : "both")) as "discover" | "enrich" | "both";
   const outDir = path.join(__dirname, "out");
   fs.mkdirSync(outDir, { recursive: true });
 
@@ -290,7 +292,18 @@ async function main() {
       const prior = existing[id];
       return Boolean(prior && (prior.brands.length > 0 || prior.pricePoints.length > 0 || prior.insiderTake));
     };
-    const todo = HOUSTON_STORES.filter((s) => !hasIntel(s.id));
+    // --only=id,id targets specific stores. Without it, resume picks up
+    // everything unresearched, which includes single-brand shops where the
+    // brands field is meaningless (Warby Parker sells Warby Parker) and
+    // paying to learn that again is waste.
+    const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7).split(",").filter(Boolean);
+    const todo = only
+      ? HOUSTON_STORES.filter((s) => only.includes(s.id))
+      : HOUSTON_STORES.filter((s) => !hasIntel(s.id));
+    if (only && todo.length !== only.length) {
+      const missing = only.filter((id) => !HOUSTON_STORES.some((s) => s.id === id));
+      console.warn(`[research] unknown store id(s): ${missing.join(", ")}`);
+    }
     console.log(
       `[research] enriching ${todo.length} store(s)${todo.length < HOUSTON_STORES.length ? ` (${HOUSTON_STORES.length - todo.length} already researched, resuming)` : ""}…`,
     );
