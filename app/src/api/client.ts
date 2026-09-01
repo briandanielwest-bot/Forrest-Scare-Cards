@@ -215,3 +215,16 @@ export function sendPlanFeedback(sessionId: string, rating: "up" | "down", comme
     body: JSON.stringify({ sessionId, rating, comment }),
   });
 }
+
+// Fire-and-forget on each check-off. The signal matters; a man tapping
+// through his list must never wait on it, and a failure here is not worth
+// telling him about.
+export function reportPurchase(sessionId: string, itemKey: string, purchased: boolean): void {
+  void request<{ ok: boolean }>("/api/plan/purchased", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, itemKey, purchased }),
+  }).catch(() => {
+    // Analytics never interrupts the thing the user is doing.
+  });
+}

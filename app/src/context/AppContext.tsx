@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { reportPurchase } from "../api/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { ChatMessage, HoustonStore, StoreCategory, StyleProfile, WardrobePlan } from "../types";
 
@@ -125,7 +126,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setInterviewDone,
       purchasedKeys,
       togglePurchased: (key: string) =>
-        setPurchasedKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key])),
+        setPurchasedKeys((prev) => {
+          const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+          // Reported from here rather than the screen, so every path that
+          // toggles an item is counted, including any future one.
+          if (sessionId) reportPurchase(sessionId, key, next.includes(key));
+          return next;
+        }),
       setPurchasedKeys,
       memoryCode,
       setMemoryCode,

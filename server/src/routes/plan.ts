@@ -146,6 +146,47 @@ planRouter.post("/outfits", spendGuard, agentRouteLimiter, async (req, res, next
   }
 });
 
+// A check-off, decoded. The client holds keys like "p0i1"; on its own
+// that is not a fact about anything. Resolved here into the store, the
+// category and the price band, it becomes the only evidence in the product
+// that a recommendation turned into a purchase, which is both the quality
+// signal and the store-partnership pitch.
+//
+// No Claude call, so no spend guard and no rate limiter: a man tapping
+// through his list should never be throttled.
+planRouter.post("/purchased", async (req, res, next) => {
+  try {
+    const { sessionId, itemKey, purchased } = req.body as {
+      sessionId?: string;
+      itemKey?: string;
+      purchased?: boolean;
+    };
+    if (!sessionId || typeof itemKey !== "string") {
+      return res.status(400).json({ error: "sessionId and itemKey are required" });
+    }
+    const session = await requireSession(sessionId);
+    const match = /^p(\d+)i(\d+)$/.exec(itemKey);
+    if (!match) return res.status(400).json({ error: "itemKey must look like p0i1" });
+
+    const phase = (session.wardrobePlan?.phases ?? [])[Number(match[1])];
+    const item = (phase?.items ?? [])[Number(match[2])];
+    if (!item) return res.status(404).json({ error: "No such item in this plan" });
+
+    track(purchased === false ? "item_unpurchased" : "item_purchased", {
+      // Primary store only: that is where he was actually sent.
+      storeId: (item.recommendedStoreIds ?? [])[0],
+      category: item.category,
+      priority: item.priority,
+      itemName: item.itemName,
+      lowUsd: item.estimatedBudgetLowUsd,
+      highUsd: item.estimatedBudgetHighUsd,
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // What a tester actually thought. Cheap to give, and without it a
 // friends-and-family round produces ten opinions in ten text messages and
 // nothing you can count. Stored with the profile and the plan's shape so a
