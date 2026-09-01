@@ -35,7 +35,7 @@ photoRouter.post("/analyze", upload.array("photos", 12), async (req, res, next) 
     const session = await requireSession(sessionId);
 
     const totalBytes = files.reduce((sum, f) => sum + f.size, 0);
-    console.log(`[photo] ${files.length} file(s), ${(totalBytes / 1024).toFixed(0)} KB total — analyzing in background`);
+    console.log(`[photo] ${files.length} file(s), ${(totalBytes / 1024).toFixed(0)} KB total, analyzing in background`);
 
     const images: UploadedImage[] = files.map((f) => ({
       mediaType: f.mimetype as UploadedImage["mediaType"],
@@ -60,6 +60,7 @@ photoRouter.post("/analyze", upload.array("photos", 12), async (req, res, next) 
         // Non-fatal by design: the plan still generates without the
         // assessment rather than dead-ending the whole run.
         session.photoStatus = "error";
+        saveSession(session);
         console.error("[photo] analysis failed (plan will proceed without it):", err);
       });
 

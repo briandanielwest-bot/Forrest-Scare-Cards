@@ -61,6 +61,10 @@ planRouter.post("/generate", spendGuard, agentRouteLimiter, async (req, res, nex
     // single-request timeout. Kick the work off in the background and let
     // the client poll GET /:sessionId for status instead of holding one
     // long-lived request open.
+    // Deliberately NOT persisted. "generating" is a claim about a promise
+    // running in THIS process; written to Postgres it outlives the process
+    // that could ever finish it, and the guard above would then refuse the
+    // retry the user just tapped. Only the terminal states get written down.
     session.planStatus = "generating";
     session.planError = undefined;
     const t0 = Date.now();
@@ -84,6 +88,11 @@ planRouter.post("/generate", spendGuard, agentRouteLimiter, async (req, res, nex
           ? "Kyla's team is offline: the app's usage credits ran out. If this is your app, top up at console.anthropic.com (Plans & Billing)."
           : raw;
         track("plan_failed");
+        // A failure is a terminal state and has to be written down. Only the
+        // success path persisted, so a plan that failed and then got evicted
+        // from the hot cache came back from Postgres looking untouched, and
+        // the man was never told what went wrong.
+        saveSession(session);
         console.error("Plan generation failed after retries:", err);
       });
 
@@ -119,6 +128,10 @@ planRouter.post("/ask", spendGuard, agentRouteLimiter, async (req, res, next) =>
       question.trim().slice(0, 1000),
       Array.isArray(purchasedKeys) ? purchasedKeys.slice(0, 200) : [],
     );
+    // askAboutPlan appends the turn to session.planQAHistory. Without this
+    // the whole conversation with Kyla lived only in the hot cache, so a
+    // redeploy mid-chat lost it even with a database wired up.
+    saveSession(session);
     track("plan_question_asked");
     res.json({ reply });
   } catch (err) {
@@ -139,6 +152,9 @@ planRouter.post("/outfits", spendGuard, agentRouteLimiter, async (req, res, next
     }
     if (!session.wardrobePlan) return res.status(409).json({ error: "No plan yet for this session" });
     const outfits = await buildOutfitMatrix(session);
+    // buildOutfitMatrix caches the matrix on the session; persist it so a
+    // restart doesn't silently charge for building it a second time.
+    saveSession(session);
     track("outfits_built", { count: outfits.length });
     res.json({ outfits });
   } catch (err) {
@@ -237,7 +253,7 @@ planRouter.get("/:sessionId", async (req, res) => {
     // instead of a bare 404 that reads as "lost connection".
     return res.json({
       status: "error",
-      error: "The server restarted and lost this session — head back and start a new plan. Sorry about that!",
+      error: "The server restarted and lost this session. Head back and start a new plan, sorry about that.",
     });
   }
   res.json({

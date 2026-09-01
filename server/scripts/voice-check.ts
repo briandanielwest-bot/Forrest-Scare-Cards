@@ -51,6 +51,20 @@ const SCANNED = [
   "../app/src/screens/PlanScreen.tsx",
   "../app/src/screens/StaplesScreen.tsx",
   "../app/src/screens/StoreDirectoryScreen.tsx",
+  // Error copy is copy. These are the lines a man reads on the worst day
+  // he has with the app, and they were the last place the old cadence was
+  // still living, precisely because nothing scanned them.
+  "src/index.ts",
+  "src/costs.ts",
+  "src/routes/plan.ts",
+  "src/routes/memory.ts",
+  "src/routes/interview.ts",
+  "src/routes/photo.ts",
+  "../app/src/screens/GeneratingPlanScreen.tsx",
+  "../app/src/screens/InterviewScreen.tsx",
+  "../app/src/screens/PhotoUploadScreen.tsx",
+  "../app/src/components/AskConcierge.tsx",
+  "../app/src/data/houstonEvents.ts",
 ];
 
 let failures = 0;

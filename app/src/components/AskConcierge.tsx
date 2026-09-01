@@ -11,7 +11,7 @@ const CONCIERGE = TEAM.find((m) => m.title === "Houston Concierge")!;
 // The Houston Concierge: dress codes, seasons, and above all
 // what to wear to a specific Houston event.
 //
-// He could always answer this; the card just never said so. A text box is
+// She could always answer this; the card just never said so. A text box is
 // a search box, and a search box only serves a man who already knows what
 // to type. The event chips are the feature announcing itself, ordered so
 // what's actually on the calendar comes first.

@@ -54,7 +54,7 @@ ${SEASON_BRIEF}`
 }
 
 // Compact directory sheet so Marisol's store mentions stay inside the
-// vetted set (he named a womenswear boutique from background knowledge
+// vetted set (she named a womenswear boutique from background knowledge
 // before this existed).
 const ALMANAC_STORE_SHEET = getAllStores()
   .map((st) => `${st.name} (${st.neighborhood}; ${st.priceTier}): ${st.knownFor}`)
