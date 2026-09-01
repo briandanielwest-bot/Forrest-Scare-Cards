@@ -116,7 +116,7 @@ export function WelcomeScreen({ navigation }: Props) {
             </View>
           </View>
           <Text style={styles.subtitle}>
-            43 Houston shops we've researched store by store, from the Galleria designer floors to the shirtmaker on
+            50 Houston shops we've researched store by store, from the Galleria designer floors to the shirtmaker on
             Richmond cutting paper patterns since 1883. We know the brands they carry, what things run, and the lead
             times.
           </Text>

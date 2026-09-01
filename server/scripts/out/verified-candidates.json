@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Larry's Original Custom Tailors",
+    "verdict": "confirmed",
+    "reason": "Multiple independent sources (own website, Yelp with 2025 activity, Birdeye 'open now' status, Facebook) show a consistent Hillcroft-area address and phone with no permanently-closed marker found.",
+    "address": "5645 Hillcroft Ave, Unit/Ste 402, Houston, TX 77036",
+    "phone": "(832) 755-9740",
+    "website": "https://www.myhoustontailor.com/custom-mens-clothing",
+    "priceTier": "$$",
+    "knownFor": "Family-owned, since-1975 custom tailor shop known for made-from-scratch men's suits, shirts and slacks (custom suits advertised from about $499) plus alterations, using 25+ measurements and 3,000+ fabrics.",
+    "catersTo": "Houston professionals and everyday men needing affordable, well-fitted custom suits, dress shirts, tuxedos and wedding attire, especially those who don't fit standard off-the-rack sizes.",
+    "howToBuy": "Appointment required (site states estimates are free but you must call ahead to book); walk-in during posted Mon-Fri 10-6 / Sat 10-2:30 hours also appears common per reviews, with Sunday by appointment only.",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Nick Lopez Tailoring",
+    "verdict": "confirmed",
+    "reason": "Business's own site, Yelp, Facebook and a Houston Chronicle relocation story all show it actively operating at 2121 Sage Road with recent posts/reviews and no closure markers.",
+    "address": "2121 Sage Road, Suite 225, Houston, TX 77056",
+    "phone": "(713) 621-5411",
+    "website": "nicklopeztailoring.com",
+    "priceTier": "$$$",
+    "knownFor": "Full-canvas, 100% hand-stitched bespoke suits made on-site by third-generation tailor Nick Lopez, who has dressed clients since 1981.",
+    "catersTo": "Discerning Houston-area professionals and executives seeking custom suits for business, courtroom, or formal occasions, with a two-piece bespoke suit running around $1,700.",
+    "howToBuy": "By appointment (call or book a fitting; walk-ins for alterations also accepted during posted business hours).",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Saad's Tailors",
+    "verdict": "confirmed",
+    "reason": "The business's own site (saadtailors.com), an active Yelp listing with current hours/reviews, Facebook, Instagram, and Nextdoor all show a live Houston shop with no permanently-closed marker (a separately listed Dallas location under the same name is closed, but Houston is active).",
+    "address": "5866 Westheimer Rd, Houston, TX 77057",
+    "phone": "(713) 785-2212",
+    "website": "saadtailors.com",
+    "priceTier": "$$",
+    "knownFor": "A family-owned Houston tailoring boutique operating since 1971 in the Galleria area, known for custom-made Italian suits, European fabrics, and expert alterations (currently running a discount on Italian ready-to-wear suits).",
+    "catersTo": "Professional men, grooms/wedding parties, and clients across Houston who want a precise custom or altered fit rather than generic off-the-rack tailoring.",
+    "howToBuy": "Walk in during posted Mon–Sat store hours, or schedule an appointment/consultation by phone or online, with mobile fittings available at the customer's home or workplace.",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Memorial Tailors",
+    "verdict": "confirmed",
+    "reason": "Business has an active official website with current Google reviews, an active Yelp listing with recent activity, and no closure indicators found.",
+    "address": "9774 Katy Fwy, Suite 350, Houston, TX 77055",
+    "phone": "(713) 461-2230",
+    "website": "https://memorialtailors.com/",
+    "priceTier": "$$",
+    "knownFor": "Known as an award-winning Houston tailor shop for alterations, wedding gown work, and custom uniforms for pro sports teams like the Houston Rockets and Dynamo.",
+    "catersTo": "Serves a broad mix of Houston-area men and women needing suit/garment alterations, brides needing wedding gown alterations, and professional sports/dance teams needing custom uniforms.",
+    "howToBuy": "walk-in or appointment",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Star Tailor & Alterations",
+    "verdict": "confirmed",
+    "reason": "Multiple independent sources (Facebook, BBB, Yelp, ZoomInfo, YellowPages, Apple Maps, Nextdoor) consistently list the same active address, phone, and posted hours with no permanently-closed marker, though it is actually located in Montrose, not The Heights.",
+    "address": "1611 Westheimer Rd, Houston, TX 77006",
+    "phone": "(713) 524-7904",
+    "website": "startailor.net",
+    "priceTier": "$$",
+    "knownFor": "A long-running Montrose-area shop specializing in alterations, re-weaving, leather repair and dry cleaning, including suit alterations per customer reviews.",
+    "catersTo": "General Houston-area customers, including men needing suits and trousers altered as well as dry-cleaning and leather-repair clients.",
+    "howToBuy": "walk in",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Bay Area Custom Clothing",
+    "verdict": "confirmed",
+    "reason": "A Yelp business listing (updated as of September 2025, with no permanently-closed marker) plus a ZoomInfo profile and third-party tailor directory confirm a real, currently listed operation with a physical address, though customer reviews on file are older.",
+    "address": "2003 Dawn Crest Ct, League City, TX",
+    "website": "",
+    "priceTier": "$$$",
+    "knownFor": "A mobile custom clothier that brings Italian and English fine tropical-weight fabrics directly to clients for made-to-measure suits, sport coats, slacks, tuxedos, and shirts.",
+    "catersTo": "Houston-area business professionals in League City, Clear Lake, Galveston, and Friendswood who want tailored, made-to-order menswear without visiting a storefront.",
+    "howToBuy": "Mobile fitting — the clothier travels to the client's home or office to take measurements and show fabric selections.",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Knot Standard Houston",
+    "verdict": "confirmed",
+    "reason": "Live official site, an active showroom booking page, and an actively-updated Yelp listing (18 reviews, no permanently-closed marker) confirm the business is operating, though the actual verified address differs from the one supplied.",
+    "address": "2626 Westheimer Rd, Ste 200, Houston, TX 77098 (River Oaks District)",
+    "phone": "(713) 352-7316",
+    "website": "https://www.knotstandard.com/showrooms/houston/",
+    "priceTier": "$$$",
+    "knownFor": "Custom and made-to-measure suits, shirts, and accessories delivered through a personalized, stylist-led fitting experience in a showroom setting.",
+    "catersTo": "Professionals, wedding parties, and grooms/groomsmen seeking tailored suits with hands-on styling guidance.",
+    "howToBuy": "Appointment-based — customers book a fitting with a stylist at the Houston showroom (online booking available, including virtual appointment option).",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Ahmed's Custom Clothiers",
+    "verdict": "confirmed",
+    "reason": "Live business website, a Yelp listing updated November 2025 with active hours, and no permanently-closed marker anywhere confirm it is currently operating.",
+    "address": "3300 Chimney Rock Rd, Suite 102, Houston, TX 77056",
+    "phone": "(713) 977-3401",
+    "website": "https://ahmedscustomclothiers.com/",
+    "priceTier": "$$$$",
+    "knownFor": "A 40+ year Houston custom tailoring shop known for made-to-order suits, shirts, and alterations crafted on premises by master tailor Jimmy Ahmed.",
+    "catersTo": "Upscale Houston clientele including executives, investors, entrepreneurs, attorneys, judges, and physicians.",
+    "howToBuy": "By appointment (all fittings are made directly with Jimmy Ahmed), with home/mobile appointments also available by calling the shop.",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Kick Game",
+    "verdict": "unconfirmed",
+    "reason": "Searches for a Houston sneaker consignment shop called 'Kick Game' returned no matching business in the Rice Village/Montrose area — the only 'Kick Game' found is a UK-based retailer (kickgame.co.uk), while actual Houston sneaker consignment shops turned up in search results (e.g., Sneaker Vault in ",
+    "website": "",
+    "priceTier": "$$",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Round Two",
+    "verdict": "unconfirmed",
+    "reason": "Web search access was exhausted before independent sources (site, Maps listing, or recent reviews) could confirm a specific Houston street address, phone number, or current open status for this consignment streetwear chain.",
+    "website": "https://www.roundtwo.com",
+    "priceTier": "$$",
+    "checkedAt": "2026-09-01"
+  },
+  {
+    "name": "Circle T Western Wear",
+    "verdict": "unconfirmed",
+    "reason": "Independent sources (Yelp, D&B, MerchantCircle) confirm a real 'Circle T Western Wear' business, but it appears to be based in Dallas, TX, not Katy/greater Houston as expected, and no Houston-area address, phone, or reviews could be found or the supplied website independently verified.",
+    "website": "https://www.circletwesternwear.com",
+    "checkedAt": "2026-09-01"
+  }
+]
