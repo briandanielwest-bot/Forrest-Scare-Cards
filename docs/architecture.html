@@ -46,9 +46,9 @@
 
 <div class="wrap">
   <header class="brand">
-    <p class="doc-kind">Architecture &amp; Feature Reference · Final Build · August 31, 2026</p>
+    <p class="doc-kind">Architecture &amp; Feature Reference · September 1, 2026</p>
     <h1>Bayou &amp; Blazer Architecture</h1>
-    <p class="standfirst">The complete record of what was built: every agent, every feature, every data system, the measured latency budget, the quality machinery — and the expansion roadmap for new markets and the women's application. Final validation: <strong>16 of 16 surface checks passed.</strong></p>
+    <p class="standfirst">The complete record of what was built: every agent, every feature, every data system, the measured latency budget, the quality machinery — and the expansion roadmap for new markets and the women's application. Current state: <strong>6 of 6 eval profiles clean, 91 deterministic checks passing, a plan costing $0.33 to $0.47.</strong></p>
   </header>
 
   <section>
@@ -76,6 +76,41 @@ flowchart TD
   </section>
 
   <section>
+    <p class="eyebrow">What you are running</p>
+    <h2>The stack, end to end</h2>
+    <div class="table-scroll"><table>
+      <tr><th>Layer</th><th>What it is</th><th>Where it runs</th></tr>
+      <tr><td>App</td><td>Expo / React Native (web, iOS and Android capable), React Navigation, AsyncStorage</td><td>Vercel, auto-deploys from <code>main</code></td></tr>
+      <tr><td>API</td><td>Node + TypeScript, Express, helmet, cors, multer, express-rate-limit</td><td>Render, auto-deploys from <code>main</code></td></tr>
+      <tr><td>Intelligence</td><td><code>@anthropic-ai/sdk</code>. Opus for the planner, Sonnet for the other seven agents</td><td>Anthropic API</td></tr>
+      <tr><td>Storage</td><td>Postgres via <code>pg</code> when <code>DATABASE_URL</code> is set, file and memory fallback when it is not</td><td>Render Postgres (declared in <code>render.yaml</code>)</td></tr>
+      <tr><td>CI</td><td>GitHub Actions: typecheck both halves, voice check, plan-shape check</td><td>Every push and PR to <code>main</code></td></tr>
+    </table></div>
+
+    <h3>The commands you actually use</h3>
+    <div class="table-scroll"><table>
+      <tr><th>Command</th><th>What it does</th><th>Costs money?</th></tr>
+      <tr><td><code>npm run dev</code></td><td>API with hot reload</td><td>Only what you exercise</td></tr>
+      <tr><td><code>npm run eval</code></td><td>Six fixed profiles, 91 deterministic checks. Run before shipping a prompt change</td><td class="num">~$2.20</td></tr>
+      <tr><td><code>npm run eval -- --only=&lt;id&gt;</code></td><td>One profile</td><td class="num">~$0.35</td></tr>
+      <tr><td><code>npm run voice:check</code></td><td>Tell detector plus a scan for em-dashes in shipped copy</td><td>Free</td></tr>
+      <tr><td><code>npm run plan:check</code></td><td>Malformed planner envelopes seen in live runs</td><td>Free</td></tr>
+      <tr><td><code>npm run refresh:data</code></td><td>Monthly re-verification of every store, season and price brief</td><td class="num">~$8-12</td></tr>
+      <tr><td><code>scripts/research-stores.ts --only=&lt;ids&gt;</code></td><td>Enrich named stores. Without <code>--only</code> it also runs discovery</td><td class="num">~$0.15/store</td></tr>
+      <tr><td><code>scripts/verify-candidates.ts</code></td><td>Confirm discovered shops are real and trading before listing them</td><td class="num">~$0.30/shop</td></tr>
+    </table></div>
+
+    <h3>Environment</h3>
+    <ul>
+      <li><code>ANTHROPIC_API_KEY</code> — required. Also needed as a GitHub Actions secret for the monthly refresh, which is <strong>not yet set</strong>, so that cron does not currently fire.</li>
+      <li><code>DAILY_LIMIT_USD</code> — the spend ceiling, set to 15 in <code>render.yaml</code>. Unset means no limit, which is right locally and wrong for a shared link.</li>
+      <li><code>DATABASE_URL</code> — wired automatically from the declared Render database. Absent, sessions and claim codes fall back to memory and disk.</li>
+      <li><code>ANTHROPIC_MODEL</code> / <code>ANTHROPIC_FAST_MODEL</code> — the planner model and everything else.</li>
+      <li><code>DATA_DIR</code> — where file-backed claim codes and the event ledger live.</li>
+    </ul>
+  </section>
+
+  <section>
     <p class="eyebrow">The team</p>
     <h2>Nine staff, each tuned to its job</h2>
     <div class="table-scroll"><table>
@@ -99,9 +134,9 @@ flowchart TD
       <tr><td>Kyla reply</td><td class="num">4–9s</td><td>Words stream as she writes; typing dots with her face</td></tr>
       <tr><td>Photo analysis</td><td class="num">10–14s</td><td>Runs while he's still on the photo screen</td></tr>
       <tr><td>Experts vet stores</td><td class="num">5–8s</td><td>Pre-warmed at interview submit — usually done before he taps build</td></tr>
-      <tr><td>Plan generation</td><td class="num">54–78s</td><td>Team spotlight + elapsed timer + tip/store deck + live draft ticker from ~20s</td></tr>
-      <tr><td>Plan chat answer</td><td class="num">4–7s</td><td>—</td></tr>
-      <tr><td>Outfit matrix</td><td class="num">10–12s once</td><td>On-demand button, then cached</td></tr>
+      <tr><td>Plan generation</td><td class="num">50–58s</td><td>Team spotlight + elapsed timer + tip/store deck + live draft ticker from ~20s</td></tr>
+      <tr><td>Plan chat answer</td><td class="num">2–4s warm</td><td>The first question seeds the whole plan and directory, so it runs ~3.5s</td></tr>
+      <tr><td>Outfit matrix</td><td class="num">8–10s once</td><td>On-demand button, then cached</td></tr>
       <tr><td>Save / restore code</td><td class="num">&lt;0.5s</td><td>Disk, no model</td></tr>
       <tr><td>Ask Marisol</td><td class="num">4–6s</td><td>—</td></tr>
     </table></div>
@@ -130,7 +165,10 @@ flowchart TD
       <li>Living checklist: tap-to-buy check-offs with a progress bar; copy-plan hand-over text with store contacts</li>
       <li>Ask Kyla plan chat (purchase-aware), on-demand outfit matrix, claim-code save/restore, Ask Marisol on the store directory, searchable directory with monthly "right now" notes</li>
       <li>Hold screen: team spotlight with legend-true lines, elapsed timer, tappable tip/store-fact deck, live plan-draft ticker</li>
-      <li>Starter Staples showcase (4 industries × 3 levels), Kyla-fronted Welcome with team portraits</li>
+      <li>Starter Staples showcase (4 industries × 3 levels), Kyla-fronted Welcome with team portraits and a Does/Likes line each</li>
+      <li>Ask Marisol on the front page: twelve tappable Houston events ordered by what is actually on the calendar, answered as an outfit head to toe in about five seconds, with no interview and no sign-up</li>
+      <li>Plan feedback: yes or not really plus an optional sentence, stored with the plan's shape so a low rating can be traced to what produced it</li>
+      <li>Purchase tracking: each check-off is decoded into the store, category and price band, which is the only evidence in the product that a recommendation became a sale and the whole store-partnership pitch</li>
     </ul>
   </section>
 
@@ -142,7 +180,11 @@ flowchart TD
       <li><strong>Schema-enforced caps</strong> — word limits live in tool schemas, not just prompts; script fields structurally limited to what a man reads standing in a store.</li>
       <li><strong>Conversational guardrails</strong> — never re-ask the answered, never accuse of dodging, budget-ambiguity chip with conservative default, send-off travels with the submit call, "north star" never printed.</li>
       <li><strong>Resilience</strong> — plan retry (2 attempts), streaming fallback to plain requests, photo-failure and session-loss messages that tell the truth, rate limiting on Claude-calling routes only, trust-proxy correct.</li>
-      <li><strong>Validation history</strong> — five personas end-to-end (terse $400 first-jobber, western oil-field manager, three-week groom, decide-everything developer, standard UI) plus a 16/16 full-surface sweep on the final build; exact budgets in every validated plan.</li>
+      <li><strong>The eval set</strong> — <code>npm run eval</code>. Ten fixed profiles, each one a failure this build actually hit, scored by 15 deterministic checks per plan: budget arithmetic, per-period cadence, real store ids, banned colours, the tailoring ceiling, voice, length, and lead times on an urgent event. Nothing is model-graded, because a model grading a model is one more thing to debug. It mirrors the route's single retry, so it measures what a customer gets rather than what the first attempt produced.</li>
+      <li><strong>The house voice, enforced</strong> — em-dashes are stripped mechanically; the antithesis shape, punchy fragments, banned openers and a sentence-count overrun are detected in code. A flagged intro or sign-off is rewritten by one fast-model call in about two seconds and re-checked before it is accepted, rather than costing a full regenerate. <code>npm run voice:check</code> guards the detector and scans shipped copy.</li>
+      <li><strong>The tailoring ceiling</strong> — measured plans were putting 22% and once 42% of a man's budget into alterations. The business sells clothes, so the planner targets 8-12%, the inspector rejects anything past 20%, and two eval checks hold it there.</li>
+      <li><strong>Envelope salvage</strong> — the planner has returned a complete plan under a junk top-level key. Rather than pay a minute to regenerate content already in hand, it is recovered. <code>npm run plan:check</code> covers four malformed shapes seen live.</li>
+      <li><strong>Validation history</strong> — five personas end-to-end, a 16/16 full-surface sweep, then the eval set that replaced hand-reading as the quality bar.</li>
     </ul>
   </section>
 
@@ -153,7 +195,9 @@ flowchart TD
       <li><strong>Topology</strong> — Expo web app on Vercel (auto-deploy from <code>main</code>); Node/Express + TypeScript API on Render (auto-deploy from <code>main</code>); Anthropic API for all agent calls.</li>
       <li><strong>CI</strong> — GitHub Actions typechecks server and app on every push/PR to main.</li>
       <li><strong>Refresh</strong> — <code>refresh-data.yml</code> on monthly + seasonal crons (needs <code>ANTHROPIC_API_KEY</code> secret); commits regenerated data, Render redeploys.</li>
-      <li><strong>Cost profile</strong> — roughly $0.60–1.50 of API per plan; pennies per chat turn; hosting from free (with cold starts) to ~$8/month with a persistent disk, which also makes claim codes survive redeploys (<code>DATA_DIR</code>).</li>
+      <li><strong>Cost profile, now measured rather than estimated</strong> — a plan costs <strong>$0.33 to $0.47</strong> of API, attributed per agent by <code>costs.ts</code> and reported at <code>/api/stats</code>. The earlier $0.60-1.50 was a guess and it was pessimistic. Cached input runs $0.15 per hundred thousand tokens against $1.50 fresh, which is the prompt-caching strategy stated in dollars. Chat turns are pennies. Hosting runs free with cold starts to about $8/month with a persistent disk.</li>
+      <li><strong>The spend ceiling</strong> — <code>DAILY_LIMIT_USD</code> stops the Claude-calling routes for the day and says the shop is booked rather than showing an error. The rate limiter caps how fast one person spends; this caps what everyone can spend, which is the failure a shared link actually causes.</li>
+      <li><strong>Housekeeping</strong> — the session hot cache ages out at 24 hours and the pre-warm map expires after 30 minutes. Both leaked before: the database pruner only ever deleted Postgres rows and returned immediately with no database configured, so nothing pruned memory at all.</li>
     </ul>
   </section>
 
@@ -161,12 +205,12 @@ flowchart TD
     <p class="eyebrow">Large improvements ahead</p>
     <h2>The big builds, in order of impact</h2>
     <ol>
-      <li><strong>Real accounts + database.</strong> Postgres (or managed equivalent) behind the claim-code system: email/passkey login, plans that survive anything, shareable read-only plan links, returning-customer Kyla by default. The foundation every revenue feature stands on.</li>
+      <li><strong>Real accounts.</strong> Postgres is already wired behind the claim-code system; what is missing is identity. Email or passkey login, shareable read-only plan links, returning-customer Kyla by default. The foundation every revenue feature stands on.</li>
       <li><strong>Progressive plan render.</strong> The ticker proves the stream parses; the next step renders finished phases as cards while Elena writes the rest — first phase readable in ~20 seconds.</li>
       <li><strong>Native apps.</strong> The Expo codebase already targets iOS/Android; App Store presence needs accounts, push notifications (phase reminders: "Week 3 — shoe week"), and the $99/yr Apple program.</li>
       <li><strong>Seasonal re-engagement.</strong> With accounts: Kyla emails/pushes at the calendar moments the app already knows — "Gala season's six weeks out; your tux plan is ready."</li>
       <li><strong>Store portal.</strong> Give partner stores a login to see (aggregate) referral counts and post their own trunk-show dates into the directory — turns the receipt book into a product.</li>
-      <li><strong>Business items from the playbook doc</strong> — persona renaming before monetization, LLC, trademark, hosting upgrade.</li>
+      <li><strong>Business items from the playbook doc</strong> — LLC, trademark, hosting upgrade. The persona renaming is done: the roster carries no third-party identity.</li>
     </ol>
   </section>
 
@@ -199,5 +243,5 @@ flowchart TD
     </div>
   </section>
 
-  <p class="footer-note">Compiled from the live codebase and this session's measured validation runs, August 31, 2026. Companion documents: the Bayou &amp; Blazer Playbook (business plan) and the Back of House Review (agent architecture decisions).</p>
+  <p class="footer-note">Compiled from the live codebase and measured runs, September 1, 2026. Companion documents: the Bayou &amp; Blazer Playbook (business plan), the Back of House Review (agent architecture decisions), and What It Cost, Who's Coming (build economics and the competitive field).</p>
 </div>
