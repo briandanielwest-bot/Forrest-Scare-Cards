@@ -10,10 +10,14 @@ services:
   - type: web
     name: bayou-blazer-server
     runtime: node
-    # "free" spins down when idle, so the first visitor after a quiet
-    # stretch waits ~30-60s for a cold start. "starter" (~$7/mo) keeps it
-    # warm — worth it the day real people start using this.
-    plan: free
+    # This MUST match what is actually running, because the dashboard shows
+    # this service as Blueprint managed, and Render overwrites a dashboard
+    # change that conflicts with this file on the next Blueprint sync. It
+    # said "free" while the service was upgraded to starter, so a sync would
+    # have quietly downgraded it and brought back the 30-60s cold start that
+    # upgrade was bought to remove.
+    # starter: 0.5 CPU / 512 MB, ~$7/mo, stays warm.
+    plan: starter
     rootDir: server
     buildCommand: npm install && npm run build
     startCommand: npm start
@@ -44,8 +48,15 @@ databases:
   - name: bayou-blazer-db
     databaseName: bayoublazer
     user: bayoublazer
-    # Render's free Postgres is deleted after its trial window — fine for
-    # kicking the tires, but move to a paid plan (basic-256mb, roughly
-    # $6/mo at the time of writing) before real users depend on it.
-    # Check the current price on the plan selector when you create it.
+    # THIS ONE HAS A DEADLINE. Render's free Postgres expires 30 days after
+    # it is created, then a 14-day grace period, then the database and
+    # everything in it is deleted. It also gets no backups. This instance
+    # was created 2026-08-31, so it expires around 2026-09-30 and the data
+    # goes around 2026-10-14 unless the plan is changed before then.
+    #
+    # 1 GB of fixed storage is the tell that a Render Postgres is still on
+    # the free plan; the paid tiers start at 10 GB.
+    #
+    # Every claim code a customer saves lives here. Upgrade before handing
+    # the link to anyone whose plan is supposed to still exist next month.
     plan: free
