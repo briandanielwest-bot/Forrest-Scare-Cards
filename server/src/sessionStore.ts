@@ -13,6 +13,41 @@ import { isDbEnabled, query } from "./db";
  */
 const sessions = new Map<string, SessionState>();
 
+// Last touch per session, so the hot cache can be aged out. Kept beside
+// the map rather than on SessionState because it is a cache concern and
+// has no business being persisted or restored.
+const touched = new Map<string, number>();
+
+/**
+ * How long an idle session stays in memory. Matches the 24h the database
+ * pruner uses, so a session evicted here is rehydrated from Postgres on
+ * the next read when one is configured, and is genuinely gone when one is
+ * not, which is the same thing a restart already did.
+ */
+const IDLE_TTL_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Evicts idle sessions from the hot cache.
+ *
+ * pruneOldSessions in db.ts only ever deleted Postgres rows, and returned
+ * immediately when no database was configured, so with DATABASE_URL unset
+ * nothing pruned anything: every session ever created stayed in memory
+ * with its interview history, plan, photo assessment and chat, for the
+ * life of the process.
+ */
+export function pruneSessionCache(now = Date.now()): number {
+  let evicted = 0;
+  for (const [id, last] of touched) {
+    if (now - last > IDLE_TTL_MS) {
+      sessions.delete(id);
+      touched.delete(id);
+      evicted++;
+    }
+  }
+  if (evicted > 0) console.log(`[sessions] evicted ${evicted} idle session(s) from the cache`);
+  return evicted;
+}
+
 // Fire-and-forget: persistence must never add latency to a chat turn or
 // break a request when the database hiccups.
 function persist(session: SessionState): void {
@@ -36,6 +71,7 @@ export function createSession(): SessionState {
     planStatus: "idle",
   };
   sessions.set(session.id, session);
+  touched.set(session.id, Date.now());
   persist(session);
   return session;
 }
@@ -46,6 +82,7 @@ export function createSession(): SessionState {
  */
 export function saveSession(session: SessionState): void {
   sessions.set(session.id, session);
+  touched.set(session.id, Date.now());
   persist(session);
 }
 
@@ -59,6 +96,7 @@ export async function getSession(id: string): Promise<SessionState | undefined> 
     // Rehydrate into the hot cache so the next read is instant.
     const session = rows[0].data;
     sessions.set(id, session);
+    touched.set(id, Date.now());
     return session;
   } catch (err) {
     console.warn(`[sessions] load failed (${(err as Error).message.slice(0, 80)})`);

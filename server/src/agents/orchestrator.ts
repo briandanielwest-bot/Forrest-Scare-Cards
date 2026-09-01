@@ -10,6 +10,10 @@ import { buildWardrobePlan } from "./wardrobePlanner";
 // wait. Keyed off-session so types.ts stays free of agent imports.
 const prewarmedScouts = new Map<string, Promise<ScoutReport[] | null>>();
 
+// Generous: a man can sit on the photo screen for a while. Long past this
+// and he is not coming back for that plan in this process.
+const PREWARM_TTL_MS = 30 * 60 * 1000;
+
 export function prewarmScouts(session: SessionState): void {
   if (!session.styleProfile) return;
   const t0 = Date.now();
@@ -23,6 +27,11 @@ export function prewarmScouts(session: SessionState): void {
       return null;
     });
   prewarmedScouts.set(session.id, promise);
+
+  // A man who finishes the interview and never asks for a plan would
+  // otherwise leave his scout reports in this map for the life of the
+  // process. The plan path deletes its own entry well before this fires.
+  setTimeout(() => prewarmedScouts.delete(session.id), PREWARM_TTL_MS).unref?.();
 }
 
 /**

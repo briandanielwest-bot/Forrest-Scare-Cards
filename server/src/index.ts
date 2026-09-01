@@ -15,6 +15,7 @@ import { almanacRouter } from "./routes/almanac";
 import { memoryRouter } from "./routes/memory";
 import { readStats } from "./analytics";
 import { initDb, pruneOldSessions } from "./db";
+import { pruneSessionCache } from "./sessionStore";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
@@ -109,6 +110,12 @@ app.listen(PORT, async () => {
   // Storage comes up after the port so a database hiccup can never stop
   // the app from serving — it just falls back to memory and disk.
   await initDb();
+  // Two different stores, both needing housekeeping: Postgres rows, and
+  // the in-memory hot cache that grows whether or not a database exists.
   void pruneOldSessions();
-  setInterval(() => void pruneOldSessions(), 6 * 60 * 60 * 1000);
+  pruneSessionCache();
+  setInterval(() => {
+    void pruneOldSessions();
+    pruneSessionCache();
+  }, 6 * 60 * 60 * 1000).unref?.();
 });
