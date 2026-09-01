@@ -244,6 +244,7 @@ planRouter.get("/:sessionId", async (req, res) => {
     status: session.planStatus,
     stage: session.planStage,
     draftedPhases: session.draftedPhases,
+    draftedPlanPhases: session.draftedPlanPhases,
     plan: session.wardrobePlan,
     error: session.planError,
   });
