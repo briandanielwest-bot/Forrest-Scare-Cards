@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
@@ -73,6 +74,7 @@ export async function buildOutfitMatrix(session: SessionState): Promise<Outfit[]
     output_config: { effort: "low" },
   };
   const response = await anthropic.messages.create(params);
+  recordUsage("outfits", FAST_AGENT_MODEL, response.usage);
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_outfits",
   );

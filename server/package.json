@@ -12,7 +12,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "refresh:data": "ts-node --transpile-only scripts/refresh-data.ts",
     "voice:check": "ts-node --transpile-only scripts/voice-check.ts",
-    "plan:check": "ts-node --transpile-only scripts/plan-shape-check.ts"
+    "plan:check": "ts-node --transpile-only scripts/plan-shape-check.ts",
+    "eval": "ts-node --transpile-only scripts/eval.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",

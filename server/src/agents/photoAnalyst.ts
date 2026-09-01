@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
@@ -119,6 +120,7 @@ export async function analyzePhotos(
     output_config: { effort: "medium" },
   };
   const response = await anthropic.messages.create(params);
+  recordUsage("photoAnalyst", FAST_AGENT_MODEL, response.usage);
 
   const toolUse = response.content.find(
     (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "submit_assessment",

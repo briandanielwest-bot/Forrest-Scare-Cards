@@ -5,6 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PORT, CORS_ORIGIN } from "./config";
 import { SessionNotFoundError } from "./sessionStore";
 import { agentRouteLimiter } from "./rateLimiter";
+import { getSpend, isOverDailyBudget, OVER_BUDGET_MESSAGE } from "./costs";
 import { interviewRouter } from "./routes/interview";
 import { photoRouter } from "./routes/photo";
 import { planRouter } from "./routes/plan";
@@ -41,17 +42,30 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 // read (like stores/session/health below) that a client hits every few
 // seconds for minutes while a plan builds, and sharing this budget with
 // it would let normal polling alone lock a real user out mid-generation.
-app.use("/api/interview", agentRouteLimiter, interviewRouter);
-app.use("/api/photo", agentRouteLimiter, photoRouter);
+// The spend ceiling, in front of every route that calls Claude. A rate
+// limiter caps how fast one person can spend; this caps how much everyone
+// can spend in a day, which is the failure a shared link actually causes.
+// Unset DAILY_LIMIT_USD means no ceiling (right for local, wrong for a
+// link in a group chat).
+function spendGuard(_req: Request, res: Response, next: NextFunction): void {
+  if (isOverDailyBudget()) {
+    res.status(503).json({ error: OVER_BUDGET_MESSAGE });
+    return;
+  }
+  next();
+}
+
+app.use("/api/interview", spendGuard, agentRouteLimiter, interviewRouter);
+app.use("/api/photo", spendGuard, agentRouteLimiter, photoRouter);
 app.use("/api/plan", planRouter);
 app.use("/api/stores", storesRouter);
 app.use("/api/session", sessionRouter);
-app.use("/api/almanac", agentRouteLimiter, almanacRouter);
+app.use("/api/almanac", spendGuard, agentRouteLimiter, almanacRouter);
 // No Claude calls in memory save/restore — cheap disk reads/writes.
 app.use("/api/memory", memoryRouter);
 // Aggregate funnel counts only (no per-user data) — the receipt book for
 // store partnership conversations.
-app.get("/api/stats", (_req, res) => res.json(readStats()));
+app.get("/api/stats", (_req, res) => res.json({ ...readStats(), spend: getSpend() }));
 
 app.use((req, res) => {
   res.status(404).json({ error: `No route for ${req.method} ${req.path}` });

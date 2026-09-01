@@ -1,13 +1,25 @@
-import { Router } from "express";
+import { Router, type NextFunction, type Request, type Response } from "express";
 import { requireSession, saveSession } from "../sessionStore";
 import { generateWardrobePlan } from "../agents/orchestrator";
 import { askAboutPlan } from "../agents/planQA";
 import { buildOutfitMatrix } from "../agents/outfits";
 import { agentRouteLimiter } from "../rateLimiter";
+import { isOverDailyBudget, OVER_BUDGET_MESSAGE } from "../costs";
 import { track } from "../analytics";
 import type { SessionState } from "../types";
 
 export const planRouter = Router();
+
+// The daily ceiling, applied per expensive route rather than at the mount,
+// because the status poll below must stay free: a client hits it every few
+// seconds for a minute while a plan builds.
+function spendGuard(_req: Request, res: Response, next: NextFunction): void {
+  if (isOverDailyBudget()) {
+    res.status(503).json({ error: OVER_BUDGET_MESSAGE });
+    return;
+  }
+  next();
+}
 
 // One transparent retry before surfacing an error to the phone: the flaky
 // failure modes seen live (a truncated or malformed planner response) are
@@ -29,7 +41,7 @@ async function generatePlanWithRetry(session: SessionState): Promise<void> {
 // Only this route actually calls Claude — the GET status poll below is a
 // cheap in-memory read a client hits every few seconds for minutes while a
 // plan builds, so it deliberately stays outside this limiter.
-planRouter.post("/generate", agentRouteLimiter, async (req, res, next) => {
+planRouter.post("/generate", spendGuard, agentRouteLimiter, async (req, res, next) => {
   try {
     const { sessionId } = req.body as { sessionId?: string };
     if (!sessionId) {
@@ -83,7 +95,7 @@ planRouter.post("/generate", agentRouteLimiter, async (req, res, next) => {
 
 // Post-plan Q&A with Kyla — short synchronous turns (~3-5s), rate limited
 // like every other Claude-calling route.
-planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
+planRouter.post("/ask", spendGuard, agentRouteLimiter, async (req, res, next) => {
   try {
     const { sessionId, question, purchasedKeys } = req.body as {
       sessionId?: string;
@@ -115,7 +127,7 @@ planRouter.post("/ask", agentRouteLimiter, async (req, res, next) => {
 });
 
 // On-demand outfit matrix — one fast call, cached on the session.
-planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
+planRouter.post("/outfits", spendGuard, agentRouteLimiter, async (req, res, next) => {
   try {
     const { sessionId } = req.body as { sessionId?: string };
     if (!sessionId) return res.status(400).json({ error: "sessionId is required" });
@@ -129,6 +141,46 @@ planRouter.post("/outfits", agentRouteLimiter, async (req, res, next) => {
     const outfits = await buildOutfitMatrix(session);
     track("outfits_built", { count: outfits.length });
     res.json({ outfits });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// What a tester actually thought. Cheap to give, and without it a
+// friends-and-family round produces ten opinions in ten text messages and
+// nothing you can count. Stored with the profile and the plan's shape so a
+// low rating can be traced to what produced it.
+planRouter.post("/feedback", async (req, res, next) => {
+  try {
+    const { sessionId, rating, comment } = req.body as {
+      sessionId?: string;
+      rating?: string;
+      comment?: string;
+    };
+    if (!sessionId || (rating !== "up" && rating !== "down")) {
+      return res.status(400).json({ error: "sessionId and a rating of 'up' or 'down' are required" });
+    }
+    const session = await requireSession(sessionId);
+    const plan = session.wardrobePlan;
+    const itemCount = (plan?.phases ?? []).reduce((n, ph) => n + (ph.items ?? []).length, 0);
+
+    track("plan_feedback", {
+      rating,
+      // Trimmed, not dropped: a tester's own words are the whole point, but
+      // an unbounded field is an unbounded row.
+      comment: (comment ?? "").trim().slice(0, 1000) || undefined,
+      // Enough of the plan's shape to spot a pattern in the bad ones
+      // without copying the customer's file into the event log.
+      lifestyle: session.styleProfile?.lifestyle?.slice(0, 120),
+      homeBase: session.styleProfile?.homeBase,
+      budgetTotalUsd: session.styleProfile?.budgetTotalUsd,
+      budgetCadence: session.styleProfile?.budgetCadence,
+      phases: (plan?.phases ?? []).length,
+      items: itemCount,
+      hadPhotos: Boolean(session.photoAssessment),
+      askedKyla: (session.planQAHistory?.length ?? 0) > 2,
+    });
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

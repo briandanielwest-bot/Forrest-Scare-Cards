@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { recordUsage } from "../costs";
 import { EM_DASH, HUMAN_VOICE_RULES, sanitizeVoice } from "./voice";
 import { anthropic, type WithEffort } from "../anthropicClient";
 import { FAST_AGENT_MODEL } from "../config";
@@ -279,6 +280,7 @@ function buildTurnParams(session: SessionState): WithEffort<Anthropic.MessageCre
 
 async function runTurn(session: SessionState): Promise<InterviewTurnResult> {
   const response = await anthropic.messages.create(buildTurnParams(session));
+  recordUsage("interviewer", FAST_AGENT_MODEL, response.usage);
   return processTurnResponse(session, response);
 }
 
@@ -307,6 +309,7 @@ export async function runTurnStreaming(
     pending = "";
   });
   const response = await stream.finalMessage();
+  recordUsage("interviewer", FAST_AGENT_MODEL, response.usage);
   return processTurnResponse(session, response);
 }
 
