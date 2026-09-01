@@ -48,15 +48,18 @@ databases:
   - name: bayou-blazer-db
     databaseName: bayoublazer
     user: bayoublazer
-    # THIS ONE HAS A DEADLINE. Render's free Postgres expires 30 days after
-    # it is created, then a 14-day grace period, then the database and
-    # everything in it is deleted. It also gets no backups. This instance
-    # was created 2026-08-31, so it expires around 2026-09-30 and the data
-    # goes around 2026-10-14 unless the plan is changed before then.
+    # No `plan` here on purpose, and it must not say "free".
     #
-    # 1 GB of fixed storage is the tell that a Render Postgres is still on
-    # the free plan; the paid tiers start at 10 GB.
+    # This database is on a PAID instance type (the dashboard shows it as
+    # 0.5c-1g, and the billing page accrues real datastore charges; a free
+    # database accrues nothing). It therefore does not expire, and it is not
+    # on the 30-day free-tier clock.
     #
-    # Every claim code a customer saves lives here. Upgrade before handing
-    # the link to anyone whose plan is supposed to still exist next month.
-    plan: free
+    # The field is omitted rather than guessed because Render retains an
+    # existing database's instance type when the Blueprint is synced, so
+    # leaving it out is the option that cannot fight the dashboard. Naming
+    # the wrong instance type here could. Set the instance type on the
+    # database's own page in Render.
+    #
+    # Do not restore `plan: free`. This holds every claim code a customer
+    # saves, and free databases are deleted after their trial window.
