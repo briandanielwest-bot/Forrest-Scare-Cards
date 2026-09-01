@@ -1,0 +1,278 @@
+<title>What It Cost, Who's Coming</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Archivo:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  /* Palette and type inherited from the sibling documents in docs/ so the
+     set reads as one company's paperwork. Two tokens are new: --threat and
+     --threat-soft, carrying the competitive severity scale. */
+  :root {
+    --ground: #F7F3EA;
+    --paper: #FFFFFF;
+    --ink: #22201B;
+    --muted: #6B675C;
+    --bayou: #1F3A34;
+    --bayou-soft: #2A4F3D;
+    --gold: #B08A27;
+    --gold-bright: #D9B24C;
+    --flag: #8A3B2E;
+    --flag-ground: #F6E7E1;
+    --line: #E2DCCB;
+    --card: #FDFBF5;
+    --threat: #8A3B2E;
+    --threat-soft: #B08A27;
+    --quiet: #6B675C;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #171B19;
+      --paper: #1F2522;
+      --ink: #EDE8DB;
+      --muted: #A39E90;
+      --bayou: #9DC3B2;
+      --bayou-soft: #7FAE97;
+      --gold: #D9B24C;
+      --gold-bright: #D9B24C;
+      --flag: #E5967F;
+      --flag-ground: #33231E;
+      --line: #35403A;
+      --card: #232A26;
+      --threat: #E5967F;
+      --threat-soft: #D9B24C;
+      --quiet: #A39E90;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #171B19;
+    --paper: #1F2522;
+    --ink: #EDE8DB;
+    --muted: #A39E90;
+    --bayou: #9DC3B2;
+    --bayou-soft: #7FAE97;
+    --gold: #D9B24C;
+    --gold-bright: #D9B24C;
+    --flag: #E5967F;
+    --flag-ground: #33231E;
+    --line: #35403A;
+    --card: #232A26;
+    --threat: #E5967F;
+    --threat-soft: #D9B24C;
+    --quiet: #A39E90;
+  }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header.brand { border-bottom: 3px solid var(--bayou); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+  .brandmark { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .brandmark h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    margin: 0;
+    color: var(--bayou);
+    text-wrap: balance;
+  }
+  .doc-kind { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0 0 .3rem; }
+  .standfirst { color: var(--muted); max-width: 60ch; margin: .8rem 0 0; }
+  section { margin: 0 0 2.75rem; }
+  .eyebrow {
+    font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700; margin: 0 0 .3rem;
+  }
+  h2 {
+    font-family: "Fraunces", Georgia, serif; font-weight: 700;
+    font-size: 1.45rem; margin: 0 0 .9rem; color: var(--ink); text-wrap: balance;
+  }
+  h3 { font-size: 1.02rem; font-weight: 700; margin: 1.4rem 0 .4rem; }
+  p { margin: 0 0 .9rem; max-width: 65ch; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; max-width: 62ch; }
+  li { margin-bottom: .45rem; }
+  a { color: var(--bayou-soft); }
+  a:focus-visible, .tier:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .money { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; font-size: .92em; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  .table-scroll { overflow-x: auto; margin: 0 0 1rem; }
+  th { text-align: left; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--bayou); padding: .45rem .7rem .45rem 0; }
+  td { border-bottom: 1px solid var(--line); padding: .55rem .7rem .55rem 0; vertical-align: top; }
+  td:first-child { font-weight: 700; }
+  td.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 400; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.1rem 1.25rem; margin: 0 0 1rem;
+  }
+  .flag {
+    background: var(--flag-ground); border-left: 4px solid var(--flag);
+    border-radius: 0 10px 10px 0; padding: 1.1rem 1.25rem; margin: 1.2rem 0;
+  }
+  .flag .eyebrow { color: var(--flag); }
+  .flag p:last-child { margin-bottom: 0; }
+
+  /* The competitor tiers are ordered by distance from your customer, which
+     is real information, so the rail encodes proximity rather than counting.
+     Severity rides the left border, not a decorative badge. */
+  .tier {
+    border-left: 4px solid var(--rail, var(--quiet));
+    padding: .1rem 0 .1rem 1.1rem;
+    margin: 0 0 1.6rem;
+  }
+  .tier.near { --rail: var(--threat); }
+  .tier.mid { --rail: var(--threat-soft); }
+  .tier.far { --rail: var(--quiet); }
+  .tier h3 { margin-top: 0; }
+  .tier .range {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--rail, var(--quiet)); font-weight: 600; margin: 0 0 .15rem;
+  }
+  .odds { display: grid; gap: .55rem; margin: 0 0 1rem; }
+  .odds div {
+    display: flex; gap: .9rem; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: .5rem;
+  }
+  .odds .pct {
+    font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+    font-weight: 600; color: var(--bayou); min-width: 5.5rem; font-size: .95rem;
+  }
+  .odds span:last-child { max-width: 52ch; }
+  .footer-note { border-top: 1px solid var(--line); padding-top: 1.2rem; color: var(--muted); font-size: .85rem; max-width: 65ch; }
+  .footer-note a { color: var(--bayou-soft); }
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <p class="doc-kind">Reference · September 2026</p>
+    <div class="brandmark"><h1>What It Cost, <span style="color:var(--gold)">Who's Coming</span></h1></div>
+    <p class="standfirst">Two questions with one answer between them: what this build would have cost through any other route, and who already occupies the ground it stands on.</p>
+  </header>
+
+  <section>
+    <p class="eyebrow">The asset, measured</p>
+    <h2>What actually exists</h2>
+    <p>Numbers taken from the repository rather than from memory, so the estimate that follows has something real underneath it.</p>
+    <div class="table-scroll"><table>
+      <tr><th>Component</th><th>Size</th></tr>
+      <tr><td>Hand-written TypeScript</td><td class="num">~9,000 lines across 59 files</td></tr>
+      <tr><td>Prompt engineering</td><td class="num">~73,000 characters (~18,000 words)</td></tr>
+      <tr><td>Researched Houston data</td><td class="num">~1,950 lines</td></tr>
+      <tr><td>Store directory</td><td class="num">43 stores, brands, prices, insider notes</td></tr>
+      <tr><td>Social profiles</td><td class="num">30 Instagram, 28 Facebook</td></tr>
+      <tr><td>Agents</td><td class="num">8, plus an offline monthly researcher</td></tr>
+      <tr><td>App screens</td><td class="num">7</td></tr>
+      <tr><td>Commits</td><td class="num">143, essentially all in two days</td></tr>
+    </table></div>
+    <p>The prompts are the product. Eighteen thousand words of instruction is a small book, and it is where the Houston knowledge, the voice rules, and the budget discipline actually live.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">The counterfactual</p>
+    <h2>"Before Claude Code" splits two ways</h2>
+    <p><strong>Before language models existed at all, this product cannot be built.</strong> It is eight language-model agents in a trenchcoat. The 2019 version of this idea is a decision-tree quiz, or a services business with human stylists on payroll. That is a different company, not a cheaper version of this one.</p>
+    <p><strong>The answerable question is the second one:</strong> with the API available, but every line written by hand. That estimate follows.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">The bill</p>
+    <h2>Team, time, and money</h2>
+    <div class="table-scroll"><table>
+      <tr><th>Workstream</th><th>Who</th><th>Effort</th></tr>
+      <tr><td>Server, sessions, Postgres, analytics, rate limiting</td><td>Senior backend</td><td class="num">2 wks</td></tr>
+      <tr><td>Eight agents: tool use, streaming, caching, retries, inspector</td><td>Senior backend</td><td class="num">4–5 wks</td></tr>
+      <tr><td>Orchestration, pre-warm, fallbacks</td><td>Senior backend</td><td class="num">1.5 wks</td></tr>
+      <tr><td>Expo app: seven screens, nav, state, SSE client, claim codes</td><td>Mobile dev</td><td class="num">5 wks</td></tr>
+      <tr><td>Avatar system and illustrated portrait</td><td>Designer</td><td class="num">1 wk</td></tr>
+      <tr><td>CI, deploy, environments, monitoring</td><td>Either</td><td class="num">1 wk</td></tr>
+      <tr><td>E2E harness, persona validation, QA</td><td>Either</td><td class="num">2 wks</td></tr>
+      <tr><td>Prompt engineering and eval loops</td><td>AI engineer</td><td class="num">4–6 wks</td></tr>
+      <tr><td>Houston store research, verified</td><td>Researcher</td><td class="num">4 wks</td></tr>
+      <tr><td>Brand voice, staples copy, UI copy, docs</td><td>Copywriter</td><td class="num">3 wks</td></tr>
+    </table></div>
+    <p>Two credible shapes come out of that. A <strong>team of five or six working in parallel: 10–14 weeks.</strong> A <strong>single senior generalist doing all of it: 8–12 months</strong>, and realistically a worse product, because one person rarely does store research, brand voice, and streaming transport equally well.</p>
+    <div class="table-scroll"><table>
+      <tr><th>Costing model</th><th>Total</th></tr>
+      <tr><td>Loaded salary, 5–6 people, ~3 months</td><td class="num">$150,000–200,000</td></tr>
+      <tr><td>US agency or consultancy rates</td><td class="num">$250,000–400,000</td></tr>
+      <tr><td>Blended offshore team</td><td class="num">$60,000–110,000</td></tr>
+      <tr><td>Solo senior contractor, 9 months at $150/hr</td><td class="num">$200,000+</td></tr>
+    </table></div>
+    <p>The agency figure is the one to trust for "what would someone have quoted me." An AI-powered mobile app with a custom backend, a researched content moat, and original brand voice is a <span class="money">$250k–400k</span> engagement.</p>
+    <p><strong>Actual cost: two days, one operator, and API spend in the low hundreds of dollars.</strong> Roughly three orders of magnitude on money and about 40&times; on calendar time.</p>
+    <div class="flag">
+      <p class="eyebrow">Where the comparison flatters the machine</p>
+      <p>A real team's three months would have included things this app has never had. <strong>Store visits</strong> — the directory is web-researched, and a human would have walked into M Penner and Hamilton Shirts; twelve stores still lack full enrichment and sixteen discovered candidates sit unverified. <strong>Real users</strong> — nobody has used this yet, and a team's timeline would have included testing that persona sweeps cannot replace. <strong>A designer with taste.</strong> And <strong>disagreement</strong>: a team argues about the naming, the voice rules, the front page. Those calls were made here in minutes, and fast is not the same as right.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">The field</p>
+    <h2>Who you are actually up against</h2>
+    <p>Ordered by distance from your customer. The nearest threat is not the best-funded one.</p>
+
+    <div class="tier near">
+      <p class="range">Nearest · already selling this in Houston</p>
+      <h3>Houston stylists and rep-based clothiers</h3>
+      <p><a href="https://lucho.com/houston-personal-styling-services">Lucho</a> sells wardrobe styling consultation in Houston and has been family-run since 1989. <strong>They are a recommendation inside your plans and a company selling your service.</strong> Tom James, Q Clothier, and Norton Ditto run on the same model: a person who builds a man's wardrobe over years, and in Tom James's case comes to his office to do it. Independents like <a href="https://www.bybrayden.com/">By Brayden</a> and JS Personal Styling work the same city, at <span class="money">$120–200</span> an hour or <span class="money">$150–500</span> a session.</p>
+      <p>This is either your best partnership channel or your sharpest conflict, and it is worth deciding which on purpose.</p>
+    </div>
+
+    <div class="tier mid">
+      <p class="range">Adjacent · funded, national, e-commerce</p>
+      <h3>AI shopping agents</h3>
+      <div class="table-scroll"><table>
+        <tr><th>Company</th><th>Raised</th><th>Position</th></tr>
+        <tr><td>Phia</td><td class="num">$35M Series A</td><td>1M+ users inside a year, 6,200 brands, $185M valuation</td></tr>
+        <tr><td>Daydream</td><td class="num">$50M seed</td><td>Conversational fashion search, photo input</td></tr>
+        <tr><td>Alta</td><td class="num">$11M</td><td>AI styling, closet management, weather-aware</td></tr>
+      </table></div>
+      <p>Every one of them sends a shopper to a <strong>website</strong>. Yours sends a man to a <strong>building</strong>, with a sentence to say when he walks in. Their scale works against them here: a national player cannot research 43 stores in every city, which is exactly why none of them has.</p>
+    </div>
+
+    <div class="tier far">
+      <p class="range">Crowded · weak moat</p>
+      <h3>Closet and outfit apps</h3>
+      <p>Whering, Indyx, Acloset, Lookastic, Stylebook, DLOOK, Glance, StylistIQ. Mostly free to <span class="money">$20</span> a month, mostly "photograph your closet, receive outfits." None of them knows Houston, and none of them will tell a man which tailor on Bellaire to walk into.</p>
+    </div>
+
+    <div class="tier far">
+      <p class="range">The graveyard · read it twice</p>
+      <h3>Styling subscriptions that already failed</h3>
+      <p>Nordstrom shut Trunk Club down in 2022. Stitch Fix revenue fell 16% to <span class="money">$1.3B</span> with subscribers shrinking and its founder returning as CEO. The industry called it box fatigue.</p>
+      <p>Read that as good news and a warning. You hold no inventory, ship no boxes, and eat no returns, so the economics that killed them do not apply. But investors carry scar tissue, and "AI stylist" will make some of them flinch before you finish the sentence. Lead with the store-referral model, not the styling model.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">The odds</p>
+    <h2>Has someone already built this</h2>
+    <div class="odds">
+      <div><span class="pct">100%</span><span>Someone has built an AI stylist app. Dozens shipped in the last eighteen months.</span></div>
+      <div><span class="pct">~95%</span><span>Someone has built one aimed specifically at men.</span></div>
+      <div><span class="pct">10–20%</span><span>Someone has built <strong>this</strong>: one city, physical stores, researched prices, a phased budget, and a script to say at the counter. Searches for hyperlocal city-specific AI styling returned no such product. If it exists, it is likely a solo project without the research depth.</span></div>
+      <div><span class="pct">High</span><span>Someone builds it if you prove the model works. The code took two days.</span></div>
+    </div>
+    <p>The gap is not an accident. It is unglamorous work: somebody has to research 43 stores and keep them current. Venture-backed teams build the scalable thing instead, which is precisely why the unscalable thing is available.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">The moat</p>
+    <h2>What is actually defensible</h2>
+    <p><strong>Not the code.</strong> It was built in two days and can be rebuilt in two days.</p>
+    <p>The defensible assets are the 43-store directory with real brands, prices, and insider detail, and the Houston knowledge around it: that CERAWeek is suit week, that boots carry genuine formal standing at NRG in March, that the walk from a downtown garage in August is what decides your fabric. That knowledge <em>decays</em>, which is the point — it demands continuous work, and continuous work is what a funded generalist will not do for one city.</p>
+    <p>The strongest version is not software at all. Real relationships with M Penner and Hamilton Shirts — you send qualified buyers, they give your users something in return — cannot be replicated from a laptop in another state.</p>
+    <div class="flag">
+      <p class="eyebrow">The uncomfortable part</p>
+      <p>Your moat is two days of AI research, and a competitor with the same tools can do two days of AI research. What they cannot shortcut is <em>verifying</em> it, earning trust in Houston, and having a stylist whose face people recognize. Which is why Kyla becoming a real person is not a branding nicety. It may be the actual defensibility.</p>
+    </div>
+  </section>
+
+  <p class="footer-note">
+    Prepared September 1, 2026. Build figures measured from this repository; cost models are estimates at 2026 US rates and should be treated as ranges rather than quotes. Competitive figures from public reporting:
+    <a href="https://techcrunch.com/2026/01/27/phoebe-gates-and-sophia-kiannis-phia-raises-35m-to-make-shopping-fun-again/">TechCrunch on Phia</a>,
+    <a href="https://www.crunchbase.com/organization/daydream-562f">Crunchbase on Daydream</a>,
+    <a href="https://retailwire.com/discussion/why-did-nordstrom-close-trunk-club/">RetailWire on Trunk Club</a>,
+    <a href="https://www.cnbc.com/2022/08/12/why-box-fatigue-may-be-hitting-the-apparel-industry-stitch-fix.html">CNBC on box fatigue</a>,
+    <a href="https://lucho.com/houston-personal-styling-services">Lucho's styling service</a>.
+  </p>
+</div>
