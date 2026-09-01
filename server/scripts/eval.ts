@@ -186,8 +186,8 @@ function scorePlan(plan: WardrobePlan, ev: EvalProfile): Check[] {
     .reduce((n, i) => n + (Number(i.estimatedBudgetHighUsd) || 0), 0);
   const garmentSpend = items.reduce((n, i) => n + (Number(i.estimatedBudgetHighUsd) || 0), 0) - altSpend;
   add(
-    "alterations stay a minority of spend",
-    total === 0 || altSpend / total <= 0.25,
+    "alterations stay under the 20% ceiling",
+    total === 0 || altSpend / total <= 0.2,
     `$${altSpend} of $${total}`,
   );
   add("most of the money buys clothes", garmentSpend > altSpend, `$${garmentSpend} on garments vs $${altSpend} on labour`);
@@ -255,15 +255,31 @@ function scorePlan(plan: WardrobePlan, ev: EvalProfile): Check[] {
   return checks;
 }
 
-async function run(ev: EvalProfile): Promise<{ id: string; checks: Check[]; seconds: number; error?: string }> {
+async function run(ev: EvalProfile): Promise<{ id: string; checks: Check[]; seconds: number; error?: string; retried?: boolean }> {
   const t0 = Date.now();
+  const climate = getHoustonClimateStyleBrief();
+  // Production wraps generation in one retry, so an inspector rejection is
+  // a regenerate rather than an error a user sees. Mirroring that here
+  // keeps the eval measuring what is actually shipped. The retry is
+  // counted, because needing one costs a real minute and a real dollar.
+  let retried = false;
+  let lastError = "";
   try {
-    const climate = getHoustonClimateStyleBrief();
     const scouts = await runAllScouts(ev.profile, climate);
-    const plan = await buildWardrobePlan({ profile: ev.profile, scoutReports: scouts, climateBrief: climate });
-    return { id: ev.id, checks: scorePlan(plan, ev), seconds: (Date.now() - t0) / 1000 };
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const plan = await buildWardrobePlan({ profile: ev.profile, scoutReports: scouts, climateBrief: climate });
+        return { id: ev.id, checks: scorePlan(plan, ev), seconds: (Date.now() - t0) / 1000, retried };
+      } catch (err) {
+        lastError = (err as Error).message;
+        if (attempt === 2) throw err;
+        retried = true;
+        console.log(`       (inspector rejected attempt 1, regenerating: ${lastError.slice(0, 80)})`);
+      }
+    }
+    throw new Error(lastError);
   } catch (err) {
-    return { id: ev.id, checks: [], seconds: (Date.now() - t0) / 1000, error: (err as Error).message };
+    return { id: ev.id, checks: [], seconds: (Date.now() - t0) / 1000, error: (err as Error).message, retried };
   }
 }
 
@@ -284,7 +300,7 @@ async function run(ev: EvalProfile): Promise<{ id: string; checks: Check[]; seco
     const failed = r.checks.filter((c) => !c.pass);
     const head = r.error
       ? `ERROR  ${r.id}`
-      : `${failed.length === 0 ? "PASS" : "FAIL"}   ${r.id}  ${r.checks.length - failed.length}/${r.checks.length}  ${r.seconds.toFixed(0)}s`;
+      : `${failed.length === 0 ? "PASS" : "FAIL"}   ${r.id}  ${r.checks.length - failed.length}/${r.checks.length}  ${r.seconds.toFixed(0)}s${r.retried ? "  (needed a regenerate)" : ""}`;
     console.log(head);
     console.log(`       guards: ${set.find((s) => s.id === r.id)!.guards}`);
     if (r.error) console.log(`       ${r.error}`);
@@ -298,9 +314,21 @@ async function run(ev: EvalProfile): Promise<{ id: string; checks: Check[]; seco
   const spend = getSpend();
 
   console.log("─".repeat(60));
+  const allFailures = results.flatMap((r) =>
+    r.error
+      ? [`${r.id}: ${r.error.slice(0, 110)}`]
+      : r.checks.filter((c) => !c.pass).map((c) => `${r.id}: ${c.name}${c.detail ? ` — ${c.detail}` : ""}`),
+  );
+  if (allFailures.length > 0) {
+    console.log("Failures:");
+    for (const f of allFailures) console.log(`  ✗ ${f}`);
+    console.log("");
+  }
   console.log(`Profiles clean: ${cleanProfiles}/${results.length}`);
   console.log(`Checks passed:  ${passedChecks}/${totalChecks}  (${((passedChecks / totalChecks) * 100).toFixed(1)}%)`);
   console.log(`Median plan:    ${[...results.map((r) => r.seconds)].sort((a, b) => a - b)[Math.floor(results.length / 2)].toFixed(0)}s`);
+  const retries = results.filter((r) => r.retried).length;
+  console.log(`Regenerates:    ${retries}${retries ? "  (each costs about a minute and $0.35)" : ""}`);
   console.log(`API spend:      $${spend.totalUsd.toFixed(2)} across ${spend.calls} calls`);
   process.exit(cleanProfiles === results.length ? 0 : 1);
 })();
