@@ -85,6 +85,16 @@ const PROFILES: EvalProfile[] = [
     smoke: true,
   },
   {
+    id: "clothes-not-tailoring",
+    guards: "The business sells clothes. A plan must not spend his budget at an alterations bench.",
+    profile: p({
+      lifestyle: "Sales manager downtown, client-facing most days",
+      budgetTotalUsd: 1500,
+      notes: "Closet is full but nothing fits right since I lost weight.",
+    }),
+    smoke: true,
+  },
+  {
     id: "urgent-event",
     guards: "An event inside two weeks must not be answered with made-to-measure lead times.",
     profile: p({
@@ -169,6 +179,18 @@ function scorePlan(plan: WardrobePlan, ev: EvalProfile): Check[] {
     const periods = total / stated;
     add("per-period total is a sane multiple", periods >= 0.9 && periods <= 13, `$${total} = ${periods.toFixed(1)} periods`);
   }
+
+  // He came here for clothes. Tailoring labour earns a line, not the plan.
+  const altSpend = items
+    .filter((i) => /alter|tailoring|hem\b|taper|darts|resiz/.test(`${i.category ?? ""} ${i.itemName ?? ""}`.toLowerCase()))
+    .reduce((n, i) => n + (Number(i.estimatedBudgetHighUsd) || 0), 0);
+  const garmentSpend = items.reduce((n, i) => n + (Number(i.estimatedBudgetHighUsd) || 0), 0) - altSpend;
+  add(
+    "alterations stay a minority of spend",
+    total === 0 || altSpend / total <= 0.25,
+    `$${altSpend} of $${total}`,
+  );
+  add("most of the money buys clothes", garmentSpend > altSpend, `$${garmentSpend} on garments vs $${altSpend} on labour`);
 
   add("every item is store-backed", items.every((i) => (i.recommendedStoreIds ?? []).length > 0));
   const unknown = items.flatMap((i) => i.recommendedStoreIds ?? []).filter((id) => !validIds.has(id));

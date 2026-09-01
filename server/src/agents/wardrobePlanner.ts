@@ -40,6 +40,7 @@ RULES
   - tip (OPTIONAL, max 16 words): the single most valuable extra for THIS item, a trap to refuse, an appointment/lead-time logistic, or a store fact, whichever matters most. OMIT the field entirely when nothing clears that bar; a plan where every item has a tip is a plan that ignored this rule.
   - Voice rules: stylist language, never schema language (no printing internal field names like fitGuidance or faceShape, say "the photo review showed..."); no field repeats another's content.
 - ROUTE FOR HOUSTON GEOGRAPHY: if his profile includes a homeBase, use it against each vetted store's neighborhood. When two vetted stores fit an item comparably, pick the closer one; when the best store is across town, keep it and let whyThisStore justify the drive. Where several items land in the same part of town, note it so he can knock them out in one trip, a plan that respects Houston traffic is a plan that actually gets executed.
+- ALTERATIONS ARE A LINE, NOT THE PLAN. Getting what he owns to fit is the cheapest real improvement available and it usually belongs in phase 1, so keep recommending it. But he came here for clothes. Alterations and tailoring labour should sit around 8-15% of the budget and must never be the largest line in the plan. A plan that spends a third of his money at an alterations bench has answered a different question from the one he asked, and it leaves him with nothing new to wear. The exception is a man who says outright that his closet is full of good clothes that fit badly; even then, new pieces carry the plan.
 - Respect the climate brief: weight the plan toward breathable/lightweight pieces if that's what Houston calls for, and place any cold-weather or gala pieces in the correct seasonal phase.
 - Respect his stated budget total and cadence, the sum of essential+recommended items across the plan should be a realistic fit for his budget. Wildly over it is a failed plan. If his budget can't realistically cover everything on his wish list, prioritize essentials and be upfront about what's a stretch goal.
 - CADENCE MATH: budgetCadence decides how phases are funded. "one-time": totalBudgetUsd IS his stated number, split across phases however serves the plan. "monthly"/"quarterly": his stated budgetTotalUsd is the PER-PERIOD amount, derive the period count from his timeline (two months at $400/month = $800 total; two quarters at $750/quarter = $1,500), set totalBudgetUsd to that derived total, keep each period's phases at or under the per-period amount, and say the math plainly in the intro ("$400 a month for four months is $1,600, spent in this order"). Never quietly stretch the period count beyond his stated timeline to afford more.
@@ -529,6 +530,25 @@ export function normalizeWardrobePlan(raw: unknown, profile?: StyleProfile): War
       }
     }
   }
+  // The business runs on clothes, not tailoring labour. Real plans were
+  // measured putting 22% and once 42% of a man's budget into alterations,
+  // against guidance of 8-12% that lived only in a pricing table. He came
+  // here to buy clothes; a bench that hems trousers sells him none.
+  // Generous threshold so a genuinely closet-heavy case still passes.
+  const altSpend = allPhases
+    .flatMap((ph) => ph.items ?? [])
+    .filter((it) => {
+      const text = `${it.category ?? ""} ${it.itemName ?? ""}`.toLowerCase();
+      return /alter|tailoring|hem\b|taper|darts|resiz/.test(text);
+    })
+    .reduce((sum, it) => sum + (Number(it.estimatedBudgetHighUsd) || 0), 0);
+  const planTotalUsd = Number((plan.budgetSummary as { totalBudgetUsd?: unknown })?.totalBudgetUsd) || 0;
+  if (planTotalUsd > 0 && altSpend / planTotalUsd > 0.3) {
+    throw new Error(
+      `Plan puts $${altSpend} of $${planTotalUsd} (${Math.round((altSpend / planTotalUsd) * 100)}%) into alterations, over the 30% ceiling, retry plan generation`,
+    );
+  }
+
   // One-time budgets can't quietly grow: a plan totaling well beyond the
   // stated number is the "$400 became $1,600" failure, mechanically caught.
   if (profile && profile.budgetCadence === "one-time" && Number(profile.budgetTotalUsd) > 0) {
