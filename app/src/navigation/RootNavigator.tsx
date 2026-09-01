@@ -40,7 +40,7 @@ export function RootNavigator({
       >
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Interview" component={InterviewScreen} options={{ title: "Talk to Kyla" }} />
-        <Stack.Screen name="PhotoUpload" component={PhotoUploadScreen} options={{ title: "Show Watt Your Photos" }} />
+        <Stack.Screen name="PhotoUpload" component={PhotoUploadScreen} options={{ title: "Show Theo Your Photos" }} />
         <Stack.Screen
           name="GeneratingPlan"
           component={GeneratingPlanScreen}
