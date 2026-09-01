@@ -238,10 +238,12 @@ Up to 10 brands and 6 price points. Empty arrays are correct answers when resear
 // ---------------------------------------------------------------------
 
 async function main() {
-  const phase = (process.argv.find((a) => a.startsWith("--phase="))?.split("=")[1] ?? "both") as
-    | "discover"
-    | "enrich"
-    | "both";
+  // --only names existing stores to enrich, so it can only mean the enrich
+  // phase. Defaulting to "both" there kicks off eight angles of discovery
+  // nobody asked for, which is exactly the expensive half.
+  const onlyFlag = process.argv.some((a) => a.startsWith("--only="));
+  const phase = (process.argv.find((a) => a.startsWith("--phase="))?.split("=")[1] ??
+    (onlyFlag ? "enrich" : "both")) as "discover" | "enrich" | "both";
   const outDir = path.join(__dirname, "out");
   fs.mkdirSync(outDir, { recursive: true });
 
