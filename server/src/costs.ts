@@ -1,4 +1,5 @@
 import { track } from "./analytics";
+import { isDbEnabled, query } from "./db";
 
 /**
  * What each request actually costs, and a ceiling so a shared link can't
@@ -98,7 +99,60 @@ export function recordUsage(label: string, model: string, usage: Usage | undefin
   const bucket = (ledger.byLabel[label] ??= { usd: 0, calls: 0 });
   bucket.usd += usd;
   bucket.calls += 1;
+  // Also written down durably, which is what lets restoreTodaysSpend rebuild
+  // this ledger after a restart. Previously only the planner recorded
+  // anything lasting, so the durable record of a day's spend was missing
+  // every interview turn, concierge answer, outfit matrix and plan chat.
+  track("api_call", { label, model, usd: Number(usd.toFixed(6)) });
   return usd;
+}
+
+/**
+ * Rebuilds today's ledger from the durable event log on boot.
+ *
+ * The ceiling is only as good as the counter behind it, and that counter
+ * lived in memory alone: every restart reset the day's spend to zero.
+ * With auto-deploy on every push that is not a rare event, so a limit
+ * described as "how much everyone can spend in a day" was really "since
+ * the last deploy". Measured directly: $0.31 of spend sat in Postgres
+ * while the live ledger, freshly restarted, reported $0.02.
+ *
+ * Never throws. Without a database there is nothing to restore and the
+ * ledger starts empty, which is the behaviour that already existed.
+ */
+export async function restoreTodaysSpend(): Promise<void> {
+  if (!isDbEnabled()) return;
+  try {
+    const rows = await query<{ label: string; usd: string; calls: string }>(
+      `SELECT props->>'label' AS label,
+              SUM((props->>'usd')::numeric) AS usd,
+              COUNT(*) AS calls
+         FROM events
+        WHERE event = 'api_call'
+          AND to_char(at AT TIME ZONE 'UTC', 'YYYY-MM-DD') = $1
+        GROUP BY 1`,
+      [today()],
+    );
+    rollIfNewDay();
+    for (const r of rows) {
+      const usd = Number(r.usd) || 0;
+      const calls = Number(r.calls) || 0;
+      ledger.totalUsd += usd;
+      ledger.calls += calls;
+      const bucket = (ledger.byLabel[r.label ?? "unlabelled"] ??= { usd: 0, calls: 0 });
+      bucket.usd += usd;
+      bucket.calls += calls;
+    }
+    if (ledger.calls > 0) {
+      console.log(
+        `[costs] restored $${ledger.totalUsd.toFixed(4)} of spend across ${ledger.calls} call(s) already made today`,
+      );
+    }
+  } catch (err) {
+    // A restored ledger is better than none, but failing to restore it must
+    // never stop the server from booting.
+    console.warn(`[costs] could not restore today's spend (${(err as Error).message.slice(0, 80)})`);
+  }
 }
 
 /**

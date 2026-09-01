@@ -5,7 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PORT, CORS_ORIGIN } from "./config";
 import { SessionNotFoundError } from "./sessionStore";
 import { agentRouteLimiter } from "./rateLimiter";
-import { getSpend, isOverDailyBudget, OVER_BUDGET_MESSAGE } from "./costs";
+import { getSpend, isOverDailyBudget, OVER_BUDGET_MESSAGE, restoreTodaysSpend } from "./costs";
 import { interviewRouter } from "./routes/interview";
 import { photoRouter } from "./routes/photo";
 import { planRouter } from "./routes/plan";
@@ -148,6 +148,9 @@ app.listen(PORT, async () => {
   // Storage comes up after the port so a database hiccup can never stop
   // the app from serving — it just falls back to memory and disk.
   await initDb();
+  // The spend ceiling has to know what today already cost, or a redeploy
+  // silently hands the day a fresh budget.
+  await restoreTodaysSpend();
   // Two different stores, both needing housekeeping: Postgres rows, and
   // the in-memory hot cache that grows whether or not a database exists.
   void pruneOldSessions();
