@@ -46,9 +46,9 @@
 
 <div class="wrap">
   <header class="brand">
-    <p class="doc-kind">Architecture &amp; Feature Reference · September 1, 2026</p>
+    <p class="doc-kind">Architecture &amp; Feature Reference · Revised September 1, 2026</p>
     <h1>Bayou &amp; Blazer Architecture</h1>
-    <p class="standfirst">The complete record of what was built: every agent, every feature, every data system, the measured latency budget, the quality machinery — and the expansion roadmap for new markets and the women's application. Current state: <strong>6 of 6 eval profiles clean, 91 deterministic checks passing, a plan costing $0.33 to $0.47.</strong></p>
+    <p class="standfirst">The complete record of what was built: every agent, every feature, every data system, the measured latency budget, the quality machinery — and the expansion roadmap for new markets and the women's application. Current state: <strong>6 of 6 eval profiles clean, 91 deterministic checks passing, a plan costing $0.33 to $0.47</strong>, and a full customer journey run live against a real database on 1 September.</p>
   </header>
 
   <section>
@@ -134,12 +134,13 @@ flowchart TD
       <tr><td>Kyla reply</td><td class="num">4–9s</td><td>Words stream as she writes; typing dots with her face</td></tr>
       <tr><td>Photo analysis</td><td class="num">10–14s</td><td>Runs while he's still on the photo screen</td></tr>
       <tr><td>Experts vet stores</td><td class="num">5–8s</td><td>Pre-warmed at interview submit — usually done before he taps build</td></tr>
-      <tr><td>Plan generation</td><td class="num">50–58s</td><td>Team spotlight + elapsed timer + tip/store deck + live draft ticker from ~20s</td></tr>
+      <tr><td>Plan generation</td><td class="num">50–58s<br/>~110s if it retries</td><td>Team spotlight + elapsed timer + tip/store deck + live draft ticker</td></tr>
       <tr><td>Plan chat answer</td><td class="num">2–4s warm</td><td>The first question seeds the whole plan and directory, so it runs ~3.5s</td></tr>
       <tr><td>Outfit matrix</td><td class="num">8–10s once</td><td>On-demand button, then cached</td></tr>
       <tr><td>Save / restore code</td><td class="num">&lt;0.5s</td><td>Disk, no model</td></tr>
       <tr><td>Ask Marisol</td><td class="num">4–6s</td><td>—</td></tr>
     </table></div>
+    <p>Two things the median hides. When the inspector rejects a plan, the automatic retry roughly doubles the wait: a live run reproduced 111 seconds. The customer still gets a correct plan and never learns a draft was thrown away, but he waits twice. And the draft ticker does not fill steadily from twenty seconds in, as was once assumed here: measured, the stream held 830 characters at 46 seconds and 7,400 arrived in the last five. Generation is thinking-bound, not writing-bound, so the ticker is honest company rather than an early read of the plan.</p>
     <p>The honest bottleneck is Elena's minute — and it's now a minute the customer <em>watches work happen in</em>: his own items appearing line by line, Kyla's tips, real store facts. Fast-mode (already wired with automatic fallback) halves it whenever Anthropic capacity opens.</p>
   </section>
 
@@ -150,8 +151,8 @@ flowchart TD
       <li><strong>Store directory</strong> — 50 curated Houston stores with knownFor, catersTo, howToBuy, contact, price tier; closed stores auto-filtered.</li>
       <li><strong>Houston knowledge packs</strong> — events calendar (CERAWeek, OTC, rodeo, gala season), shopping districts with drive times, industry dress-code decoder, face/body playbook, price-and-timing reality tables, Kyla's style gems and life-moments playbook.</li>
       <li><strong>Self-refreshing layer (Ryan)</strong> — monthly web research writes generated files: per-store status + insider notes, a rolling 90-day season brief, a retailer price brief. Seasonal crons add weekly pulses in Nov–Dec and July plus pre-event sweeps. Guards reject stale-dated facts and search-failure apologies.</li>
-      <li><strong>Claim-code memory</strong> — file-backed dossiers (profile, plan, purchases, photo read, chat history, outfit matrix) under human-readable codes; guest-first, no passwords.</li>
-      <li><strong>The receipt book</strong> — append-only event ledger (interviews, plans with store ids, saves, restores, questions, outfits) with an aggregate <code>/api/stats</code> — the countable evidence for store-partnership deals.</li>
+      <li><strong>Claim-code memory</strong> — Postgres-backed dossiers, falling back to files with no database (profile, plan, purchases, photo read, chat history, outfit matrix) under human-readable codes; guest-first, no passwords.</li>
+      <li><strong>The receipt book</strong> — append-only event ledger (interviews, plans with store ids, saves, restores, questions, outfits, and the cost of every individual model call) with an aggregate <code>/api/stats</code> — the countable evidence for store-partnership deals. It reads from whichever store it wrote to; reading the file while writing to the database made every number in production read zero.</li>
     </ul>
   </section>
 
@@ -180,6 +181,8 @@ flowchart TD
       <li><strong>Schema-enforced caps</strong> — word limits live in tool schemas, not just prompts; script fields structurally limited to what a man reads standing in a store.</li>
       <li><strong>Conversational guardrails</strong> — never re-ask the answered, never accuse of dodging, budget-ambiguity chip with conservative default, send-off travels with the submit call, "north star" never printed.</li>
       <li><strong>Resilience</strong> — plan retry (2 attempts), streaming fallback to plain requests, photo-failure and session-loss messages that tell the truth, rate limiting on Claude-calling routes only, trust-proxy correct.</li>
+      <li><strong>Two ways the server used to die, both reproduced before they were fixed</strong> — a single <code>GET /api/session/&lt;unknown id&gt;</code> killed the whole process, because Express 4 does not forward a rejected promise from an async handler to the error middleware and Node treats the unhandled rejection as fatal. Anyone with the URL could do it with one request. Separately, a dropped idle database connection did the same: <code>pg</code> emits <code>error</code> on the pool and an EventEmitter with no listener throws, and managed Postgres drops idle connections as a matter of routine. Both are fixed, and an <code>unhandledRejection</code> handler means the next handler written without a <code>try/catch</code> is a logged 500 rather than an outage. A synchronous throw still exits, because continuing from one is genuinely unsafe and a clean restart is the cheaper mistake.</li>
+      <li><strong>What the database is actually asked to remember</strong> — the plan chat, the outfit matrix and a failed plan's error were all written onto the session and never persisted, so a database bought to survive redeploys still lost them. Verified after the fix by killing the process mid-session: Kyla came back still knowing which shoe question had been asked and which outfits depended on the answer. <code>"generating"</code> is deliberately <em>not</em> persisted, since it is a claim about a promise in one process and would otherwise lock out the retry the customer just tapped.</li>
       <li><strong>The eval set</strong> — <code>npm run eval</code>. Ten fixed profiles, each one a failure this build actually hit, scored by 15 deterministic checks per plan: budget arithmetic, per-period cadence, real store ids, banned colours, the tailoring ceiling, voice, length, and lead times on an urgent event. Nothing is model-graded, because a model grading a model is one more thing to debug. It mirrors the route's single retry, so it measures what a customer gets rather than what the first attempt produced.</li>
       <li><strong>The house voice, enforced</strong> — em-dashes are stripped mechanically; the antithesis shape, punchy fragments, banned openers and a sentence-count overrun are detected in code. A flagged intro or sign-off is rewritten by one fast-model call in about two seconds and re-checked before it is accepted, rather than costing a full regenerate. <code>npm run voice:check</code> guards the detector and scans shipped copy.</li>
       <li><strong>The tailoring ceiling</strong> — measured plans were putting 22% and once 42% of a man's budget into alterations. The business sells clothes, so the planner targets 8-12%, the inspector rejects anything past 20%, and two eval checks hold it there.</li>
@@ -192,11 +195,12 @@ flowchart TD
     <p class="eyebrow">Operations</p>
     <h2>How it runs</h2>
     <ul>
-      <li><strong>Topology</strong> — Expo web app on Vercel (auto-deploy from <code>main</code>); Node/Express + TypeScript API on Render (auto-deploy from <code>main</code>); Anthropic API for all agent calls.</li>
+      <li><strong>Topology</strong> — Expo web app on Vercel; Node/Express + TypeScript API on Render, plus Render Postgres 18 in the same region; Anthropic API for all agent calls. The two halves currently auto-deploy from <em>different</em> branches, which works only until they drift.</li>
+      <li><strong>Is it actually wired?</strong> — <code>/api/health</code> answers it directly, reporting <code>storage</code>, <code>persistent</code> and <code>spendLimitUsd</code>. A <code>"memory"</code> there means claim codes die on the next redeploy, a state otherwise indistinguishable from working.</li>
       <li><strong>CI</strong> — GitHub Actions typechecks server and app on every push/PR to main.</li>
       <li><strong>Refresh</strong> — <code>refresh-data.yml</code> on monthly + seasonal crons (needs <code>ANTHROPIC_API_KEY</code> secret); commits regenerated data, Render redeploys.</li>
-      <li><strong>Cost profile, now measured rather than estimated</strong> — a plan costs <strong>$0.33 to $0.47</strong> of API, attributed per agent by <code>costs.ts</code> and reported at <code>/api/stats</code>. The earlier $0.60-1.50 was a guess and it was pessimistic. Cached input runs $0.15 per hundred thousand tokens against $1.50 fresh, which is the prompt-caching strategy stated in dollars. Chat turns are pennies. Hosting runs free with cold starts to about $8/month with a persistent disk.</li>
-      <li><strong>The spend ceiling</strong> — <code>DAILY_LIMIT_USD</code> stops the Claude-calling routes for the day and says the shop is booked rather than showing an error. The rate limiter caps how fast one person spends; this caps what everyone can spend, which is the failure a shared link actually causes.</li>
+      <li><strong>Cost profile, now measured rather than estimated</strong> — a plan costs <strong>$0.33 to $0.47</strong> of API, attributed per agent by <code>costs.ts</code> and reported at <code>/api/stats</code>. The earlier $0.60-1.50 was a guess and it was pessimistic. Cached input runs $0.15 per hundred thousand tokens against $1.50 fresh, which is the prompt-caching strategy stated in dollars. Chat turns are pennies; a live end-to-end run on 1 September recorded $0.31 for the plan itself. Hosting is no longer the free tier: Render projects about $51 for September across the always-warm API, the Postgres instance and the workspace subscription, the last being the largest single line.</li>
+      <li><strong>The spend ceiling</strong> — <code>DAILY_LIMIT_USD</code> stops the Claude-calling routes for the day and says the shop is booked rather than showing an error. The rate limiter caps how fast one person spends; this caps what everyone can spend, which is the failure a shared link actually causes. Its counter is rebuilt from the event log on boot, so a redeploy no longer hands the day a fresh budget: measured, $0.31 of spend sat in the database while a freshly restarted ledger claimed $0.02.</li>
       <li><strong>Housekeeping</strong> — the session hot cache ages out at 24 hours and the pre-warm map expires after 30 minutes. Both leaked before: the database pruner only ever deleted Postgres rows and returned immediately with no database configured, so nothing pruned memory at all.</li>
     </ul>
   </section>
@@ -243,5 +247,5 @@ flowchart TD
     </div>
   </section>
 
-  <p class="footer-note">Compiled from the live codebase and measured runs, September 1, 2026. Companion documents: the Bayou &amp; Blazer Playbook (business plan), the Back of House Review (agent architecture decisions), and What It Cost, Who's Coming (build economics and the competitive field).</p>
+  <p class="footer-note">Compiled from the live codebase and measured runs, revised 1 September 2026 after a live end-to-end run against a real Postgres instance. Companion documents: the Bayou &amp; Blazer Playbook (business plan), the Back of House Review (agent architecture decisions), and What It Cost, Who's Coming (build economics and the competitive field).</p>
 </div>
