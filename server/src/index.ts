@@ -14,7 +14,7 @@ import { sessionRouter } from "./routes/session";
 import { almanacRouter } from "./routes/almanac";
 import { memoryRouter } from "./routes/memory";
 import { readStats } from "./analytics";
-import { initDb, pruneOldSessions } from "./db";
+import { initDb, isDbEnabled, pruneOldSessions } from "./db";
 import { pruneSessionCache } from "./sessionStore";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
@@ -34,7 +34,18 @@ app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json({ limit: "1mb" }));
 
-app.get("/api/health", (_req, res) => res.json({ ok: true }));
+// Health doubles as the storage check. "Is the database actually wired?"
+// otherwise means reading deploy logs for the absence of a warning line,
+// which is a bad way to answer a yes/no question. persistent:false means
+// claim codes and sessions die on the next redeploy.
+app.get("/api/health", (_req, res) =>
+  res.json({
+    ok: true,
+    storage: isDbEnabled() ? "postgres" : "memory",
+    persistent: isDbEnabled(),
+    spendLimitUsd: getSpend().dailyLimitUsd,
+  }),
+);
 
 // Every route below calls the Claude API at least once per request — rate
 // limit them so a leaked link or a stuck retry loop can't run up an
