@@ -27,6 +27,18 @@ const pool = connectionString
     })
   : null;
 
+// Without this the process dies. `pg` emits 'error' on the pool when a
+// pooled connection drops while idle, and an EventEmitter with no 'error'
+// listener throws, which Node treats as an uncaught exception: exit code 1,
+// whole server gone. Managed Postgres drops idle connections routinely
+// (maintenance, restarts, an idle-timeout on the smaller plans), so this is
+// not a rare path. Reproduced by killing a live backend: the API went down
+// with the connection. A dropped connection is the pool's problem to
+// re-open, not the product's problem to die of.
+pool?.on("error", (err) => {
+  console.warn(`[db] idle connection dropped (${err.message.slice(0, 120)}), the pool will reconnect`);
+});
+
 let ready = false;
 
 export function isDbEnabled(): boolean {

@@ -21,9 +21,9 @@ memoryRouter.post("/save", async (req, res, next) => {
     try {
       session = await requireSession(sessionId);
     } catch {
-      return res.status(404).json({ error: "This session has expired — the plan on your screen can still be copied" });
+      return res.status(404).json({ error: "This session has expired. The plan on your screen can still be copied." });
     }
-    if (!session.wardrobePlan) return res.status(409).json({ error: "Nothing to save yet — finish a plan first" });
+    if (!session.wardrobePlan) return res.status(409).json({ error: "Nothing to save yet. Finish a plan first." });
     const record = await saveMemoryRecord({
       styleProfile: session.styleProfile ?? null,
       wardrobePlan: session.wardrobePlan,
@@ -48,7 +48,7 @@ memoryRouter.post("/restore", async (req, res, next) => {
     if (!code?.trim()) return res.status(400).json({ error: "code is required" });
     const record = await loadMemoryRecord(code);
     if (!record || !record.wardrobePlan) {
-      return res.status(404).json({ error: "No saved plan under that code — check the dashes and try again" });
+      return res.status(404).json({ error: "No saved plan under that code. Check the dashes and try again." });
     }
     const session = createSession();
     session.styleProfile = (record.styleProfile ?? undefined) as StyleProfile | undefined;

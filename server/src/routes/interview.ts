@@ -62,7 +62,7 @@ interviewRouter.post("/message/stream", async (req, res) => {
     });
   } catch (err) {
     console.error("Streaming interview turn failed:", err);
-    send({ error: "Kyla's reply got interrupted — send that again?" });
+    send({ error: "Kyla's reply got interrupted. Send that again?" });
   }
   res.end();
 });

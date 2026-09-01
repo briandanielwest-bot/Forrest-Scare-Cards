@@ -19,7 +19,7 @@ import { pruneSessionCache } from "./sessionStore";
 
 if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
   console.warn(
-    "WARNING: no ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN set — every agent call will fail until one is configured (see server/.env.example).",
+    "WARNING: no ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN set. Every agent call will fail until one is configured (see server/.env.example).",
   );
 }
 
@@ -77,7 +77,13 @@ app.use("/api/almanac", spendGuard, agentRouteLimiter, almanacRouter);
 app.use("/api/memory", memoryRouter);
 // Aggregate funnel counts only (no per-user data) — the receipt book for
 // store partnership conversations.
-app.get("/api/stats", (_req, res) => res.json({ ...readStats(), spend: getSpend() }));
+app.get("/api/stats", async (_req, res, next) => {
+  try {
+    res.json({ ...(await readStats()), spend: getSpend() });
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.use((req, res) => {
   res.status(404).json({ error: `No route for ${req.method} ${req.path}` });
@@ -92,7 +98,7 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     return res.status(500).json({ error: "Server is missing a valid ANTHROPIC_API_KEY" });
   }
   if (err instanceof Anthropic.RateLimitError) {
-    return res.status(429).json({ error: "Rate limited by the Claude API — try again shortly" });
+    return res.status(429).json({ error: "The Claude API is rate limiting us. Give it a few seconds and try again." });
   }
   if (err instanceof Anthropic.APIError) {
     console.error("Anthropic API error:", err.status, err.message);
@@ -101,7 +107,7 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     // outage into a two-minute fix, for the operator and the user alike.
     if (/credit balance is too low/i.test(err.message)) {
       console.error(
-        "\n*** ANTHROPIC CREDITS EXHAUSTED — the app cannot generate plans until you add credits at\n" +
+        "\n*** ANTHROPIC CREDITS EXHAUSTED. The app cannot generate plans until you add credits at\n" +
           "*** https://console.anthropic.com → Plans & Billing\n",
       );
       return res.status(503).json({
@@ -114,6 +120,27 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal server error" });
+});
+
+// The backstop for the whole class of failure above. An async handler that
+// rejects without a next(err), or a stray background promise, would
+// otherwise be fatal in Node and take the API down with it. This is the
+// failure that actually happened: one GET with an unknown session id killed
+// the server. A rejected promise leaves nothing corrupted, so continuing is
+// safe, and a wardrobe app has no business dying over one bad request.
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection (server kept running):", reason);
+});
+
+// A synchronous throw that reached the top is a different animal: the state
+// it unwound through is unknown, and Node is explicit that carrying on is
+// unsafe. Log what it was and let the process go, so the platform restarts a
+// clean one rather than leaving this one serving from a state nobody
+// understands. On the free plan that restart is a slow cold start, which is
+// still the cheaper mistake.
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception, exiting so a clean process replaces this one:", err);
+  process.exit(1);
 });
 
 app.listen(PORT, async () => {
