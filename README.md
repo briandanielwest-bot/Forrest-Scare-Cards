@@ -8,13 +8,13 @@ A React Native (Expo) app in `app/`, talking to a small Node/Express backend in 
 
 | Agent | Persona | Job |
 |---|---|---|
-| Interviewer | **Kyla** | Confident, sharp professional stylist who runs a real, in-depth conversation to get a genuine style + budget profile — not a form. |
-| Photo Analyst | **Watt** | Breaks your photos down like game film — face shape, body type, fit, coloring, and gaps — and turns them into concrete recommendations (collar spreads, lapel widths, cuts). |
-| Store Scouts | **Biggio** / **Drexler** / **Olajuwon** / **Wagner** | Four specialist agents, each reviewing one slice of Houston's custom/high-end menswear scene (bespoke tailoring; luxury department & contemporary; footwear & western wear; lifestyle & accessories) and ranking the best fits for your profile. |
-| Style & Weather | **Campbell** | Houston's climate calendar and dress culture — feeds every other agent so recommendations actually make sense for this city. |
-| Wardrobe Planner | **Moon** | The quarterback — synthesizes everything into one phased, budgeted, store-by-store wardrobe game plan. |
+| Interviewer | **Kyla** | Lead Stylist. Runs a real, in-depth conversation to get a genuine style and budget profile out of a man, and signs off on the finished plan. |
+| Photo Analyst | **Theo** | Fit & Build Specialist. Reads shoulder slope, torso length, face shape and coloring off uploaded photos, and turns them into concrete calls on collar spreads, lapel widths, and cuts. |
+| Buying Directors | **Vinh** / **Simone** / **Ade** / **Priya** | Four category specialists (tailoring; designer floors; footwear and western; accessories and eyewear) who each rank the Houston stores that fit this man's budget and build. |
+| Style & Weather | **Marisol** | Houston Concierge. The climate calendar, the venue list, and what each room in this city actually wears. Feeds every other agent and answers one-off event questions. |
+| Wardrobe Planner | **Elena** | Head of Wardrobe Planning. Turns everyone's picks into one phased, budgeted, store-by-store plan whose numbers add up. |
 
-Agent names other than Kyla are a fan homage to Houston sports legends, each matched to their role — the film-room read, the craftsman who played every position, The Glide's effortless style, the greatest footwork in the game, the closer, the power through Houston heat, and the Hall of Fame quarterback calling the plan. This app is not affiliated with or endorsed by the people these names honor.
+The team are original characters. Their portraits are illustrations, not likenesses of anyone real.
 
 See `server/src/agents/` for each one's system prompt and logic, and `server/src/data/houstonStores.ts` for the curated store dataset (see **About the store data** below).
 

@@ -33,9 +33,8 @@ interface ScoutDefinition {
   focus: string;
 }
 
-// The buying directors, each a category specialist matched to each
-// role — the craftsman, the smoothest style in the building, the footwork,
-// the closer. Not affiliated with or endorsed by the people they honor.
+// The four buying directors, each owning one category and ranking only the
+// vetted stores inside it. They run in parallel; the planner synthesizes.
 const SCOUT_DEFINITIONS: ScoutDefinition[] = [
   {
     scoutName: "Vinh (Director of Tailoring)",
